@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Wellness wise</string>
+    <string name="hello">Hey there!</string>
+    <string name="Register">Create an account</string>
+    <string name="Login">Login</string>
+    <string name="Email">Email</string>">
+    <string name="FullName">Full Name</string>">
+    <string name="Age">Age</string>
+    <string name="Gender">Gender</string>
+    <string name="Height">Height</string>
+    <string name="Weight">Weight</string>
+    <string name="Password">Password</string>
+    <string name="Habits">Life Style Habits</string>
+    <string name="MedicalHistory">Medical History</string>
+    <string name="HidePassword">Hide password</string>
+    <string name="ShowPassword">Show password</string>
+    <string name="Agreement">By continuing you agree to our terms and conditions</string>
+    <string name="TermsAndConditions">Terms of Use </string>
+</resources>
