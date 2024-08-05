@@ -6,12 +6,11 @@ import androidx.compose.runtime.mutableStateOf
 sealed class Screen {
     object SignUpScreen : Screen()
     object TermsAndConditionsScreen : Screen()
-
 }
 
 object WellnessWiseAppRouter {
     var currentScreen: MutableState<Screen> = mutableStateOf(Screen.SignUpScreen)
-    fun navigateTo(destination: Screen) {
+    fun navigateTo(destination: Screen) { // Define the navigateTo function here
         currentScreen.value = destination
     }
 }
