@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -26,8 +26,9 @@ import com.project.wellnesswise.components.DividerTextComponent
 import com.project.wellnesswise.components.HeadingTextComponent
 import com.project.wellnesswise.components.MyPasswordField
 import com.project.wellnesswise.components.MyTextField
-import com.project.wellnesswise.components.NormalTextComponent
+
 import com.project.wellnesswise.navigations.Screen
+
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 
 @Composable
@@ -50,8 +51,8 @@ fun SignUpScreen() {
     ) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
-                NormalTextComponent(value = stringResource(id = R.string.hello))
-                HeadingTextComponent(value = stringResource(id = R.string.Register))
+
+                HeadingTextComponent(value = stringResource(id = R.string.Create_an_account))
                 Spacer(modifier = Modifier.height(20.dp))
             }
             item {
@@ -89,15 +90,16 @@ fun SignUpScreen() {
             item {
                 Spacer(modifier = Modifier.height(10.dp))
                 ButtonComponent(value = stringResource(id = R.string.Register))
-                DividerTextComponent()
+                DividerTextComponent(value = "OR")
             }
             item {
-                ClickableLoginTextComponent(onTextSelected ={
-
-                } )
+                ClickableLoginTextComponent(tryingToLogin = true, onTextSelected = {
+                    WellnessWiseAppRouter.navigateTo(Screen.LoginScreen)
+                })
             }
         }
     }
+
 }
 
 @Preview

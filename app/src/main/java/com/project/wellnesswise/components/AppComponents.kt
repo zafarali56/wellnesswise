@@ -20,14 +20,15 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
+
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,28 +50,29 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.project.wellnesswise.R
 import com.project.wellnesswise.ui.theme.componentShapes
 
-@Composable
-fun NormalTextComponent(value: String) {
-    Text(
-        text = value,
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 40.dp),
-        style = TextStyle(
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Normal,
-            fontStyle = FontStyle.Normal
-        ),
-        color = colorResource(id = R.color.black),
-        textAlign = TextAlign.Center
-    )
-}
+//@Composable
+//fun NormalTextComponent(value: String) {
+//    Text(
+//        text = value,
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .heightIn(min = 40.dp),
+//        style = TextStyle(
+//            fontSize = 24.sp,
+//            fontWeight = FontWeight.Normal,
+//            fontStyle = FontStyle.Normal
+//        ),
+//        color = colorResource(id = R.color.black),
+//        textAlign = TextAlign.Center
+//    )
+//}
 
 @Composable
 fun HeadingTextComponent(value: String) {
@@ -89,7 +91,7 @@ fun HeadingTextComponent(value: String) {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun MyTextField(labelValue: String) {
     val textValue = remember { mutableStateOf("") }
@@ -99,7 +101,7 @@ fun MyTextField(labelValue: String) {
             .fillMaxWidth()
             .clip(componentShapes.small),
         label = { Text(text = labelValue) },
-        colors = TextFieldDefaults.outlinedTextFieldColors(
+        colors = OutlinedTextFieldDefaults. colors(
             focusedBorderColor = colorResource(id = R.color.primary),
             focusedLabelColor = colorResource(id = R.color.primary),
             cursorColor = colorResource(id = R.color.primary),
@@ -112,7 +114,7 @@ fun MyTextField(labelValue: String) {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun MyPasswordField(labelValue: String) {
     val password = remember { mutableStateOf("") }
@@ -123,7 +125,7 @@ fun MyPasswordField(labelValue: String) {
             .fillMaxWidth()
             .clip(componentShapes.small),
         label = { Text(text = labelValue) },
-        colors = TextFieldDefaults.outlinedTextFieldColors(
+        colors = OutlinedTextFieldDefaults. colors(
             focusedBorderColor = colorResource(id = R.color.primary),
             focusedLabelColor = colorResource(id = R.color.primary),
             cursorColor = colorResource(id = R.color.primary),
@@ -231,7 +233,7 @@ fun ButtonComponent (value: String) {
 
 
 @Composable
-fun DividerTextComponent()
+fun DividerTextComponent(value: String)
 {
     Row (modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
     HorizontalDivider(modifier = Modifier
@@ -239,7 +241,7 @@ fun DividerTextComponent()
         .weight(1f),
         color = colorResource(id = R.color.gray_100),
         thickness = 1.dp)
-        Text(modifier = Modifier.padding(8.dp), text = "OR", fontSize = 18.sp, color = colorResource(id = R.color.primary),)
+        Text(modifier = Modifier.padding(8.dp), text = value , fontSize = 18.sp, color = colorResource(id = R.color.primary))
         HorizontalDivider(modifier = Modifier
             .fillMaxWidth()
             .weight(1f),
@@ -251,10 +253,10 @@ fun DividerTextComponent()
 
 
 @Composable
-fun ClickableLoginTextComponent( onTextSelected: (String) -> Unit = {}) {
-    val initialText = "Already have an account? "
+fun ClickableLoginTextComponent( tryingToLogin: Boolean = true,onTextSelected: (String) -> Unit = {}) {
+    val initialText = if (tryingToLogin) "Already have an account " else " Don't have an account? "
 
-    val loginText = "Login"
+    val loginText = if (tryingToLogin)  "Login" else "Register"
 
     val annotatedString = buildAnnotatedString {
         append(initialText)
@@ -274,7 +276,7 @@ fun ClickableLoginTextComponent( onTextSelected: (String) -> Unit = {}) {
             .fillMaxWidth()
             .heightIn(min = 40.dp),
         style = TextStyle(
-            fontSize = 24.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Normal,
             fontStyle = FontStyle.Normal
         ),
@@ -285,4 +287,22 @@ fun ClickableLoginTextComponent( onTextSelected: (String) -> Unit = {}) {
                 onTextSelected(span.item)
             }
         }})
+}
+
+@Composable
+fun UnderLinedTextComponent(value: String) {
+    Text(
+        text = value,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 40.dp),
+        style = TextStyle(
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Normal,
+            fontStyle = FontStyle.Normal
+        ),
+        color = colorResource(id = R.color.gray_100),
+        textAlign = TextAlign.Center,
+        textDecoration = TextDecoration.Underline
+    )
 }

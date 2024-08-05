@@ -1,4 +1,4 @@
-package com.project.wellnesswise // Replace with your actual package name
+package com.project.wellnesswise
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

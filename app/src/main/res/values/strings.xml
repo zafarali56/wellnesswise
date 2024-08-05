@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">Wellness wise</string>
     <string name="hello">Hey there!</string>
-    <string name="Register">Create an account</string>
+    <string name="Create_an_account">Create an account</string>
     <string name="Login">Login</string>
+    <string name="Register">Register</string>
     <string name="Email">Email</string>">
     <string name="FullName">Full Name</string>">
     <string name="Age">Age</string>
@@ -17,6 +18,7 @@
     <string name="Agreement">By continuing you agree to our terms and conditions</string>
     <string name="TermsAndConditions">Terms of Use </string>
     <string name="Goto_login">Already have an account?</string>
+    <string name="Forgot_password">Forgot your password?</string>
 
 
 </resources>
