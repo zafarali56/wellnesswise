@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.project.wellnesswise.R
+import com.project.wellnesswise.components.ButtonComponent
 import com.project.wellnesswise.components.CheckBoxComponent
 import com.project.wellnesswise.components.HeadingTextComponent
 import com.project.wellnesswise.components.MyPasswordField
@@ -50,7 +51,10 @@ fun SignUpScreen (){
      CheckBoxComponent(value = stringResource(id = R.string.Agreement), onTextSelected = {
          WellnessWiseAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
      })
+     Spacer(modifier = Modifier.height(10.dp))
+     ButtonComponent(value = stringResource(id = R.string.Register))
  }
+
     }
 }
 
