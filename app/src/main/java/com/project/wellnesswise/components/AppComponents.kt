@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 
 import androidx.compose.foundation.text.ClickableText
@@ -20,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -224,4 +226,63 @@ fun ButtonComponent (value: String) {
             Text(text = value, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
     }
+}
+
+
+
+@Composable
+fun DividerTextComponent()
+{
+    Row (modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
+    HorizontalDivider(modifier = Modifier
+        .fillMaxWidth()
+        .weight(1f),
+        color = colorResource(id = R.color.gray_100),
+        thickness = 1.dp)
+        Text(modifier = Modifier.padding(8.dp), text = "OR", fontSize = 18.sp, color = colorResource(id = R.color.primary),)
+        HorizontalDivider(modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f),
+            color = colorResource(id = R.color.gray_100),
+            thickness = 1.dp)
+
+    }
+}
+
+
+@Composable
+fun ClickableLoginTextComponent( onTextSelected: (String) -> Unit = {}) {
+    val initialText = "Already have an account? "
+
+    val loginText = "Login"
+
+    val annotatedString = buildAnnotatedString {
+        append(initialText)
+        withStyle(style = SpanStyle(color = colorResource(id = R.color.primary))) {
+            pushStringAnnotation(tag = initialText, annotation = initialText)
+
+        }
+
+        withStyle(style = SpanStyle(color = colorResource(id = R.color.primary))) {
+            pushStringAnnotation(tag = loginText, annotation = loginText)
+            append(loginText)
+        }
+    }
+
+    ClickableText(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 40.dp),
+        style = TextStyle(
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Normal,
+            fontStyle = FontStyle.Normal
+        ),
+        text = annotatedString , onClick = { offset ->
+        annotatedString.getStringAnnotations(offset, offset).firstOrNull()?.also { span ->
+            Log.d("ClickableTextComponent", "Clicked on: ${span.item}")
+            if (span.item == loginText) {
+                onTextSelected(span.item)
+            }
+        }})
 }

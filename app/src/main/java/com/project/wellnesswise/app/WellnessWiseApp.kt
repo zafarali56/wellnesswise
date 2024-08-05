@@ -13,13 +13,12 @@ import com.project.wellnesswise.screens.TermsAndConditionsScreen
 
 @Composable
 fun WellnessWiseApp() {
-
-
     Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
-        Crossfade(targetState = WellnessWiseAppRouter.currentScreen) { currentState ->
+        Crossfade(targetState = WellnessWiseAppRouter.currentScreen, label = "") { currentState ->
             when (currentState.value) {
                 is Screen.SignUpScreen -> SignUpScreen()
                 is Screen.TermsAndConditionsScreen -> TermsAndConditionsScreen()
+                // Add other screen states here if needed
             }
         }
     }

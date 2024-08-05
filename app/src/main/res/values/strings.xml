@@ -16,4 +16,7 @@
     <string name="ShowPassword">Show password</string>
     <string name="Agreement">By continuing you agree to our terms and conditions</string>
     <string name="TermsAndConditions">Terms of Use </string>
+    <string name="Goto_login">Already have an account?</string>
+
+
 </resources>
