@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -65,6 +66,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.project.wellnesswise.R
+import com.project.wellnesswise.data.Gender
+import com.project.wellnesswise.data.Habit
 import com.project.wellnesswise.ui.theme.componentShapes
 
 //@Composable
@@ -102,30 +105,14 @@ fun HeadingTextComponent(value: String) {
 }
 
 
-@Composable
-fun MyTextField(labelValue: String) {
-    val textValue = remember { mutableStateOf("") }
 
-    OutlinedTextField(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(componentShapes.small),
-        label = { Text(text = labelValue) },
-        colors = OutlinedTextFieldDefaults. colors(
-            focusedBorderColor = colorResource(id = R.color.primary),
-            focusedLabelColor = colorResource(id = R.color.primary),
-            cursorColor = colorResource(id = R.color.primary),
-        ),
-        keyboardActions = KeyboardActions.Default,
-        value = textValue.value,
-        onValueChange = {
-            textValue.value = it
-        }
-    )
-}
 
 @Composable
-fun MyTextField(labelValue: String, keyboardType: KeyboardType = KeyboardType.Text) {
+fun MyTextField(
+    labelValue: String,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    onTextSelected: (String) -> Unit
+) {
     val textValue = remember { mutableStateOf("") }
 
     OutlinedTextField(
@@ -143,12 +130,14 @@ fun MyTextField(labelValue: String, keyboardType: KeyboardType = KeyboardType.Te
         value = textValue.value,
         onValueChange = {
             textValue.value = it
+            onTextSelected(it)
         }
     )
 }
 
+
 @Composable
-fun MyPasswordField(labelValue: String) {
+fun MyPasswordField(labelValue: String, onTextSelected: (String) -> Unit) {
     val password = remember { mutableStateOf("") }
     val passwordVisible = remember { mutableStateOf(false) }
 
@@ -166,6 +155,8 @@ fun MyPasswordField(labelValue: String) {
         value = password.value,
         onValueChange = {
             password.value = it
+            onTextSelected(it)
+
         },
         trailingIcon = {
             val iconImage = if (passwordVisible.value) {
@@ -344,34 +335,78 @@ fun UnderLinedTextComponent(value: String) {
 
 
 @Composable
-fun GenderSelection() {
-    var selectedGender by remember { mutableStateOf("Male") }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Absolute.Left,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = stringResource(id = R.string.Gender), style = MaterialTheme.typography.bodyLarge)
-            RadioButton(
+fun GenderSelection(onGenderSelected: (Gender) -> Unit) {
+    var selectedGender by remember { mutableStateOf(Gender.MALE) }
 
-                selected = selectedGender == "Male",
-                onClick = { selectedGender = "Male" },
-                        colors = RadioButtonDefaults.colors(
-                        selectedColor = colorResource(id = R.color.primary),
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = stringResource(id = R.string.Gender), style = MaterialTheme.typography.bodyLarge)
+
+        RadioButton(
+            selected = selectedGender == Gender.MALE,
+            onClick = {
+                selectedGender = Gender.MALE
+                onGenderSelected(selectedGender)
+            },
+            colors = RadioButtonDefaults.colors(
+                selectedColor = colorResource(id = R.color.primary),
                 unselectedColor = Color.Gray
             )
+        )
+        Text(text = "Male", style = MaterialTheme.typography.bodyMedium)
 
+        RadioButton(
+            selected = selectedGender == Gender.FEMALE,
+            onClick = {
+                selectedGender = Gender.FEMALE
+                onGenderSelected(selectedGender)
+            },
+            colors = RadioButtonDefaults.colors(
+                selectedColor = colorResource(id = R.color.primary),
+                unselectedColor = Color.Gray
             )
-            Text(text = "Male", style = MaterialTheme.typography.bodyMedium)
+        )
+        Text(text = "Female", style = MaterialTheme.typography.bodyMedium)
+    }
+}
 
-            RadioButton(
-                selected = selectedGender == "Female",
-                onClick = { selectedGender = "Female" },
-                colors = RadioButtonDefaults.colors(
-                    selectedColor = colorResource(id = R.color.primary),
-                    unselectedColor = Color.Gray
-                ) )
-            Text(text = "Female", style = MaterialTheme.typography.bodyMedium)
+
+@Composable
+fun HabitSelection(onHabitsSelected: (List<Habit>) -> Unit) {
+    val habits = Habit.entries
+    var selectedHabits by remember { mutableStateOf(emptyList<Habit>()) }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(text = stringResource(id = R.string.Habits), style = MaterialTheme.typography.bodyLarge)
+
+        habits.forEach { habit ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = selectedHabits.contains(habit),
+                    onCheckedChange = { isChecked ->
+                        selectedHabits = if (isChecked) {
+                            selectedHabits + habit
+                        } else {
+                            selectedHabits - habit
+                        }
+                        onHabitsSelected(selectedHabits)
+                    },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = colorResource(id = R.color.primary),
+                        uncheckedColor = Color.Gray
+                    )
+                )
+                Text(text = habit.name, style = MaterialTheme.typography.bodyMedium)
+            }
         }
-
+    }
 }
