@@ -3,10 +3,14 @@ package com.project.wellnesswise.components
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+
 import androidx.compose.foundation.layout.fillMaxWidth
+
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,18 +24,24 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 
 import androidx.compose.material3.Text
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -114,6 +124,28 @@ fun MyTextField(labelValue: String) {
     )
 }
 
+@Composable
+fun MyTextField(labelValue: String, keyboardType: KeyboardType = KeyboardType.Text) {
+    val textValue = remember { mutableStateOf("") }
+
+    OutlinedTextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(componentShapes.small),
+        label = { Text(text = labelValue) },
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = colorResource(id = R.color.primary),
+            focusedLabelColor = colorResource(id = R.color.primary),
+            cursorColor = colorResource(id = R.color.primary),
+        ),
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        keyboardActions = KeyboardActions.Default,
+        value = textValue.value,
+        onValueChange = {
+            textValue.value = it
+        }
+    )
+}
 
 @Composable
 fun MyPasswordField(labelValue: String) {
@@ -155,21 +187,7 @@ fun MyPasswordField(labelValue: String) {
 }
 
 
-@Composable
-fun CheckBoxComponent (value: String, onTextSelected: (String) -> Unit = {} )
-{
-    Row (modifier = Modifier
-        .fillMaxWidth()
-        .heightIn(min = 56.dp),
-        verticalAlignment = Alignment.CenterVertically){
 
-        val checkedState = remember { mutableStateOf(false) }
-        Checkbox(checked = checkedState.value, onCheckedChange = {
-            checkedState.value = !checkedState.value
-        })
-       ClickableTextComponent(value = value, onTextSelected)
-    }
-}
 
 @Composable
 fun ClickableTextComponent(value: String, onTextSelected: (String) -> Unit = {}) {
@@ -198,7 +216,24 @@ fun ClickableTextComponent(value: String, onTextSelected: (String) -> Unit = {})
                }
            }})
 }
+@Composable
+fun CheckBoxComponent (value: String, onTextSelected: (String) -> Unit = {} )
+{
+    Row (modifier = Modifier
+        .fillMaxWidth()
+        .heightIn(min = 56.dp),
+        verticalAlignment = Alignment.CenterVertically){
 
+        val checkedState = remember { mutableStateOf(false) }
+        Checkbox(checked = checkedState.value, onCheckedChange = {
+            checkedState.value = !checkedState.value },colors = CheckboxDefaults.colors(
+            checkedColor = colorResource(id = R.color.primary), // Set the tick color here
+            uncheckedColor = Color.Gray, // Optional: Set the unchecked color
+            checkmarkColor = Color.White // Set the checkmark color here
+        ))
+        ClickableTextComponent(value = value, onTextSelected)
+    }
+}
 
 @Composable
 fun ButtonComponent (value: String) {
@@ -254,7 +289,7 @@ fun DividerTextComponent(value: String)
 
 @Composable
 fun ClickableLoginTextComponent( tryingToLogin: Boolean = true,onTextSelected: (String) -> Unit = {}) {
-    val initialText = if (tryingToLogin) "Already have an account " else " Don't have an account? "
+    val initialText = if (tryingToLogin) "Already have an account? " else " Don't have an account? "
 
     val loginText = if (tryingToLogin)  "Login" else "Register"
 
@@ -305,4 +340,38 @@ fun UnderLinedTextComponent(value: String) {
         textAlign = TextAlign.Center,
         textDecoration = TextDecoration.Underline
     )
+}
+
+
+@Composable
+fun GenderSelection() {
+    var selectedGender by remember { mutableStateOf("Male") }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Absolute.Left,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = stringResource(id = R.string.Gender), style = MaterialTheme.typography.bodyLarge)
+            RadioButton(
+
+                selected = selectedGender == "Male",
+                onClick = { selectedGender = "Male" },
+                        colors = RadioButtonDefaults.colors(
+                        selectedColor = colorResource(id = R.color.primary),
+                unselectedColor = Color.Gray
+            )
+
+            )
+            Text(text = "Male", style = MaterialTheme.typography.bodyMedium)
+
+            RadioButton(
+                selected = selectedGender == "Female",
+                onClick = { selectedGender = "Female" },
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = colorResource(id = R.color.primary),
+                    unselectedColor = Color.Gray
+                ) )
+            Text(text = "Female", style = MaterialTheme.typography.bodyMedium)
+        }
+
 }

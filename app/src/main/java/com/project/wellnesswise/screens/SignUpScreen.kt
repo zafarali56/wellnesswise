@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -23,6 +24,7 @@ import com.project.wellnesswise.components.ButtonComponent
 import com.project.wellnesswise.components.CheckBoxComponent
 import com.project.wellnesswise.components.ClickableLoginTextComponent
 import com.project.wellnesswise.components.DividerTextComponent
+import com.project.wellnesswise.components.GenderSelection
 import com.project.wellnesswise.components.HeadingTextComponent
 import com.project.wellnesswise.components.MyPasswordField
 import com.project.wellnesswise.components.MyTextField
@@ -62,16 +64,17 @@ fun SignUpScreen() {
                 MyTextField(labelValue = stringResource(id = R.string.FullName))
             }
             item {
-                MyTextField(labelValue = stringResource(id = R.string.Age))
+                MyTextField(labelValue = stringResource(id = R.string.Age), keyboardType = KeyboardType.Number)
             }
             item {
-                MyTextField(labelValue = stringResource(id = R.string.Gender))
+                Spacer(modifier = Modifier.height(6.dp))
+            GenderSelection()
             }
             item {
-                MyTextField(labelValue = stringResource(id = R.string.Height))
+                MyTextField(labelValue = stringResource(id = R.string.Height), keyboardType = KeyboardType.Number)
             }
             item {
-                MyTextField(labelValue = stringResource(id = R.string.Weight))
+                MyTextField(labelValue = stringResource(id = R.string.Weight), keyboardType = KeyboardType.Number)
             }
             item {
                 MyTextField(labelValue = stringResource(id = R.string.Habits))
