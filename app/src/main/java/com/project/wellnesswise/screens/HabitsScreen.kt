@@ -23,9 +23,8 @@ import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 
-
 @Composable
-fun HabitsScreen (loginViewModel: LoginViewModel = viewModel ()){
+fun HabitsScreen(loginViewModel: LoginViewModel) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -38,13 +37,13 @@ fun HabitsScreen (loginViewModel: LoginViewModel = viewModel ()){
                 .padding(10.dp)
                 .imePadding() // Add this modifier to handle keyboard padding
         ) {
-           item {
-               HeadingTextComponent(value = stringResource(id = R.string.Habits))
-               Spacer(modifier = Modifier.padding(10.dp))
-               HabitSelection(onHabitsSelected = { habits ->
-                   loginViewModel.onEvent(UIEvent.HabitsChanged(habits))
-               })
-           }
+            item {
+                HeadingTextComponent(value = stringResource(id = R.string.Habits))
+                Spacer(modifier = Modifier.padding(10.dp))
+                HabitSelection(loginViewModel = loginViewModel, onHabitsSelected = { habits ->
+                    loginViewModel.onEvent(UIEvent.HabitsChanged(habits))
+                })
+            }
         }
     }
     SystemBackButtonHandler {
@@ -55,5 +54,5 @@ fun HabitsScreen (loginViewModel: LoginViewModel = viewModel ()){
 @Composable
 @Preview
 fun HabitsScreenPreview() {
-    HabitsScreen()
+    HabitsScreen(viewModel())
 }

@@ -100,15 +100,41 @@ fun HeadingTextComponent(value: String) {
 }
 
 
-
-
 @Composable
 fun MyTextField(
     labelValue: String,
-    keyboardType: KeyboardType = KeyboardType.Text,
+    initialValue: String,
     onTextSelected: (String) -> Unit
 ) {
-    val textValue = remember { mutableStateOf("") }
+    val textValue = remember { mutableStateOf(initialValue) }
+
+    OutlinedTextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(componentShapes.small),
+        label = { Text(text = labelValue) },
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = colorResource(id = R.color.primary),
+            focusedLabelColor = colorResource(id = R.color.primary),
+            cursorColor = colorResource(id = R.color.primary),
+        ),
+        keyboardActions = KeyboardActions.Default,
+        value = textValue.value,
+        onValueChange = {
+            textValue.value = it
+            onTextSelected(it)
+        }
+    )
+}
+
+@Composable
+fun MyNumberField(
+    labelValue: String,
+    initialValue: String,
+    keyboardType: KeyboardType = KeyboardType.Number,
+    onTextSelected: (Int?) -> Unit
+) {
+    val textValue = remember { mutableStateOf(initialValue) }
 
     OutlinedTextField(
         modifier = Modifier
@@ -124,16 +150,20 @@ fun MyTextField(
         keyboardActions = KeyboardActions.Default,
         value = textValue.value,
         onValueChange = {
-            textValue.value = it
-            onTextSelected(it)
+            if (it.isEmpty() || it.all { char -> char.isDigit() }) {
+                textValue.value = it
+                onTextSelected(it.toIntOrNull())
+            }
         }
     )
 }
-
-
 @Composable
-fun MyPasswordField(labelValue: String, onTextSelected: (String) -> Unit) {
-    val password = remember { mutableStateOf("") }
+fun MyPasswordField(
+    labelValue: String,
+    initialValue: String,
+    onTextSelected: (String) -> Unit
+) {
+    val password = remember { mutableStateOf(initialValue) }
     val passwordVisible = remember { mutableStateOf(false) }
 
     OutlinedTextField(
@@ -141,7 +171,7 @@ fun MyPasswordField(labelValue: String, onTextSelected: (String) -> Unit) {
             .fillMaxWidth()
             .clip(componentShapes.small),
         label = { Text(text = labelValue) },
-        colors = OutlinedTextFieldDefaults. colors(
+        colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = colorResource(id = R.color.primary),
             focusedLabelColor = colorResource(id = R.color.primary),
             cursorColor = colorResource(id = R.color.primary),
@@ -151,7 +181,6 @@ fun MyPasswordField(labelValue: String, onTextSelected: (String) -> Unit) {
         onValueChange = {
             password.value = it
             onTextSelected(it)
-
         },
         trailingIcon = {
             val iconImage = if (passwordVisible.value) {
@@ -171,8 +200,6 @@ fun MyPasswordField(labelValue: String, onTextSelected: (String) -> Unit) {
         visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation()
     )
 }
-
-
 
 
 @Composable
@@ -222,13 +249,14 @@ fun CheckBoxComponent (value: String, onTextSelected: (String) -> Unit = {} )
 }
 
 @Composable
-fun ButtonComponent (value: String, onButtonClicked: () -> Unit = {}) {
+fun ButtonComponent (value: String, onButtonClicked: () -> Unit = {}, isEnabled : Boolean = false) {
     Button(onClick = { onButtonClicked.invoke() },
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(48.dp),
         contentPadding = PaddingValues(),
-        colors = ButtonDefaults.buttonColors(Color.Transparent)
+        colors = ButtonDefaults.buttonColors(Color.Transparent),
+        enabled = isEnabled
     ){
         Box(
             modifier = Modifier
@@ -330,8 +358,11 @@ fun UnderLinedTextComponent(value: String) {
 
 
 @Composable
-fun GenderSelection(onGenderSelected: (Gender) -> Unit) {
-    var selectedGender by remember { mutableStateOf(Gender.MALE) }
+fun GenderSelection(
+    initialGender: Gender,
+    onGenderSelected: (Gender) -> Unit
+) {
+    var selectedGender by remember { mutableStateOf(initialGender) }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -369,10 +400,14 @@ fun GenderSelection(onGenderSelected: (Gender) -> Unit) {
 }
 
 
+
 @Composable
-fun HabitSelection(onHabitsSelected: (List<Habit>) -> Unit) {
+fun HabitSelection(
+    loginViewModel: LoginViewModel,
+    onHabitsSelected: (List<Habit>) -> Unit
+) {
     val habits = Habit.entries
-    var selectedHabits by remember { mutableStateOf(emptyList<Habit>()) }
+    var selectedHabits by remember { mutableStateOf(loginViewModel.registrationUIState.value.habits) }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -392,6 +427,7 @@ fun HabitSelection(onHabitsSelected: (List<Habit>) -> Unit) {
                             selectedHabits - habit
                         }
                         onHabitsSelected(selectedHabits)
+                        loginViewModel.onEvent(UIEvent.HabitsChanged(selectedHabits))
                     },
                     colors = CheckboxDefaults.colors(
                         checkedColor = colorResource(id = R.color.primary),
@@ -436,34 +472,43 @@ fun HabbitAndMedHistoryButton(text: String, onClick: () -> Unit) {
     }
 }
 
-
 @Composable
-fun MedicalHistorySection(loginViewModel: LoginViewModel, questions: List<MedicalHistoryQuestion>) {
-    val selectedAnswers = remember { mutableStateMapOf<String, String>() }
+fun MedicalHistorySection(
+    loginViewModel: LoginViewModel,
+    questions: List<MedicalHistoryQuestion>
+) {
+    val medicalHistory = loginViewModel.registrationUIState.value.medicalHistory.toMutableMap()
 
-    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         questions.forEach { question ->
-            Text(text = question.question, modifier = Modifier.padding(bottom = 8.dp))
-            question.suggestedAnswers.forEach { answer ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = selectedAnswers[question.question] == answer,
-                        onClick = {
-                            selectedAnswers[question.question] = answer
-                            loginViewModel.onEvent(UIEvent.MedicalHistoryChanged(question.question, answer))
-                        }
-                    )
-                    Text(text = answer)
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+            ) {
+                Text(text = question.question, style = MaterialTheme.typography.bodyMedium)
+                question.suggestedAnswers.forEach { answer ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = medicalHistory[question.question] == answer,
+                            onClick = {
+                                medicalHistory[question.question] = answer
+                                loginViewModel.onEvent(UIEvent.MedicalHistoryChanged(question.question, answer))
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = colorResource(id = R.color.primary),
+                                unselectedColor = Color.Gray
+                            )
+                        )
+                        Text(text = answer, style = MaterialTheme.typography.bodyMedium)
+                    }
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
-
-
 

@@ -1,7 +1,6 @@
 package com.project.wellnesswise.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,7 +22,7 @@ import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import com.project.wellnesswise.R
 
 @Composable
-fun MedicalHistoryScreen(loginViewModel: LoginViewModel = viewModel()) {
+fun MedicalHistoryScreen(loginViewModel: LoginViewModel) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -31,12 +30,11 @@ fun MedicalHistoryScreen(loginViewModel: LoginViewModel = viewModel()) {
             .padding(16.dp)
     ) {
         LazyColumn {
-           item {
-               HeadingTextComponent(value = stringResource(id = R.string.MedicalHistory))
-               MedicalHistorySection(loginViewModel = loginViewModel, questions = medicalHistoryQuestions)
-           }
+            item {
+                HeadingTextComponent(value = stringResource(id = R.string.MedicalHistory))
+                MedicalHistorySection(loginViewModel = loginViewModel, questions = medicalHistoryQuestions)
+            }
         }
-
     }
     SystemBackButtonHandler {
         WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
@@ -46,5 +44,5 @@ fun MedicalHistoryScreen(loginViewModel: LoginViewModel = viewModel()) {
 @Composable
 @Preview
 fun MedicalHistoryScreenPreview() {
-    MedicalHistoryScreen()
+    MedicalHistoryScreen(viewModel())
 }

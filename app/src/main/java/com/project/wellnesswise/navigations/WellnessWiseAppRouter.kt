@@ -13,7 +13,8 @@ sealed class Screen {
 
 object WellnessWiseAppRouter {
     var currentScreen: MutableState<Screen> = mutableStateOf(Screen.SignUpScreen)
-    fun navigateTo(destination: Screen) { // Define the navigateTo function here
+
+    fun navigateTo(destination: Screen) {
         currentScreen.value = destination
     }
 }
