@@ -9,8 +9,17 @@ data class RegistrationUIState(
     var weight: Number = 0,
     var habits: List<Habit> = emptyList(),
     var medicalHistory:  Map<String, String> = emptyMap(),
-    var password: String = ""
+    var password: String = "",
+    var isPolicyAccepted: Boolean = false
 )
+
+
+
+data class LoginUIState(
+    val email: String = "",
+    val password: String = ""
+)
+
 
 enum class Gender {
     MALE,

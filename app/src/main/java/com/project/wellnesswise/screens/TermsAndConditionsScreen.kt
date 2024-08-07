@@ -13,13 +13,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.wellnesswise.R
 import com.project.wellnesswise.components.HeadingTextComponent
-import com.project.wellnesswise.data.LoginViewModel
+import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 
 @Composable
-fun TermsAndConditionsScreen(loginViewModel: LoginViewModel) {
+fun TermsAndConditionsScreen(registrationViewModel: RegistrationViewModel) {
     Surface(
         modifier = Modifier
             .fillMaxSize()

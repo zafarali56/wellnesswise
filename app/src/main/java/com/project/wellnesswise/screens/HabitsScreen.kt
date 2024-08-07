@@ -17,14 +17,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.wellnesswise.R
 import com.project.wellnesswise.components.HabitSelection
 import com.project.wellnesswise.components.HeadingTextComponent
-import com.project.wellnesswise.data.LoginViewModel
+import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.data.UIEvent
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 
 @Composable
-fun HabitsScreen(loginViewModel: LoginViewModel) {
+fun HabitsScreen(registrationViewModel: RegistrationViewModel) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -40,8 +40,8 @@ fun HabitsScreen(loginViewModel: LoginViewModel) {
             item {
                 HeadingTextComponent(value = stringResource(id = R.string.Habits))
                 Spacer(modifier = Modifier.padding(10.dp))
-                HabitSelection(loginViewModel = loginViewModel, onHabitsSelected = { habits ->
-                    loginViewModel.onEvent(UIEvent.HabitsChanged(habits))
+                HabitSelection(registrationViewModel = registrationViewModel, onHabitsSelected = { habits ->
+                    registrationViewModel.onEvent(UIEvent.HabitsChanged(habits))
                 })
             }
         }

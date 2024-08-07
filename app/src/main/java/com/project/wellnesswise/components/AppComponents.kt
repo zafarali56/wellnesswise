@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -46,7 +45,6 @@ import androidx.compose.material3.Text
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -75,7 +73,7 @@ import androidx.compose.ui.unit.sp
 import com.project.wellnesswise.R
 import com.project.wellnesswise.data.Gender
 import com.project.wellnesswise.data.Habit
-import com.project.wellnesswise.data.LoginViewModel
+import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.data.MedicalHistoryQuestion
 import com.project.wellnesswise.data.UIEvent
 import com.project.wellnesswise.ui.theme.componentShapes
@@ -230,23 +228,31 @@ fun ClickableTextComponent(value: String, onTextSelected: (String) -> Unit = {})
            }})
 }
 @Composable
-fun CheckBoxComponent (value: String, onTextSelected: (String) -> Unit = {} )
-{
-    Row (modifier = Modifier
-        .fillMaxWidth()
-        .heightIn(min = 56.dp),
-        verticalAlignment = Alignment.CenterVertically){
-
-        val checkedState = remember { mutableStateOf(false) }
-        Checkbox(checked = checkedState.value, onCheckedChange = {
-            checkedState.value = !checkedState.value },colors = CheckboxDefaults.colors(
-            checkedColor = colorResource(id = R.color.primary), // Set the tick color here
-            uncheckedColor = Color.Gray, // Optional: Set the unchecked color
-            checkmarkColor = Color.White // Set the checkmark color here
-        ))
+fun CheckBoxComponent(
+    value: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    onTextSelected: (String) -> Unit = {}
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = CheckboxDefaults.colors(
+                checkedColor = colorResource(id = R.color.primary), // Set the tick color here
+                uncheckedColor = Color.Gray, // Optional: Set the unchecked color
+                checkmarkColor = Color.White // Set the checkmark color here
+            )
+        )
         ClickableTextComponent(value = value, onTextSelected)
     }
 }
+
 
 @Composable
 fun ButtonComponent (value: String, onButtonClicked: () -> Unit = {}, isEnabled : Boolean = false) {
@@ -403,11 +409,11 @@ fun GenderSelection(
 
 @Composable
 fun HabitSelection(
-    loginViewModel: LoginViewModel,
+    registrationViewModel: RegistrationViewModel,
     onHabitsSelected: (List<Habit>) -> Unit
 ) {
     val habits = Habit.entries
-    var selectedHabits by remember { mutableStateOf(loginViewModel.registrationUIState.value.habits) }
+    var selectedHabits by remember { mutableStateOf(registrationViewModel.registrationUIState.value.habits) }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -427,7 +433,7 @@ fun HabitSelection(
                             selectedHabits - habit
                         }
                         onHabitsSelected(selectedHabits)
-                        loginViewModel.onEvent(UIEvent.HabitsChanged(selectedHabits))
+                        registrationViewModel.onEvent(UIEvent.HabitsChanged(selectedHabits))
                     },
                     colors = CheckboxDefaults.colors(
                         checkedColor = colorResource(id = R.color.primary),
@@ -474,10 +480,10 @@ fun HabbitAndMedHistoryButton(text: String, onClick: () -> Unit) {
 
 @Composable
 fun MedicalHistorySection(
-    loginViewModel: LoginViewModel,
+    registrationViewModel: RegistrationViewModel,
     questions: List<MedicalHistoryQuestion>
 ) {
-    val medicalHistory = loginViewModel.registrationUIState.value.medicalHistory.toMutableMap()
+    val medicalHistory = registrationViewModel.registrationUIState.value.medicalHistory.toMutableMap()
 
     Column(
         modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -497,7 +503,7 @@ fun MedicalHistorySection(
                             selected = medicalHistory[question.question] == answer,
                             onClick = {
                                 medicalHistory[question.question] = answer
-                                loginViewModel.onEvent(UIEvent.MedicalHistoryChanged(question.question, answer))
+                                registrationViewModel.onEvent(UIEvent.MedicalHistoryChanged(question.question, answer))
                             },
                             colors = RadioButtonDefaults.colors(
                                 selectedColor = colorResource(id = R.color.primary),

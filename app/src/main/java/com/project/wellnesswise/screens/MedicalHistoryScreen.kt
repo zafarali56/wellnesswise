@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.wellnesswise.components.HeadingTextComponent
 import com.project.wellnesswise.components.MedicalHistorySection
-import com.project.wellnesswise.data.LoginViewModel
+import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.data.medicalHistoryQuestions
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
@@ -22,7 +22,7 @@ import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import com.project.wellnesswise.R
 
 @Composable
-fun MedicalHistoryScreen(loginViewModel: LoginViewModel) {
+fun MedicalHistoryScreen(registrationViewModel: RegistrationViewModel) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -32,7 +32,7 @@ fun MedicalHistoryScreen(loginViewModel: LoginViewModel) {
         LazyColumn {
             item {
                 HeadingTextComponent(value = stringResource(id = R.string.MedicalHistory))
-                MedicalHistorySection(loginViewModel = loginViewModel, questions = medicalHistoryQuestions)
+                MedicalHistorySection(registrationViewModel = registrationViewModel, questions = medicalHistoryQuestions)
             }
         }
     }

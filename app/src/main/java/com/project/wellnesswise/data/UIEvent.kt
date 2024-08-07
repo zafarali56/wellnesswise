@@ -10,7 +10,21 @@ sealed class UIEvent {
     data class HabitsChanged(val habits: List<Habit>) : UIEvent()
     data class MedicalHistoryChanged(val question: String, val answer: String) : UIEvent()
     data class PasswordChanged(val password: String) : UIEvent()
+    data class PolicyAcceptedChanged(val isPolicyAccepted: Boolean) : UIEvent()
 
 
     object RegisterButtonClicked : UIEvent()
+
+
+
+
+}
+
+
+sealed class LoginUIEvent {
+    data class EmailChangedLogin(val email: String) : LoginUIEvent()
+    data class PasswordChangedLogin(val password: String) : LoginUIEvent()
+
+
+    object LoginButtonClicked : LoginUIEvent()
 }

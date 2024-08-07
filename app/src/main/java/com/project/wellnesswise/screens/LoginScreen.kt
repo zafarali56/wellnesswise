@@ -26,8 +26,11 @@ import com.project.wellnesswise.components.HeadingTextComponent
 import com.project.wellnesswise.components.MyPasswordField
 import com.project.wellnesswise.components.MyTextField
 import com.project.wellnesswise.components.UnderLinedTextComponent
+import com.project.wellnesswise.data.LoginUIEvent
 import com.project.wellnesswise.data.LoginViewModel
+import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.data.UIEvent
+import com.project.wellnesswise.data.rules.Validator
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
@@ -45,7 +48,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
         )
     }
 
-    val registrationUIState = loginViewModel.registrationUIState.value
+    val loginUIState = loginViewModel.loginUIState.value
 
     Surface(
         modifier = Modifier
@@ -74,22 +77,23 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                 Spacer(modifier = Modifier.height(30.dp))
                 MyTextField(
                     labelValue = stringResource(id = R.string.Email),
-                    initialValue = registrationUIState.email,
+                    initialValue = loginUIState.email,
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.EmailChanged(it))
+                        loginViewModel.onEvent(LoginUIEvent.EmailChangedLogin(it))
                     }
                 )
                 MyPasswordField(
                     labelValue = stringResource(id = R.string.Password),
-                    initialValue = registrationUIState.password,
+                    initialValue = loginUIState.password,
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.PasswordChanged(it))
+                        loginViewModel.onEvent(LoginUIEvent.PasswordChangedLogin(it))
                     }
                 )
                 Spacer(modifier = Modifier.height(30.dp))
                 ButtonComponent(value = stringResource(id = R.string.Login), onButtonClicked = {
+                    loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked)
                     // Handle login logic here
-                })
+                },   isEnabled = Validator.isValidLoginUIState(loginUIState) )
                 Spacer(modifier = Modifier.height(30.dp))
                 UnderLinedTextComponent(value = stringResource(id = R.string.Forgot_password))
                 ClickableLoginTextComponent(tryingToLogin = false, onTextSelected = {

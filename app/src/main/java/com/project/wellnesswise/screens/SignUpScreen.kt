@@ -30,14 +30,14 @@ import com.project.wellnesswise.components.HeadingTextComponent
 import com.project.wellnesswise.components.MyNumberField
 import com.project.wellnesswise.components.MyPasswordField
 import com.project.wellnesswise.components.MyTextField
-import com.project.wellnesswise.data.LoginViewModel
+import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.data.UIEvent
 import com.project.wellnesswise.data.rules.Validator
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 
 @Composable
-fun SignUpScreen(loginViewModel: LoginViewModel) {
+fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = MaterialTheme.colorScheme.surface.luminance() > 0.5f
 
@@ -48,8 +48,8 @@ fun SignUpScreen(loginViewModel: LoginViewModel) {
         )
     }
 
-    val validationResults = loginViewModel.validationResults.value
-    val registrationUIState = loginViewModel.registrationUIState.value
+    val validationResults = registrationViewModel.validationResults.value
+    val registrationUIState = registrationViewModel.registrationUIState.value
 
     Surface(
         modifier = Modifier
@@ -67,7 +67,7 @@ fun SignUpScreen(loginViewModel: LoginViewModel) {
                     labelValue = stringResource(id = R.string.Email),
                     initialValue = registrationUIState.email,
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.EmailChanged(it))
+                        registrationViewModel.onEvent(UIEvent.EmailChanged(it))
                     }
                 )
                 if (validationResults["email"] == false) {
@@ -79,7 +79,7 @@ fun SignUpScreen(loginViewModel: LoginViewModel) {
                     labelValue = stringResource(id = R.string.FullName),
                     initialValue = registrationUIState.fullName,
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.FullNameChanged(it))
+                        registrationViewModel.onEvent(UIEvent.FullNameChanged(it))
                     }
                 )
                 if (validationResults["fullName"] == false) {
@@ -91,7 +91,7 @@ fun SignUpScreen(loginViewModel: LoginViewModel) {
                     labelValue = stringResource(id = R.string.Age),
                     initialValue = registrationUIState.age.toString(),
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.AgeChanged(it ?: 0))
+                        registrationViewModel.onEvent(UIEvent.AgeChanged(it ?: 0))
                     }
                 )
                 if (validationResults["age"] == false) {
@@ -103,7 +103,7 @@ fun SignUpScreen(loginViewModel: LoginViewModel) {
                 GenderSelection(
                     initialGender = registrationUIState.gender,
                     onGenderSelected = { gender ->
-                        loginViewModel.onEvent(UIEvent.GenderChanged(gender))
+                        registrationViewModel.onEvent(UIEvent.GenderChanged(gender))
                     }
                 )
                 if (validationResults["gender"] == false) {
@@ -115,7 +115,7 @@ fun SignUpScreen(loginViewModel: LoginViewModel) {
                     labelValue = stringResource(id = R.string.Height),
                     initialValue = registrationUIState.height.toString(),
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.HeightChanged(it ?: 0))
+                        registrationViewModel.onEvent(UIEvent.HeightChanged(it ?: 0))
                     }
                 )
                 if (validationResults["height"] == false) {
@@ -127,7 +127,7 @@ fun SignUpScreen(loginViewModel: LoginViewModel) {
                     labelValue = stringResource(id = R.string.Weight),
                     initialValue = registrationUIState.weight.toString(),
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.WeightChanged(it ?: 0))
+                        registrationViewModel.onEvent(UIEvent.WeightChanged(it ?: 0))
                     }
                 )
                 if (validationResults["weight"] == false) {
@@ -153,11 +153,12 @@ fun SignUpScreen(loginViewModel: LoginViewModel) {
                 }
             }
             item {
+                Spacer(modifier = Modifier.height(4.dp))
                 MyPasswordField(
                     labelValue = stringResource(id = R.string.Password),
                     initialValue = registrationUIState.password,
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.PasswordChanged(it))
+                        registrationViewModel.onEvent(UIEvent.PasswordChanged(it))
                     }
                 )
                 if (validationResults["password"] == false) {
@@ -166,18 +167,24 @@ fun SignUpScreen(loginViewModel: LoginViewModel) {
             }
             item {
                 CheckBoxComponent(
-                    value = stringResource(id = R.string.Agreement),
-                    onTextSelected = {
+                    value = "I accept the privacy policy and terms of service",
+                    checked = registrationUIState.isPolicyAccepted,
+                    onCheckedChange = {
+                        registrationViewModel.onEvent(UIEvent.PolicyAcceptedChanged(it))
+                    },
+                    onTextSelected = { selectedText ->
                         WellnessWiseAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
                     }
                 )
+
+
             }
             item {
                 Spacer(modifier = Modifier.height(10.dp))
                 ButtonComponent(
                     value = stringResource(id = R.string.Register),
                     onButtonClicked = {
-                        loginViewModel.onEvent(UIEvent.RegisterButtonClicked)
+                        registrationViewModel.onEvent(UIEvent.RegisterButtonClicked)
                     },
                     isEnabled = Validator.isValidRegistrationUIState(registrationUIState)
                 )
@@ -193,4 +200,10 @@ fun SignUpScreen(loginViewModel: LoginViewModel) {
             }
         }
     }
+}
+
+@Composable
+@Preview
+fun SignUpScreenPreview() {
+    SignUpScreen(viewModel())
 }

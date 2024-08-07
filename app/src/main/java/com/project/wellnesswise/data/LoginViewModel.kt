@@ -7,81 +7,49 @@ import com.project.wellnesswise.data.rules.Validator
 
 class LoginViewModel : ViewModel() {
     private val TAG = LoginViewModel::class.simpleName
-    var registrationUIState = mutableStateOf(RegistrationUIState())
+    var loginUIState = mutableStateOf(LoginUIState())
         private set
     var validationResults = mutableStateOf(emptyMap<String, Boolean>())
         private set
 
-    fun onEvent(event: UIEvent) {
+    fun onEvent(event: LoginUIEvent) {
         when (event) {
-            is UIEvent.EmailChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
+            is LoginUIEvent.EmailChangedLogin -> {
+                loginUIState.value = loginUIState.value.copy(
                     email = event.email
                 )
             }
-            is UIEvent.FullNameChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    fullName = event.fullName
-                )
-            }
-            is UIEvent.AgeChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    age = event.age
-                )
-            }
-            is UIEvent.GenderChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    gender = event.gender
-                )
-            }
-            is UIEvent.HeightChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    height = event.height
-                )
-            }
-            is UIEvent.WeightChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    weight = event.weight
-                )
-            }
-            is UIEvent.HabitsChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    habits = event.habits
-                )
-            }
-            is UIEvent.MedicalHistoryChanged -> {
-                val updatedMedicalHistory = registrationUIState.value.medicalHistory.toMutableMap()
-                updatedMedicalHistory[event.question] = event.answer
-                registrationUIState.value = registrationUIState.value.copy(medicalHistory = updatedMedicalHistory)
-            }
-            is UIEvent.PasswordChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
+            is LoginUIEvent.PasswordChangedLogin -> {
+                loginUIState.value = loginUIState.value.copy(
                     password = event.password
                 )
             }
-            is UIEvent.RegisterButtonClicked -> {
+            is LoginUIEvent.LoginButtonClicked -> {
                 updateValidationResults()
-                if (Validator.isValidRegistrationUIState(registrationUIState.value)) {
-                    signUp()
+                if (Validator.isValidLoginUIState(loginUIState.value)) {
+                    login()
                 } else {
                     // Show validation errors
                     Log.d(TAG, "Validation failed")
                 }
             }
+
+
+
         }
     }
 
     private fun updateValidationResults() {
-        validationResults.value = Validator.validateRegistrationUIState(registrationUIState.value)
+        validationResults.value = Validator.validateLoginUIState(loginUIState.value)
     }
 
-    private fun signUp() {
-        Log.d(TAG, "Inside SignUp")
+    private fun login() {
+        Log.d(TAG, "Inside Login")
         printState()
     }
 
     private fun printState() {
         Log.d(TAG, "Inside printState")
-        Log.d(TAG, registrationUIState.value.toString())
+        Log.d(TAG, loginUIState.value.toString())
     }
 }
