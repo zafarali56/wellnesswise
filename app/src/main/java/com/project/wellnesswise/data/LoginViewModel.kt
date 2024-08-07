@@ -54,18 +54,28 @@ class LoginViewModel : ViewModel() {
                 printState()
             }
             is UIEvent.MedicalHistoryChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    medicalHistory = event.medicalHistory
-                )
+                val updatedMedicalHistory = registrationUIState.value.medicalHistory.toMutableMap()
+                updatedMedicalHistory[event.question] = event.answer
+                registrationUIState.value = registrationUIState.value.copy(medicalHistory = updatedMedicalHistory)
                 printState()
             }
+
             is UIEvent.PasswordChanged -> {
                 registrationUIState.value = registrationUIState.value.copy(
                     password = event.password
                 )
                 printState()
             }
+
+            is UIEvent.RegisterButtonClicked -> {
+                signUp()
+            }
         }
+    }
+
+    private fun signUp() {
+        Log.d(TAG, "Inside SignUp")
+        printState()
     }
 
     private fun printState() {

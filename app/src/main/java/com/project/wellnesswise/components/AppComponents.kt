@@ -3,14 +3,17 @@ package com.project.wellnesswise.components
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -20,6 +23,8 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -36,10 +41,12 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 
+
 import androidx.compose.material3.Text
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -68,24 +75,12 @@ import androidx.compose.ui.unit.sp
 import com.project.wellnesswise.R
 import com.project.wellnesswise.data.Gender
 import com.project.wellnesswise.data.Habit
+import com.project.wellnesswise.data.LoginViewModel
+import com.project.wellnesswise.data.MedicalHistoryQuestion
+import com.project.wellnesswise.data.UIEvent
 import com.project.wellnesswise.ui.theme.componentShapes
 
-//@Composable
-//fun NormalTextComponent(value: String) {
-//    Text(
-//        text = value,
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .heightIn(min = 40.dp),
-//        style = TextStyle(
-//            fontSize = 24.sp,
-//            fontWeight = FontWeight.Normal,
-//            fontStyle = FontStyle.Normal
-//        ),
-//        color = colorResource(id = R.color.black),
-//        textAlign = TextAlign.Center
-//    )
-//}
+
 
 @Composable
 fun HeadingTextComponent(value: String) {
@@ -227,8 +222,8 @@ fun CheckBoxComponent (value: String, onTextSelected: (String) -> Unit = {} )
 }
 
 @Composable
-fun ButtonComponent (value: String) {
-    Button(onClick = { /*TODO*/ },
+fun ButtonComponent (value: String, onButtonClicked: () -> Unit = {}) {
+    Button(onClick = { onButtonClicked.invoke() },
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(48.dp),
@@ -383,8 +378,6 @@ fun HabitSelection(onHabitsSelected: (List<Habit>) -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(text = stringResource(id = R.string.Habits), style = MaterialTheme.typography.bodyLarge)
-
         habits.forEach { habit ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -410,3 +403,67 @@ fun HabitSelection(onHabitsSelected: (List<Habit>) -> Unit) {
         }
     }
 }
+
+@Composable
+fun HabbitAndMedHistoryButton(text: String, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = colorResource(id = R.color.primary),
+                shape = RoundedCornerShape(5.dp)
+            )
+            .clickable { onClick() }
+            .padding(17.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = text,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.weight(1f)) // This will push the icon to the end
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = null,
+                tint = Color.White
+            )
+        }
+    }
+}
+
+
+@Composable
+fun MedicalHistorySection(loginViewModel: LoginViewModel, questions: List<MedicalHistoryQuestion>) {
+    val selectedAnswers = remember { mutableStateMapOf<String, String>() }
+
+    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+        questions.forEach { question ->
+            Text(text = question.question, modifier = Modifier.padding(bottom = 8.dp))
+            question.suggestedAnswers.forEach { answer ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = selectedAnswers[question.question] == answer,
+                        onClick = {
+                            selectedAnswers[question.question] = answer
+                            loginViewModel.onEvent(UIEvent.MedicalHistoryChanged(question.question, answer))
+                        }
+                    )
+                    Text(text = answer)
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+
+

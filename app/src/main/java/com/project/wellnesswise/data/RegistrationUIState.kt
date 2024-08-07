@@ -4,30 +4,34 @@ data class RegistrationUIState(
     var email: String = "",
     var fullName: String = "",
     var age: Number = 0,
-    var gender: Gender = Gender.UNSPECIFIED,
+    var gender: Gender = Gender.MALE,
     var height: Number = 0,
     var weight: Number = 0,
     var habits: List<Habit> = emptyList(),
-    var medicalHistory: String = "",// it will chang Map<String, String> = emptyMap()e
+    var medicalHistory:  Map<String, String> = emptyMap(),
     var password: String = ""
 )
 
 enum class Gender {
     MALE,
     FEMALE,
-    UNSPECIFIED
+
 }
 
 enum class Habit {
-    SMOKING,
-    DRINKING,
-    EXERCISE,
-    // Add other habits as needed
-}
+    Smoking,
+    Drinking,
+    Exercise,
+    HealthyEating,
+    SleepPatterns,
+    StressManagement,
+    Meditation,
+    AlcoholConsumption,
+    DrugUse,
+    ScreenTime,
+    SocialInteraction,
+    PhysicalActivity,
+    MentalHealthPractices,
+    HygienePractices,
 
-// Example usage of medical history map
-val medicalHistoryExample = mapOf(
-    "Do you have any allergies?" to "Yes",
-    "Have you had any surgeries?" to "No",
-    // Add other medical history questions and answers
-)
+}

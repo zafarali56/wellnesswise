@@ -8,6 +8,9 @@ sealed class UIEvent {
     data class HeightChanged(val height: Number) : UIEvent()
     data class WeightChanged(val weight: Number) : UIEvent()
     data class HabitsChanged(val habits: List<Habit>) : UIEvent()
-    data class MedicalHistoryChanged(val medicalHistory: String) : UIEvent()
+    data class MedicalHistoryChanged(val question: String, val answer: String) : UIEvent()
     data class PasswordChanged(val password: String) : UIEvent()
+
+
+    object RegisterButtonClicked : UIEvent()
 }
