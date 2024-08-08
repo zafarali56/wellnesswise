@@ -3,6 +3,8 @@ package com.project.wellnesswise.data
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.project.wellnesswise.data.rules.Validator
 
 class RegistrationViewModel : ViewModel() {
@@ -11,6 +13,9 @@ class RegistrationViewModel : ViewModel() {
         private set
     var validationResults = mutableStateOf(emptyMap<String, Boolean>())
         private set
+
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 
     fun onEvent(event: UIEvent) {
         when (event) {
@@ -68,7 +73,17 @@ class RegistrationViewModel : ViewModel() {
             is UIEvent.RegisterButtonClicked -> {
                 updateValidationResults()
                 if (Validator.isValidRegistrationUIState(registrationUIState.value)) {
-                    signUp()
+                    createUserInFirebase(
+                        email = registrationUIState.value.email,
+                        password = registrationUIState.value.password,
+                        fullName = registrationUIState.value.fullName,
+                        age = registrationUIState.value.age,
+                        gender = registrationUIState.value.gender,
+                        height = registrationUIState.value.height,
+                        weight = registrationUIState.value.weight,
+                        habits = registrationUIState.value.habits,
+                        medicalHistory = registrationUIState.value.medicalHistory
+                    )
                 } else {
                     // Show validation errors
                     Log.d(TAG, "Validation failed")
@@ -89,5 +104,45 @@ class RegistrationViewModel : ViewModel() {
     private fun printState() {
         Log.d(TAG, "Inside printState")
         Log.d(TAG, registrationUIState.value.toString())
+    }
+
+    private fun createUserInFirebase(
+        email: String,
+        password: String,
+        fullName: String,
+        age: Number,
+        gender: Gender,
+        height: Number,
+        weight: Number,
+        habits: List<Habit>,
+        medicalHistory: Map<String, String>
+    ) {
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    if (user != null) {
+                        val userData = mapOf(
+                            "fullName" to fullName,
+                            "age" to age,
+                            "gender" to gender.name,
+                            "height" to height,
+                            "weight" to weight,
+                            "habits" to habits.map { it.name },
+                            "medicalHistory" to medicalHistory
+                        )
+                        firestore.collection("users").document(user.uid)
+                            .set(userData)
+                            .addOnSuccessListener {
+                                Log.d(TAG, "User data stored successfully")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.w(TAG, "Error storing user data", e)
+                            }
+                    }
+                } else {
+                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
+                }
+            }
     }
 }
