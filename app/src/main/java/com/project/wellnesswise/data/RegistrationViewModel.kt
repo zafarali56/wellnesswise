@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.project.wellnesswise.data.rules.Validator
+import com.project.wellnesswise.navigations.Screen
+import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 
 class RegistrationViewModel : ViewModel() {
     private val TAG = RegistrationViewModel::class.simpleName
@@ -13,6 +15,8 @@ class RegistrationViewModel : ViewModel() {
         private set
     var validationResults = mutableStateOf(emptyMap<String, Boolean>())
         private set
+
+    var signUpInProgress = mutableStateOf(false)
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -117,6 +121,7 @@ class RegistrationViewModel : ViewModel() {
         habits: List<Habit>,
         medicalHistory: Map<String, String>
     ) {
+        signUpInProgress.value = true
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -133,8 +138,12 @@ class RegistrationViewModel : ViewModel() {
                         )
                         firestore.collection("users").document(user.uid)
                             .set(userData)
+
                             .addOnSuccessListener {
                                 Log.d(TAG, "User data stored successfully")
+                                signUpInProgress.value = false
+                                WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
+
                             }
                             .addOnFailureListener { e ->
                                 Log.w(TAG, "Error storing user data", e)
@@ -145,4 +154,6 @@ class RegistrationViewModel : ViewModel() {
                 }
             }
     }
+
+
 }

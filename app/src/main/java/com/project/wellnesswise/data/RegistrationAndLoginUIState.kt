@@ -16,8 +16,11 @@ data class RegistrationUIState(
 
 
 data class LoginUIState(
-    val email: String = "",
-    val password: String = ""
+    var email: String = "",
+    var password: String = "",
+
+    var emailError: Boolean = false,
+    var passwordError: Boolean = false,
 )
 
 

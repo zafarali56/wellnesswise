@@ -18,6 +18,8 @@
     <string name="TermsAndConditions">Terms of Use </string>
     <string name="Goto_login">Already have an account?</string>
     <string name="Forgot_password">Forgot your password?</string>
+    <string name="Home"> Home </string>
+    <string name="Logout" >Log out</string>
 
 
 

@@ -3,7 +3,10 @@ package com.project.wellnesswise.data
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.project.wellnesswise.data.rules.Validator
+import com.project.wellnesswise.navigations.Screen
+import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 
 class LoginViewModel : ViewModel() {
     private val TAG = LoginViewModel::class.simpleName
@@ -11,6 +14,13 @@ class LoginViewModel : ViewModel() {
         private set
     var validationResults = mutableStateOf(emptyMap<String, Boolean>())
         private set
+    var errorMessage = mutableStateOf<String?>(null)
+        private set
+
+    var logInProgress = mutableStateOf(false)
+
+
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     fun onEvent(event: LoginUIEvent) {
         when (event) {
@@ -33,9 +43,6 @@ class LoginViewModel : ViewModel() {
                     Log.d(TAG, "Validation failed")
                 }
             }
-
-
-
         }
     }
 
@@ -44,12 +51,42 @@ class LoginViewModel : ViewModel() {
     }
 
     private fun login() {
+        logInProgress.value = true
         Log.d(TAG, "Inside Login")
         printState()
+
+        auth.signInWithEmailAndPassword(loginUIState.value.email, loginUIState.value.password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    logInProgress.value = false
+                    Log.d(TAG, "Login successful")
+                    WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
+                } else {
+                    Log.w(TAG, "Login failed", task.exception)
+                    errorMessage.value = task.exception?.message ?: "Login failed"
+                }
+            }
     }
 
     private fun printState() {
         Log.d(TAG, "Inside printState")
         Log.d(TAG, loginUIState.value.toString())
+
+    }
+
+    fun logOut ()
+    {
+        val firebaseAuth = FirebaseAuth.getInstance()
+        firebaseAuth.signOut()
+        val authStateListener = FirebaseAuth.AuthStateListener {
+            if (it.currentUser == null) {
+                Log.d(TAG, "Inside signOut")
+                WellnessWiseAppRouter.navigateTo(Screen.LoginScreen)
+            }
+            else {
+                Log.d(TAG, "Inside signOut else")
+            }
+        }
+        firebaseAuth.addAuthStateListener(authStateListener)
     }
 }

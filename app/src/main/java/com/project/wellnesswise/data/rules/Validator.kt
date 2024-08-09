@@ -82,10 +82,13 @@ object Validator {
     }
 
     // Validate login UI state
-    fun validateLoginUIState(uiState: LoginUIState): Map<String, Boolean> {
+    fun validateLoginUIState(loginUIState: LoginUIState): Map<String, Boolean> {
+        val emailValid = loginUIState.email.isNotBlank()
+        val passwordValid = loginUIState.password.isNotBlank()
+
         return mapOf(
-            "email" to validateEmail(uiState.email),
-            "password" to validatePassword(uiState.password)
+            "email" to emailValid,
+            "password" to passwordValid
         )
     }
 

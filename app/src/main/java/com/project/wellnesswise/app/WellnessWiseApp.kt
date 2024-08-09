@@ -16,6 +16,7 @@ import com.project.wellnesswise.screens.SignUpScreen
 import com.project.wellnesswise.screens.TermsAndConditionsScreen
 import com.project.wellnesswise.screens.MedicalHistoryScreen
 import com.project.wellnesswise.data.RegistrationViewModel
+import com.project.wellnesswise.screens.HomeScreen
 
 @Composable
 fun WellnessWiseApp(registrationViewModel: RegistrationViewModel = viewModel(), loginViewModel: LoginViewModel = viewModel()) {
@@ -27,6 +28,7 @@ fun WellnessWiseApp(registrationViewModel: RegistrationViewModel = viewModel(), 
                 is Screen.LoginScreen -> LoginScreen(loginViewModel)
                 is Screen.HabitsScreen -> HabitsScreen(registrationViewModel)
                 is Screen.MedicalHistoryScreen -> MedicalHistoryScreen(registrationViewModel)
+                is Screen.HomeScreen -> HomeScreen(LoginViewModel())
             }
         }
     }
