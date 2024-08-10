@@ -100,16 +100,6 @@ class RegistrationViewModel : ViewModel() {
         validationResults.value = Validator.validateRegistrationUIState(registrationUIState.value)
     }
 
-    private fun signUp() {
-        Log.d(TAG, "Inside SignUp")
-        printState()
-    }
-
-    private fun printState() {
-        Log.d(TAG, "Inside printState")
-        Log.d(TAG, registrationUIState.value.toString())
-    }
-
     private fun createUserInFirebase(
         email: String,
         password: String,
@@ -132,34 +122,48 @@ class RegistrationViewModel : ViewModel() {
                             .addOnCompleteListener { verificationTask ->
                                 if (verificationTask.isSuccessful) {
                                     Log.d(TAG, "Verification email sent")
-                                    // Store other user data in Firestore...
-                                    val userData = mapOf(
-                                        "fullName" to fullName,
-                                        "age" to age,
-                                        "gender" to gender.name,
-                                        "height" to height,
-                                        "weight" to weight,
-                                        "habits" to habits.map { it.name },
-                                        "medicalHistory" to medicalHistory
-                                    )
-                                    firestore.collection("users").document(user.uid)
-                                        .set(userData)
-                                        .addOnSuccessListener {
-                                            Log.d(TAG, "User data stored successfully")
-                                            signUpInProgress.value = false
-                                            WellnessWiseAppRouter.navigateTo(Screen.EmailVerificationScreen)
-                                        }
-                                        .addOnFailureListener { e ->
-                                            Log.w(TAG, "Error storing user data", e)
-                                        }
+                                    signUpInProgress.value = false
+                                    WellnessWiseAppRouter.navigateTo(Screen.EmailVerificationScreen)
                                 } else {
                                     Log.w(TAG, "Error sending verification email", verificationTask.exception)
+                                    signUpInProgress.value = false
                                 }
                             }
                     }
                 } else {
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
+                    signUpInProgress.value = false
                 }
             }
+    }
+
+    fun checkEmailVerification() {
+        val user = auth.currentUser
+        user?.reload()?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                if (user.isEmailVerified) {
+                    val userData = mapOf(
+                        "fullName" to registrationUIState.value.fullName,
+                        "age" to registrationUIState.value.age,
+                        "gender" to registrationUIState.value.gender.name,
+                        "height" to registrationUIState.value.height,
+                        "weight" to registrationUIState.value.weight,
+                        "habits" to registrationUIState.value.habits.map { it.name },
+                        "medicalHistory" to registrationUIState.value.medicalHistory
+                    )
+                    firestore.collection("users").document(user.uid)
+                        .set(userData)
+                        .addOnSuccessListener {
+                            Log.d(TAG, "User data stored successfully")
+                            WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w(TAG, "Error storing user data", e)
+                        }
+                }
+            } else {
+                Log.w(TAG, "Error reloading user", task.exception)
+            }
+        }
     }
 }

@@ -31,7 +31,7 @@ fun WellnessWiseApp(registrationViewModel: RegistrationViewModel, loginViewModel
                 is Screen.HabitsScreen -> HabitsScreen(registrationViewModel)
                 is Screen.MedicalHistoryScreen -> MedicalHistoryScreen(registrationViewModel)
                 is Screen.HomeScreen -> HomeScreen(loginViewModel)
-                is Screen.EmailVerificationScreen -> EmailVerificationScreen()
+                is Screen.EmailVerificationScreen -> EmailVerificationScreen(registrationViewModel)
 
             }
         }

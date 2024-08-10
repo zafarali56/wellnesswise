@@ -16,7 +16,7 @@ import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ButtonComponent
 import com.project.wellnesswise.components.HeadingTextComponent
 import com.project.wellnesswise.data.LoginViewModel
-import com.project.wellnesswise.data.RegistrationViewModel
+
 
 @Composable
 fun HomeScreen(loginViewModel: LoginViewModel) {
