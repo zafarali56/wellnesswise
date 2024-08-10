@@ -1,5 +1,7 @@
 package com.project.wellnesswise.data
 
+
+
 data class RegistrationUIState(
     var email: String = "",
     var fullName: String = "",
@@ -10,9 +12,8 @@ data class RegistrationUIState(
     var habits: List<Habit> = emptyList(),
     var medicalHistory:  Map<String, String> = emptyMap(),
     var password: String = "",
-    var isPolicyAccepted: Boolean = false
-)
-
+    var isPolicyAccepted: Boolean = false,
+    )
 
 
 data class LoginUIState(

@@ -12,6 +12,8 @@ composeBom = "2024.06.00"
 materialIconsExtended = "1.6.8"
 firebaseAuthKtx = "23.0.0"
 firebaseFirestoreKtx = "25.0.0"
+appcompat = "1.7.0"
+roomKtx = "2.6.1"
 
 [libraries]
 
@@ -38,6 +40,8 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

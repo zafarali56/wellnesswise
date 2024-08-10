@@ -5,21 +5,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+
 import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.wellnesswise.data.LoginViewModel
+import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
+import com.project.wellnesswise.screens.EmailVerificationScreen
 import com.project.wellnesswise.screens.HabitsScreen
 import com.project.wellnesswise.screens.LoginScreen
 import com.project.wellnesswise.screens.SignUpScreen
 import com.project.wellnesswise.screens.TermsAndConditionsScreen
 import com.project.wellnesswise.screens.MedicalHistoryScreen
-import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.screens.HomeScreen
 
+
 @Composable
-fun WellnessWiseApp(registrationViewModel: RegistrationViewModel = viewModel(), loginViewModel: LoginViewModel = viewModel()) {
+fun WellnessWiseApp(registrationViewModel: RegistrationViewModel, loginViewModel: LoginViewModel) {
     Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
         Crossfade(targetState = WellnessWiseAppRouter.currentScreen, label = "") { currentState ->
             when (currentState.value) {
@@ -28,7 +30,9 @@ fun WellnessWiseApp(registrationViewModel: RegistrationViewModel = viewModel(), 
                 is Screen.LoginScreen -> LoginScreen(loginViewModel)
                 is Screen.HabitsScreen -> HabitsScreen(registrationViewModel)
                 is Screen.MedicalHistoryScreen -> MedicalHistoryScreen(registrationViewModel)
-                is Screen.HomeScreen -> HomeScreen(LoginViewModel())
+                is Screen.HomeScreen -> HomeScreen(loginViewModel)
+                is Screen.EmailVerificationScreen -> EmailVerificationScreen()
+
             }
         }
     }

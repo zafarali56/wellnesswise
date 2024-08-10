@@ -205,11 +205,11 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                 }
             }
         }
-   if (registrationViewModel.signUpInProgress.value){
-       CircularProgressIndicator(
-           color = colorResource(id = R.color.primary)
-       )
-   }
+        if (registrationViewModel.signUpInProgress.value){
+            CircularProgressIndicator(
+                color = colorResource(id = R.color.primary)
+            )
+        }
 
     }
 

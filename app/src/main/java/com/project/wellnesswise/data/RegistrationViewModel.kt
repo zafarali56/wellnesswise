@@ -127,26 +127,34 @@ class RegistrationViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     val user = auth.currentUser
                     if (user != null) {
-                        val userData = mapOf(
-                            "fullName" to fullName,
-                            "age" to age,
-                            "gender" to gender.name,
-                            "height" to height,
-                            "weight" to weight,
-                            "habits" to habits.map { it.name },
-                            "medicalHistory" to medicalHistory
-                        )
-                        firestore.collection("users").document(user.uid)
-                            .set(userData)
-
-                            .addOnSuccessListener {
-                                Log.d(TAG, "User data stored successfully")
-                                signUpInProgress.value = false
-                                WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
-
-                            }
-                            .addOnFailureListener { e ->
-                                Log.w(TAG, "Error storing user data", e)
+                        // Send verification email
+                        user.sendEmailVerification()
+                            .addOnCompleteListener { verificationTask ->
+                                if (verificationTask.isSuccessful) {
+                                    Log.d(TAG, "Verification email sent")
+                                    // Store other user data in Firestore...
+                                    val userData = mapOf(
+                                        "fullName" to fullName,
+                                        "age" to age,
+                                        "gender" to gender.name,
+                                        "height" to height,
+                                        "weight" to weight,
+                                        "habits" to habits.map { it.name },
+                                        "medicalHistory" to medicalHistory
+                                    )
+                                    firestore.collection("users").document(user.uid)
+                                        .set(userData)
+                                        .addOnSuccessListener {
+                                            Log.d(TAG, "User data stored successfully")
+                                            signUpInProgress.value = false
+                                            WellnessWiseAppRouter.navigateTo(Screen.EmailVerificationScreen)
+                                        }
+                                        .addOnFailureListener { e ->
+                                            Log.w(TAG, "Error storing user data", e)
+                                        }
+                                } else {
+                                    Log.w(TAG, "Error sending verification email", verificationTask.exception)
+                                }
                             }
                     }
                 } else {
@@ -154,6 +162,4 @@ class RegistrationViewModel : ViewModel() {
                 }
             }
     }
-
-
 }
