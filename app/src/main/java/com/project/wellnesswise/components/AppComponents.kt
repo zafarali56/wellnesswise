@@ -30,6 +30,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -42,6 +43,7 @@ import androidx.compose.material3.RadioButtonDefaults
 
 
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -77,6 +79,34 @@ import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.data.MedicalHistoryQuestion
 import com.project.wellnesswise.data.UIEvent
 import com.project.wellnesswise.ui.theme.componentShapes
+import androidx.compose.material3.DrawerValue
+
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.rememberDrawerState
+
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+
+
+
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.ModalNavigationDrawer
+
+@Composable
+
+fun NormalTextComponent(value: String)
+{
+    Text(
+        text = value,
+        modifier = Modifier.fillMaxWidth(),
+        style = TextStyle(
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Normal,
+            fontStyle = FontStyle.Normal,
+        ), color = colorResource(id = R.color.black),
+      textAlign = TextAlign.Center
+    )
+}
 
 
 
@@ -486,12 +516,16 @@ fun MedicalHistorySection(
     val medicalHistory = registrationViewModel.registrationUIState.value.medicalHistory.toMutableMap()
 
     Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         questions.forEach { question ->
             Column(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
             ) {
                 Text(text = question.question, style = MaterialTheme.typography.bodyMedium)
                 question.suggestedAnswers.forEach { answer ->
@@ -518,3 +552,63 @@ fun MedicalHistorySection(
     }
 }
 
+
+
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppToolbar(onNavigationIconClick: () -> Unit) {
+    TopAppBar(
+        title = { Text("WellnessWise") },
+        navigationIcon = {
+            IconButton(onClick = onNavigationIconClick) {
+                Icon(Icons.Filled.Menu, contentDescription = "Menu")
+            }
+        }
+    )
+}
+
+
+
+
+@Composable
+fun NavigationDrawer(content: @Composable () -> Unit) {
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        modifier = Modifier.padding(10.dp),
+        drawerState = drawerState,
+        drawerContent =  {
+            ModalDrawerSheet {
+                // Add your navigation items here
+                Text (
+                    text = stringResource(id = R.string.Home),
+                    modifier = Modifier.padding(16.dp),
+                    fontSize = 20.sp,
+                )
+                Text (
+                    text = stringResource(id = R.string.Profile),
+                    modifier = Modifier.padding(16.dp),
+                    fontSize = 20.sp,
+                )
+
+                Text (
+                    text = stringResource(id = R.string.Logout),
+                    modifier = Modifier.padding(16.dp),
+                    fontSize = 20.sp,
+                )
+            }
+        },
+        content = {
+            content()
+            AppToolbar(onNavigationIconClick = {
+                scope.launch {
+                    drawerState.open()
+                }
+            })
+        }
+    )
+}

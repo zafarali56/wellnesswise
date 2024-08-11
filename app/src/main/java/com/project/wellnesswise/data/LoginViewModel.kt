@@ -70,15 +70,17 @@ class LoginViewModel : ViewModel() {
                                 WellnessWiseAppRouter.navigateTo(Screen.EmailVerificationScreen)
                             }
                         } else {
+                            logInProgress.value = false
                             Log.w(TAG, "Error reloading user", reloadTask.exception)
                             errorMessage.value = reloadTask.exception?.message ?: "Error reloading user"
-                            logInProgress.value = false
+
                         }
                     }
                 } else {
+                    logInProgress.value = false
                     Log.w(TAG, "Login failed", task.exception)
                     errorMessage.value = task.exception?.message ?: "Login failed"
-                    logInProgress.value = false
+
                 }
             }
     }

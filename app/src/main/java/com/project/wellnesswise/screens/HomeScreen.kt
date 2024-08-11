@@ -1,5 +1,3 @@
-package com.project.wellnesswise.screens
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -15,30 +13,31 @@ import androidx.compose.ui.unit.dp
 import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ButtonComponent
 import com.project.wellnesswise.components.HeadingTextComponent
+import com.project.wellnesswise.components.NavigationDrawer
 import com.project.wellnesswise.data.LoginViewModel
-
 
 @Composable
 fun HomeScreen(loginViewModel: LoginViewModel) {
-
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(28.dp)
-    ) {
-        LazyColumn(
+    NavigationDrawer {
+        Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(10.dp)
-                .imePadding() // Add this modifier to handle keyboard padding
+                .background(MaterialTheme.colorScheme.background)
+                .padding(28.dp)
         ) {
-            item {
-                HeadingTextComponent(value = stringResource(id = R.string.Home))
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(10.dp)
+                    .imePadding() // Add this modifier to handle keyboard padding
+            ) {
+                item {
 
-                ButtonComponent(value = stringResource(id = R.string.Logout), isEnabled = true, onButtonClicked = {
-                    loginViewModel.logOut()
-                })
+
+                    ButtonComponent(value = stringResource(id = R.string.Logout), isEnabled = true, onButtonClicked = {
+                        loginViewModel.logOut()
+                    })
+                }
             }
         }
     }
@@ -47,5 +46,5 @@ fun HomeScreen(loginViewModel: LoginViewModel) {
 @Composable
 @Preview
 fun HomeScreenPreview() {
-    HomeScreen(LoginViewModel ())
+    HomeScreen(LoginViewModel())
 }

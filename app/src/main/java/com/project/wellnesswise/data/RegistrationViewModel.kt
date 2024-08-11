@@ -125,14 +125,16 @@ class RegistrationViewModel : ViewModel() {
                                     signUpInProgress.value = false
                                     WellnessWiseAppRouter.navigateTo(Screen.EmailVerificationScreen)
                                 } else {
-                                    Log.w(TAG, "Error sending verification email", verificationTask.exception)
                                     signUpInProgress.value = false
+                                    Log.w(TAG, "Error sending verification email", verificationTask.exception)
+
                                 }
                             }
                     }
                 } else {
-                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     signUpInProgress.value = false
+                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
+
                 }
             }
     }

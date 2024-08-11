@@ -1,5 +1,6 @@
 package com.project.wellnesswise.app
 
+import HomeScreen
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
@@ -17,8 +18,6 @@ import com.project.wellnesswise.screens.LoginScreen
 import com.project.wellnesswise.screens.SignUpScreen
 import com.project.wellnesswise.screens.TermsAndConditionsScreen
 import com.project.wellnesswise.screens.MedicalHistoryScreen
-import com.project.wellnesswise.screens.HomeScreen
-
 
 @Composable
 fun WellnessWiseApp(registrationViewModel: RegistrationViewModel, loginViewModel: LoginViewModel) {
