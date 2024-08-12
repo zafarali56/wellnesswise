@@ -168,4 +168,10 @@ class RegistrationViewModel : ViewModel() {
             }
         }
     }
+
+    fun resetRegistrationUIState (){
+        registrationUIState.value = RegistrationUIState()
+        validationResults.value = emptyMap()
+        signUpInProgress.value = false
+    }
 }

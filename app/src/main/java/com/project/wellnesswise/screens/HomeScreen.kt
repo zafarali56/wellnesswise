@@ -12,39 +12,50 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ButtonComponent
-import com.project.wellnesswise.components.HeadingTextComponent
 import com.project.wellnesswise.components.NavigationDrawer
+import com.project.wellnesswise.data.AuthViewModel
+import com.project.wellnesswise.data.HomeViewModel
 import com.project.wellnesswise.data.LoginViewModel
+import com.project.wellnesswise.data.RegistrationViewModel
 
 @Composable
-fun HomeScreen(loginViewModel: LoginViewModel) {
-    NavigationDrawer {
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(28.dp)
-        ) {
-            LazyColumn(
+fun HomeScreen(
+    homeViewModel: HomeViewModel,
+    authViewModel: AuthViewModel,
+    registrationViewModel: RegistrationViewModel,
+    loginViewModel: LoginViewModel
+) {
+    NavigationDrawer(
+        content = {
+            Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(10.dp)
-                    .imePadding() // Add this modifier to handle keyboard padding
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(28.dp)
             ) {
-                item {
-
-
-                    ButtonComponent(value = stringResource(id = R.string.Logout), isEnabled = true, onButtonClicked = {
-                        loginViewModel.logOut()
-                    })
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .imePadding() // Add this modifier to handle keyboard padding
+                ) {
+                    item {
+                        ButtonComponent(
+                            value = stringResource(id = R.string.Logout),
+                            isEnabled = true,
+                            onButtonClicked = {
+                                authViewModel.logOut(registrationViewModel, loginViewModel)
+                            }
+                        )
+                    }
                 }
             }
-        }
-    }
+        },
+        onLogoutClick = { authViewModel.logOut(registrationViewModel, loginViewModel) }
+    )
 }
 
 @Composable
 @Preview
 fun HomeScreenPreview() {
-    HomeScreen(LoginViewModel())
+    HomeScreen(HomeViewModel(), AuthViewModel(), RegistrationViewModel(), LoginViewModel())
 }

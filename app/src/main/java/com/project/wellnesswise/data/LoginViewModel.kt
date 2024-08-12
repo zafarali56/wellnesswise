@@ -90,17 +90,11 @@ class LoginViewModel : ViewModel() {
         Log.d(TAG, loginUIState.value.toString())
     }
 
-    fun logOut() {
-        val firebaseAuth = FirebaseAuth.getInstance()
-        firebaseAuth.signOut()
-        val authStateListener = FirebaseAuth.AuthStateListener {
-            if (it.currentUser == null) {
-                Log.d(TAG, "Inside signOut")
-                WellnessWiseAppRouter.navigateTo(Screen.LoginScreen)
-            } else {
-                Log.d(TAG, "Inside signOut else")
-            }
-        }
-        firebaseAuth.addAuthStateListener(authStateListener)
+    fun resetLoginUIState() {
+        loginUIState.value = LoginUIState()
+        logInProgress.value = false
+
     }
+
+
 }

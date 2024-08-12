@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.FirebaseApp
 import com.project.wellnesswise.app.WellnessWiseApp
+import com.project.wellnesswise.data.AuthViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -18,8 +19,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             WellnessWiseApp(
+                homeViewModel = viewModel(),
                 registrationViewModel = viewModel(),
-                loginViewModel = viewModel()
+                loginViewModel = viewModel(),
+                authViewModel = AuthViewModel()
             )
         }
     }

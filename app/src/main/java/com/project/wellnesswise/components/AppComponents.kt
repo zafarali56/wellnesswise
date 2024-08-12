@@ -556,7 +556,6 @@ fun MedicalHistorySection(
 
 
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppToolbar(onNavigationIconClick: () -> Unit) {
@@ -572,32 +571,29 @@ fun AppToolbar(onNavigationIconClick: () -> Unit) {
 
 
 
-
 @Composable
-fun NavigationDrawer(content: @Composable () -> Unit) {
+fun NavigationDrawer(content: @Composable () -> Unit, onLogoutClick: ()-> Unit) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
     ModalNavigationDrawer(
-        modifier = Modifier.padding(10.dp),
         drawerState = drawerState,
-        drawerContent =  {
+        drawerContent = {
             ModalDrawerSheet {
                 // Add your navigation items here
-                Text (
+                Text(
                     text = stringResource(id = R.string.Home),
                     modifier = Modifier.padding(16.dp),
                     fontSize = 20.sp,
                 )
-                Text (
+                Text(
                     text = stringResource(id = R.string.Profile),
                     modifier = Modifier.padding(16.dp),
                     fontSize = 20.sp,
                 )
-
-                Text (
+                Text(
                     text = stringResource(id = R.string.Logout),
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(16.dp).clickable {onLogoutClick()},
                     fontSize = 20.sp,
                 )
             }
