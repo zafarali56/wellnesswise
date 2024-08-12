@@ -23,7 +23,11 @@ import com.project.wellnesswise.screens.MedicalHistoryScreen
 
 @Composable
 fun WellnessWiseApp(registrationViewModel: RegistrationViewModel, loginViewModel: LoginViewModel,  authViewModel: AuthViewModel, homeViewModel: HomeViewModel) {
+homeViewModel.checkForActiveSession()
     Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
+     if (homeViewModel.isUserLoggedIn.value == true){
+         WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
+     }
         Crossfade(targetState = WellnessWiseAppRouter.currentScreen, label = "") { currentState ->
             when (currentState.value) {
                 is Screen.SignUpScreen -> SignUpScreen(registrationViewModel)

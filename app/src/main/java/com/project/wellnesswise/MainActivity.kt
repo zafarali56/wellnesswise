@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
                 homeViewModel = viewModel(),
                 registrationViewModel = viewModel(),
                 loginViewModel = viewModel(),
-                authViewModel = AuthViewModel()
+                authViewModel = AuthViewModel(),
             )
         }
     }

@@ -60,7 +60,7 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(28.dp)
+                .padding(16.dp)
         ) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item {

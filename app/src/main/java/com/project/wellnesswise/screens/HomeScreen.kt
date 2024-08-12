@@ -6,10 +6,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ButtonComponent
 import com.project.wellnesswise.components.NavigationDrawer
@@ -25,6 +29,15 @@ fun HomeScreen(
     registrationViewModel: RegistrationViewModel,
     loginViewModel: LoginViewModel
 ) {
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = MaterialTheme.colorScheme.surface.luminance() > 0.5f
+
+    SideEffect {
+        systemUiController.setSystemBarsColor(
+            color = Color.Transparent,
+            darkIcons = useDarkIcons
+        )
+    }
     NavigationDrawer(
         content = {
             Surface(
@@ -39,13 +52,7 @@ fun HomeScreen(
                         .imePadding() // Add this modifier to handle keyboard padding
                 ) {
                     item {
-                        ButtonComponent(
-                            value = stringResource(id = R.string.Logout),
-                            isEnabled = true,
-                            onButtonClicked = {
-                                authViewModel.logOut(registrationViewModel, loginViewModel)
-                            }
-                        )
+
                     }
                 }
             }

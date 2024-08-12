@@ -66,11 +66,13 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                     .imePadding() // Add this modifier to handle keyboard padding
             ) {
                 item {
-                    Image(
-                        painter = painterResource(id = R.drawable.img),
-                        contentDescription = "Logo",
-                        modifier = Modifier.size(310.dp)
-                    )
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        Image(
+                            painter = painterResource(id = R.drawable.img),
+                            contentDescription = "Logo",
+                            modifier = Modifier.size(310.dp)
+                        )
+                    }
                     HeadingTextComponent(value = stringResource(id = R.string.Login))
                     Spacer(modifier = Modifier.height(30.dp))
                     HorizontalDivider(
