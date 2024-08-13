@@ -11,6 +11,7 @@ sealed class Screen {
     object MedicalHistoryScreen : Screen()
     object HomeScreen: Screen()
     object EmailVerificationScreen: Screen()
+    object HealthDataScreen: Screen()
 }
 
 object WellnessWiseAppRouter {

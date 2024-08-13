@@ -10,12 +10,22 @@ data class RegistrationUIState(
     var height: Number = 0,
     var weight: Number = 0,
     var habits: List<Habit> = emptyList(),
-    var medicalHistory:  Map<String, String> = emptyMap(),
+    var medicalHistory: Map<String, String> = emptyMap(),
     var password: String = "",
     var isPolicyAccepted: Boolean = false,
-    )
 
+    // Health parameters
+    var bloodPressure: String = "",
+    var heartRate: String = "",
+    var bloodSugar: String = "",
+    var cholesterol: String = "",
 
+    // Error states for health parameters
+    var bloodPressureError: Boolean = false,
+    var heartRateError: Boolean = false,
+    var bloodSugarError: Boolean = false,
+    var cholesterolError: Boolean = false
+)
 data class LoginUIState(
     var email: String = "",
     var password: String = "",
@@ -48,3 +58,5 @@ enum class Habit {
     HygienePractices,
 
 }
+
+

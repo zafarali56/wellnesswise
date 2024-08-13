@@ -23,6 +23,7 @@
     <string name="home_title">Home</string>
     <string name="menu">Menu</string>
     <string name="Profile">Profile</string>
+    <string name="HealthData">Health Data</string>
 
 
 </resources>

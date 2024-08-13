@@ -1,5 +1,6 @@
 package com.project.wellnesswise.data
 
+import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -10,16 +11,56 @@ import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 
 class RegistrationViewModel : ViewModel() {
-    private val TAG = RegistrationViewModel::class.simpleName
     var registrationUIState = mutableStateOf(RegistrationUIState())
         private set
     var validationResults = mutableStateOf(emptyMap<String, Boolean>())
         private set
-
     var signUpInProgress = mutableStateOf(false)
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    fun updateHealthParameters(
+        bloodPressure: String,
+        heartRate: String,
+        bloodSugar: String,
+        cholesterol: String
+    ) {
+        val validationResults = Validator.validateHealthParameters(bloodPressure, heartRate, bloodSugar, cholesterol)
+
+        registrationUIState.value = registrationUIState.value.copy(
+            bloodPressure = bloodPressure,
+            heartRate = heartRate,
+            bloodSugar = bloodSugar,
+            cholesterol = cholesterol,
+            bloodPressureError = !validationResults["bloodPressure"]!!,
+            heartRateError = !validationResults["heartRate"]!!,
+            bloodSugarError = !validationResults["bloodSugar"]!!,
+            cholesterolError = !validationResults["cholesterol"]!!
+        )
+    }
+
+    fun sendHealthDataToFirestore() {
+        val uiState = registrationUIState.value
+        val user = auth.currentUser
+        if (user != null) {
+            val healthData = mapOf(
+                "bloodPressure" to uiState.bloodPressure,
+                "heartRate" to uiState.heartRate,
+                "bloodSugar" to uiState.bloodSugar,
+                "cholesterol" to uiState.cholesterol
+            )
+            firestore.collection("users").document(user.uid)
+                .update(healthData)
+                .addOnSuccessListener {
+                    Log.d(TAG, "Health data updated successfully")
+                    WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "Error updating health data", e)
+                }
+        }
+    }
 
     fun onEvent(event: UIEvent) {
         when (event) {
@@ -68,7 +109,6 @@ class RegistrationViewModel : ViewModel() {
                     password = event.password
                 )
             }
-
             is UIEvent.PolicyAcceptedChanged -> {
                 registrationUIState.value = registrationUIState.value.copy(
                     isPolicyAccepted = event.isPolicyAccepted
@@ -127,14 +167,12 @@ class RegistrationViewModel : ViewModel() {
                                 } else {
                                     signUpInProgress.value = false
                                     Log.w(TAG, "Error sending verification email", verificationTask.exception)
-
                                 }
                             }
                     }
                 } else {
                     signUpInProgress.value = false
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
-
                 }
             }
     }
@@ -157,7 +195,7 @@ class RegistrationViewModel : ViewModel() {
                         .set(userData)
                         .addOnSuccessListener {
                             Log.d(TAG, "User data stored successfully")
-                            WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
+                            WellnessWiseAppRouter.navigateTo(Screen.HealthDataScreen)
                         }
                         .addOnFailureListener { e ->
                             Log.w(TAG, "Error storing user data", e)
@@ -169,7 +207,7 @@ class RegistrationViewModel : ViewModel() {
         }
     }
 
-    fun resetRegistrationUIState (){
+    fun resetRegistrationUIState() {
         registrationUIState.value = RegistrationUIState()
         validationResults.value = emptyMap()
         signUpInProgress.value = false

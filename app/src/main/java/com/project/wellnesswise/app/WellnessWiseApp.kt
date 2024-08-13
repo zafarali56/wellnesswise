@@ -16,6 +16,7 @@ import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import com.project.wellnesswise.screens.EmailVerificationScreen
 import com.project.wellnesswise.screens.HabitsScreen
+import com.project.wellnesswise.screens.HealthDataScreen
 import com.project.wellnesswise.screens.LoginScreen
 import com.project.wellnesswise.screens.SignUpScreen
 import com.project.wellnesswise.screens.TermsAndConditionsScreen
@@ -37,6 +38,7 @@ homeViewModel.checkForActiveSession()
                 is Screen.MedicalHistoryScreen -> MedicalHistoryScreen(registrationViewModel)
                 is Screen.HomeScreen -> HomeScreen( homeViewModel , authViewModel, registrationViewModel, loginViewModel)
                 is Screen.EmailVerificationScreen -> EmailVerificationScreen(registrationViewModel)
+                is Screen.HealthDataScreen -> HealthDataScreen(registrationViewModel)
 
             }
         }

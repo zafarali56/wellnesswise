@@ -555,7 +555,6 @@ fun MedicalHistorySection(
 
 
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppToolbar(onNavigationIconClick: () -> Unit) {
@@ -568,8 +567,6 @@ fun AppToolbar(onNavigationIconClick: () -> Unit) {
         }
     )
 }
-
-
 
 @Composable
 fun NavigationDrawer(content: @Composable () -> Unit, onLogoutClick: ()-> Unit) {
