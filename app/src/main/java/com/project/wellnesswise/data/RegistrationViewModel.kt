@@ -195,7 +195,7 @@ class RegistrationViewModel : ViewModel() {
                         .set(userData)
                         .addOnSuccessListener {
                             Log.d(TAG, "User data stored successfully")
-                            WellnessWiseAppRouter.navigateTo(Screen.HealthDataScreen)
+                            WellnessWiseAppRouter.navigateTo(Screen.HealthDataSelectionScreen)
                         }
                         .addOnFailureListener { e ->
                             Log.w(TAG, "Error storing user data", e)

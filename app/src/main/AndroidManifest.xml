@@ -12,11 +12,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WellnessWise"
         tools:targetApi="31">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.WellnessWise">
+            <!-- TODO: declare Health Connect visibility -->
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
