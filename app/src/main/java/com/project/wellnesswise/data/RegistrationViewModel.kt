@@ -2,6 +2,7 @@ package com.project.wellnesswise.data
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -9,30 +10,55 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.project.wellnesswise.data.rules.Validator
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
-
 class RegistrationViewModel : ViewModel() {
     var registrationUIState = mutableStateOf(RegistrationUIState())
         private set
     var validationResults = mutableStateOf(emptyMap<String, Boolean>())
         private set
+
+    private val _isSyncing = mutableStateOf(false)
+    val isSyncing: State<Boolean> = _isSyncing
+
+    private val _syncMessage = mutableStateOf<String?>(null)
+    val syncMessage: State<String?> = _syncMessage
     var signUpInProgress = mutableStateOf(false)
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    fun setIsSyncing(syncing: Boolean) {
+        _isSyncing.value = syncing
+    }
 
+    fun setSyncMessage(message: String?) {
+        _syncMessage.value = message
+    }
     fun updateHealthParameters(
-        bloodPressure: String,
-        heartRate: String,
-        bloodSugar: String,
-        cholesterol: String
+        bloodPressure: String? = null,
+        heartRate: String? = null,
+        bloodSugar: String? = null,
+        cholesterol: String? = null
     ) {
-        val validationResults = Validator.validateHealthParameters(bloodPressure, heartRate, bloodSugar, cholesterol)
+        val currentState = registrationUIState.value
+        val newState = currentState.copy(
+            bloodPressure = bloodPressure ?: currentState.bloodPressure,
+            heartRate = heartRate ?: currentState.heartRate,
+            bloodSugar = bloodSugar ?: currentState.bloodSugar,
+            cholesterol = cholesterol ?: currentState.cholesterol
+        )
 
-        registrationUIState.value = registrationUIState.value.copy(
-            bloodPressure = bloodPressure,
-            heartRate = heartRate,
-            bloodSugar = bloodSugar,
-            cholesterol = cholesterol,
+        registrationUIState.value = newState
+        validateHealthParameters(newState)
+    }
+
+    private fun validateHealthParameters(state: RegistrationUIState) {
+        val validationResults = Validator.validateHealthParameters(
+            state.bloodPressure,
+            state.heartRate,
+            state.bloodSugar,
+            state.cholesterol
+        )
+
+        registrationUIState.value = state.copy(
             bloodPressureError = !validationResults["bloodPressure"]!!,
             heartRateError = !validationResults["heartRate"]!!,
             bloodSugarError = !validationResults["bloodSugar"]!!,
@@ -41,6 +67,8 @@ class RegistrationViewModel : ViewModel() {
     }
 
     fun sendHealthDataToFirestore() {
+        setIsSyncing(true)
+        setSyncMessage(null)
         val uiState = registrationUIState.value
         val user = auth.currentUser
         if (user != null) {
@@ -54,12 +82,26 @@ class RegistrationViewModel : ViewModel() {
                 .update(healthData)
                 .addOnSuccessListener {
                     Log.d(TAG, "Health data updated successfully")
+                    setIsSyncing(false)
+                    setSyncMessage("Health data updated successfully")
                     WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
                 }
                 .addOnFailureListener { e ->
                     Log.w(TAG, "Error updating health data", e)
+                    setIsSyncing(false)
+                    setSyncMessage("Error updating health data: ${e.localizedMessage}")
                 }
+        } else {
+            setIsSyncing(false)
+            setSyncMessage("Error: User not signed in")
         }
+    }
+
+    fun updateHeartRate(heartRate: Float) {
+        registrationUIState.value = registrationUIState.value.copy(
+            heartRate = heartRate.toString()
+        )
+        sendHealthDataToFirestore()
     }
 
     fun onEvent(event: UIEvent) {

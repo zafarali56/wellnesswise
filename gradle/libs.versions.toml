@@ -14,9 +14,12 @@ materialIconsExtended = "1.6.8"
 firebaseAuthKtx = "23.0.0"
 firebaseFirestoreKtx = "25.0.0"
 appcompat = "1.7.0"
+playServicesAuth = "21.2.0"
+playServicesFitness = "21.2.0"
 playServicesWearable = "18.2.0"
 roomKtx = "2.6.1"
 gamesActivity = "3.0.5"
+runtimeLivedata = "1.6.8"
 
 [libraries]
 
@@ -48,7 +51,10 @@ firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-fires
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 androidx-games-activity = { group = "androidx.games", name = "games-activity", version.ref = "gamesActivity" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
+play-services-fitness = { module = "com.google.android.gms:play-services-fitness", version.ref = "playServicesFitness" }
 play-services-wearable = { module = "com.google.android.gms:play-services-wearable", version.ref = "playServicesWearable" }
+androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
