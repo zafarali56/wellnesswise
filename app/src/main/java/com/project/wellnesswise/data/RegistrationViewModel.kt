@@ -5,11 +5,14 @@ import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.project.wellnesswise.data.rules.Validator
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
+import kotlinx.coroutines.launch
+
 class RegistrationViewModel : ViewModel() {
     var registrationUIState = mutableStateOf(RegistrationUIState())
         private set
@@ -50,6 +53,7 @@ class RegistrationViewModel : ViewModel() {
         validateHealthParameters(newState)
     }
 
+
     private fun validateHealthParameters(state: RegistrationUIState) {
         val validationResults = Validator.validateHealthParameters(
             state.bloodPressure,
@@ -65,29 +69,28 @@ class RegistrationViewModel : ViewModel() {
             cholesterolError = !validationResults["cholesterol"]!!
         )
     }
-
-    fun sendHealthDataToFirestore() {
+    fun sendHealthDataToFirestore(navigateToHome: Boolean = false) {
         setIsSyncing(true)
         setSyncMessage(null)
         val uiState = registrationUIState.value
         val user = auth.currentUser
         if (user != null) {
             val healthData = mapOf(
-                "bloodPressure" to uiState.bloodPressure,
-                "heartRate" to uiState.heartRate,
-                "bloodSugar" to uiState.bloodSugar,
-                "cholesterol" to uiState.cholesterol
+                "bloodPressure" to (uiState.bloodPressure.takeIf { it.isNotBlank() } ?: "N/A"),
+                "heartRate" to (uiState.heartRate.takeIf { it.isNotBlank() } ?: "N/A"),
+                "bloodSugar" to (uiState.bloodSugar.takeIf { it.isNotBlank() } ?: "N/A"),
+                "cholesterol" to (uiState.cholesterol.takeIf { it.isNotBlank() } ?: "N/A")
             )
             firestore.collection("users").document(user.uid)
-                .update(healthData)
+                .set(healthData, com.google.firebase.firestore.SetOptions.merge())
                 .addOnSuccessListener {
-                    Log.d(TAG, "Health data updated successfully")
                     setIsSyncing(false)
                     setSyncMessage("Health data updated successfully")
-                    WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
+                    if (navigateToHome) {
+                        WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
+                    }
                 }
                 .addOnFailureListener { e ->
-                    Log.w(TAG, "Error updating health data", e)
                     setIsSyncing(false)
                     setSyncMessage("Error updating health data: ${e.localizedMessage}")
                 }
@@ -97,11 +100,45 @@ class RegistrationViewModel : ViewModel() {
         }
     }
 
+
+
     fun updateHeartRate(heartRate: Float) {
         registrationUIState.value = registrationUIState.value.copy(
             heartRate = heartRate.toString()
         )
         sendHealthDataToFirestore()
+    }
+    fun syncWithGoogleFit(heartRate: Float?, bloodPressure: String?, bloodSugar: Float?) {
+        viewModelScope.launch {
+            setIsSyncing(true)
+            setSyncMessage(null)
+
+            var dataUpdated = false
+
+            heartRate?.let {
+                updateHealthParameters(heartRate = it.toString())
+                dataUpdated = true
+            }
+
+            bloodPressure?.let {
+                updateHealthParameters(bloodPressure = it)
+                dataUpdated = true
+            }
+
+            bloodSugar?.let {
+                updateHealthParameters(bloodSugar = it.toString())
+                dataUpdated = true
+            }
+
+            if (dataUpdated) {
+                sendHealthDataToFirestore()
+                setSyncMessage("Data synced successfully from Google Fit")
+            } else {
+                setSyncMessage("No new data found in Google Fit")
+            }
+
+            setIsSyncing(false)
+        }
     }
 
     fun onEvent(event: UIEvent) {

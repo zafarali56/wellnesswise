@@ -1,30 +1,40 @@
-package com.project.wellnesswise.screens
-
-import android.util.Log
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import android.content.Context
+import android.content.Intent
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.project.wellnesswise.R
-import com.project.wellnesswise.components.ButtonComponent
-import com.project.wellnesswise.components.HeadingTextComponent
-import com.project.wellnesswise.components.MyTextField
-import com.project.wellnesswise.data.RegistrationViewModel
+import com.google.android.gms.fitness.data.Field
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.DataType
-import com.google.android.gms.fitness.data.Field
 import com.google.android.gms.fitness.data.HealthDataTypes
-import com.google.android.gms.fitness.Fitness
-import com.google.android.gms.fitness.request.DataReadRequest
+import com.google.android.gms.fitness.data.HealthFields
+import com.project.wellnesswise.data.RegistrationViewModel
+import com.project.wellnesswise.navigations.Screen
+import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.util.concurrent.TimeUnit
-
 @Composable
 fun HealthDataScreen(
     registrationViewModel: RegistrationViewModel,
@@ -36,26 +46,44 @@ fun HealthDataScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
+    val fitnessOptions = remember {
+        FitnessOptions.builder()
+            .addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ)
+            .addDataType(HealthDataTypes.TYPE_BLOOD_PRESSURE, FitnessOptions.ACCESS_READ)
+            .addDataType(HealthDataTypes.TYPE_BLOOD_GLUCOSE, FitnessOptions.ACCESS_READ)
+            .build()
+    }
+
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            coroutineScope.launch {
+                syncWithGoogleFit(context, registrationViewModel, fitnessOptions)
+            }
+        } else {
+            registrationViewModel.setSyncMessage("Failed to obtain Google Fit permissions")
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        HeadingTextComponent(value = stringResource(id = R.string.HealthData))
+        Text("Health Data", style = MaterialTheme.typography.headlineMedium)
+        Spacer(modifier = Modifier.height(16.dp))
 
-        ButtonComponent(
-            value = if (isSyncing) "Syncing..." else "Sync with Google Fit",
-            onButtonClicked = {
-                registrationViewModel.setIsSyncing(true)
-                registrationViewModel.setSyncMessage(null)
-                onRequestGoogleFitPermission()
+        Button(
+            onClick = {
                 coroutineScope.launch {
-                    syncWithGoogleFit(context, registrationViewModel)
+                    handleGoogleFitSync(context, registrationViewModel, fitnessOptions, googleSignInLauncher)
                 }
             },
-            isEnabled = !isSyncing
-        )
-
+            enabled = !isSyncing
+        ) {
+            Text(if (isSyncing) "Syncing..." else "Sync with Google Fit")
+        }
         syncMessage?.let { message ->
             Text(
                 text = message,
@@ -66,145 +94,156 @@ fun HealthDataScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        MyTextField(
-            labelValue = "Blood Pressure (e.g. 80/120)",
-            initialValue = uiState.bloodPressure,
-            onTextSelected = { registrationViewModel.updateHealthParameters(bloodPressure = it) },
+        OutlinedTextField(
+            value = uiState.bloodPressure,
+            onValueChange = { registrationViewModel.updateHealthParameters(bloodPressure = it) },
+            label = { Text("Blood Pressure (e.g. 120/80)") },
+            modifier = Modifier.fillMaxWidth()
         )
         if (uiState.bloodPressureError) {
-            Text(text = "Invalid blood pressure format", color = MaterialTheme.colorScheme.error)
+            Text("Invalid blood pressure format", color = MaterialTheme.colorScheme.error)
         }
+
         Spacer(modifier = Modifier.height(8.dp))
 
-        MyTextField(
-            labelValue = "Heart Rate (e.g. 70)",
-            initialValue = uiState.heartRate,
-            onTextSelected = { registrationViewModel.updateHealthParameters(heartRate = it) },
+        OutlinedTextField(
+            value = uiState.heartRate,
+            onValueChange = { registrationViewModel.updateHealthParameters(heartRate = it) },
+            label = { Text("Heart Rate (e.g. 70)") },
+            modifier = Modifier.fillMaxWidth()
         )
         if (uiState.heartRateError) {
-            Text(text = "Invalid heart rate", color = MaterialTheme.colorScheme.error)
+            Text("Invalid heart rate", color = MaterialTheme.colorScheme.error)
         }
+
         Spacer(modifier = Modifier.height(8.dp))
 
-        MyTextField(
-            labelValue = "Blood Sugar Levels (e.g. 100)",
-            initialValue = uiState.bloodSugar,
-            onTextSelected = { registrationViewModel.updateHealthParameters(bloodSugar = it) },
+        OutlinedTextField(
+            value = uiState.bloodSugar,
+            onValueChange = { registrationViewModel.updateHealthParameters(bloodSugar = it) },
+            label = { Text("Blood Sugar (e.g. 100)") },
+            modifier = Modifier.fillMaxWidth()
         )
         if (uiState.bloodSugarError) {
-            Text(text = "Invalid blood sugar level", color = MaterialTheme.colorScheme.error)
+            Text("Invalid blood sugar value", color = MaterialTheme.colorScheme.error)
         }
+
         Spacer(modifier = Modifier.height(8.dp))
 
-        MyTextField(
-            labelValue = "Cholesterol Levels (e.g. 200)",
-            initialValue = uiState.cholesterol,
-            onTextSelected = { registrationViewModel.updateHealthParameters(cholesterol = it) },
+        OutlinedTextField(
+            value = uiState.cholesterol,
+            onValueChange = { registrationViewModel.updateHealthParameters(cholesterol = it) },
+            label = { Text("Cholesterol (e.g. 200)") },
+            modifier = Modifier.fillMaxWidth()
         )
         if (uiState.cholesterolError) {
-            Text(text = "Invalid cholesterol level", color = MaterialTheme.colorScheme.error)
+            Text("Invalid cholesterol value", color = MaterialTheme.colorScheme.error)
         }
-        Spacer(modifier = Modifier.height(16.dp))
 
-        ButtonComponent(
-            value = "Submit Health Data",
-            onButtonClicked = {
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = {
                 registrationViewModel.sendHealthDataToFirestore()
+                HealthDataSyncWorker.startPeriodicSync(context)
+                WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
             },
-            isEnabled = true
-        )
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Submit Health Data")
+        }
+    }
+}
+private suspend fun handleGoogleFitSync(
+    context: Context,
+    registrationViewModel: RegistrationViewModel,
+    fitnessOptions: FitnessOptions,
+    googleSignInLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
+) {
+    val account = GoogleSignIn.getAccountForExtension(context, fitnessOptions)
+
+    if (!GoogleSignIn.hasPermissions(account, fitnessOptions)) {
+        try {
+            registrationViewModel.setIsSyncing(true)
+            registrationViewModel.setSyncMessage("Requesting Google Fit permissions...")
+
+            val signInOptions = GoogleSignInOptions.Builder()
+                .addExtension(fitnessOptions)
+                .build()
+            val intent = GoogleSignIn.getClient(context, signInOptions).signInIntent
+            googleSignInLauncher.launch(intent)
+        } catch (e: Exception) {
+            registrationViewModel.setSyncMessage("Error requesting Google Fit permissions: ${e.message}")
+        } finally {
+            registrationViewModel.setIsSyncing(false)
+        }
+    } else {
+        syncWithGoogleFit(context, registrationViewModel, fitnessOptions)
     }
 }
 
 private suspend fun syncWithGoogleFit(
     context: android.content.Context,
-    registrationViewModel: RegistrationViewModel
+    registrationViewModel: RegistrationViewModel,
+    fitnessOptions: FitnessOptions
 ) {
     try {
-        val fitnessOptions = FitnessOptions.builder()
-            .addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ)
-            .addDataType(HealthDataTypes.TYPE_BLOOD_PRESSURE, FitnessOptions.ACCESS_READ)
-            .build()
+        registrationViewModel.setIsSyncing(true)
+        registrationViewModel.setSyncMessage("Syncing with Google Fit...")
 
         val account = GoogleSignIn.getAccountForExtension(context, fitnessOptions)
 
-        if (!GoogleSignIn.hasPermissions(account, fitnessOptions)) {
-            registrationViewModel.setSyncMessage("Google Fit permissions not granted. Please grant permissions and try again.")
-            return
-        }
-
-        var dataFound = false
-        var heartRateFound = false
-        var bloodPressureFound = false
+        var heartRate: Float? = null
+        var bloodPressure: String? = null
+        var bloodSugar: Float? = null
 
         // Read heart rate
-        try {
-            val heartRateResult = Fitness.getHistoryClient(context, account)
-                .readDailyTotal(DataType.TYPE_HEART_RATE_BPM)
-                .await()
-            if (!heartRateResult.isEmpty) {
-                val heartRate = heartRateResult.dataPoints.firstOrNull()
-                    ?.getValue(Field.FIELD_AVERAGE)?.asFloat()
-                if (heartRate != null) {
-                    registrationViewModel.updateHealthParameters(heartRate = heartRate.toString())
-                    dataFound = true
-                    heartRateFound = true
+        val heartRateResult = Fitness.getHistoryClient(context, account)
+            .readDailyTotal(DataType.TYPE_HEART_RATE_BPM)
+            .await()
+        if (!heartRateResult.isEmpty) {
+            heartRate = heartRateResult.dataPoints.firstOrNull()
+                ?.getValue(Field.FIELD_AVERAGE)?.asFloat()
+        }
+
+        // Read blood pressure and blood sugar
+        val endTime = System.currentTimeMillis()
+        val startTime = endTime - 24 * 60 * 60 * 1000 // 24 hours ago
+        val readRequest = com.google.android.gms.fitness.request.DataReadRequest.Builder()
+            .read(HealthDataTypes.TYPE_BLOOD_PRESSURE)
+            .read(HealthDataTypes.TYPE_BLOOD_GLUCOSE)
+            .setTimeRange(startTime, endTime, java.util.concurrent.TimeUnit.MILLISECONDS)
+            .build()
+
+        val dataResponse = Fitness.getHistoryClient(context, account)
+            .readData(readRequest)
+            .await()
+
+        for (dataSet in dataResponse.dataSets) {
+            when (dataSet.dataType) {
+                HealthDataTypes.TYPE_BLOOD_PRESSURE -> {
+                    for (dataPoint in dataSet.dataPoints.sortedByDescending { it.getEndTime(java.util.concurrent.TimeUnit.MILLISECONDS) }) {
+                        val systolic = dataPoint.getValue(HealthFields.FIELD_BLOOD_PRESSURE_SYSTOLIC).asFloat()
+                        val diastolic = dataPoint.getValue(HealthFields.FIELD_BLOOD_PRESSURE_DIASTOLIC).asFloat()
+                        bloodPressure = "${systolic.toInt()}/${diastolic.toInt()}"
+                        break // Take the most recent reading
+                    }
+                }
+                HealthDataTypes.TYPE_BLOOD_GLUCOSE -> {
+                    for (dataPoint in dataSet.dataPoints.sortedByDescending { it.getEndTime(java.util.concurrent.TimeUnit.MILLISECONDS) }) {
+                        bloodSugar = dataPoint.getValue(HealthFields.FIELD_BLOOD_GLUCOSE_LEVEL).asFloat()
+                        break // Take the most recent reading
+                    }
                 }
             }
-        } catch (e: Exception) {
-            Log.e("GoogleFit", "Error reading heart rate data: ${e.message}")
         }
 
-        // Read blood pressure
-        try {
-            val endTime = System.currentTimeMillis()
-            val startTime = endTime - 7 * 24 * 60 * 60 * 1000 // 7 days ago
-
-            val readRequest = DataReadRequest.Builder()
-                .read(HealthDataTypes.TYPE_BLOOD_PRESSURE)
-                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                .build()
-
-            val bloodPressureResponse = Fitness.getHistoryClient(context, account)
-                .readData(readRequest)
-                .await()
-
-            Log.d("GoogleFit", "Blood Pressure Response: ${bloodPressureResponse.dataSets}")
-
-            for (dataSet in bloodPressureResponse.dataSets) {
-                for (dataPoint in dataSet.dataPoints) {
-                    val systolic = dataPoint.getValue(HealthDataTypes.TYPE_BLOOD_PRESSURE.fields[0]).asFloat()
-                    val diastolic = dataPoint.getValue(HealthDataTypes.TYPE_BLOOD_PRESSURE.fields[1]).asFloat()
-                    Log.d("GoogleFit", "Blood Pressure: $systolic / $diastolic")
-                    registrationViewModel.updateHealthParameters(bloodPressure = "$systolic/$diastolic")
-                    dataFound = true
-                    bloodPressureFound = true
-                    break // Just take the most recent reading
-                }
-                if (bloodPressureFound) break
-            }
-        } catch (e: Exception) {
-            Log.e("GoogleFit", "Error reading blood pressure data: ${e.message}")
-        }
-
-        if (dataFound) {
-            var message = "Sync successful. "
-            if (heartRateFound) message += "Heart rate data retrieved. "
-            if (bloodPressureFound) message += "Blood pressure data retrieved. "
-            if (!heartRateFound) message += "No recent heart rate data found. "
-            if (!bloodPressureFound) message += "No recent blood pressure data found. "
-            registrationViewModel.setSyncMessage(message.trim())
-        } else {
-            registrationViewModel.setSyncMessage("No recent health data found in Google Fit. Make sure you have recorded data recently.")
-        }
+        registrationViewModel.syncWithGoogleFit(heartRate, bloodPressure, bloodSugar)
     } catch (e: Exception) {
         registrationViewModel.setSyncMessage("Error syncing with Google Fit: ${e.message}")
-        Log.e("GoogleFit", "Error syncing with Google Fit", e)
     } finally {
         registrationViewModel.setIsSyncing(false)
     }
 }
-
 @Composable
 @Preview
 fun HealthDataScreenPreview() {

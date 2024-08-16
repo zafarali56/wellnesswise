@@ -1,5 +1,6 @@
 package com.project.wellnesswise.screens
 
+
 import android.app.Activity
 import android.content.Context
 import androidx.compose.foundation.layout.*
@@ -22,6 +23,7 @@ import com.google.android.gms.fitness.result.DataReadResponse
 import com.project.wellnesswise.components.ButtonComponent
 import com.project.wellnesswise.components.HeadingTextComponent
 import com.project.wellnesswise.data.RegistrationViewModel
+
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import kotlinx.coroutines.launch
