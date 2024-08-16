@@ -41,11 +41,7 @@ fun WellnessWiseApp(
                 is Screen.HomeScreen -> HomeScreen(homeViewModel, authViewModel, registrationViewModel, loginViewModel)
                 is Screen.EmailVerificationScreen -> EmailVerificationScreen(registrationViewModel)
                 is Screen.HealthDataScreen -> HealthDataScreen(registrationViewModel,onRequestGoogleFitPermission = onRequestGoogleFitPermission)
-                is Screen.HealthDataWatchScreen -> HealthDataWatchScreen(
-                    viewModel = registrationViewModel,
-                    onRequestGoogleFitPermission = onRequestGoogleFitPermission
-                )
-                is Screen.HealthDataSelectionScreen -> HealthDataSelectionScreen()
+
             }
         }
     }

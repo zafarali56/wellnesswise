@@ -9,13 +9,11 @@ sealed class Screen {
     object LoginScreen : Screen()
     object HabitsScreen : Screen()
     object MedicalHistoryScreen : Screen()
-    object HomeScreen: Screen()
-    object EmailVerificationScreen: Screen()
-    object HealthDataScreen: Screen()
-    object HealthDataWatchScreen: Screen()
-    object HealthDataSelectionScreen: Screen()
-}
+    object HomeScreen : Screen()
+    object EmailVerificationScreen : Screen()
+    object HealthDataScreen : Screen()
 
+}
 object WellnessWiseAppRouter {
     var currentScreen: MutableState<Screen> = mutableStateOf(Screen.SignUpScreen)
 

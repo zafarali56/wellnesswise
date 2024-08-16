@@ -98,24 +98,26 @@ object Validator {
         return validationResults.all { it.value }
     }
 
+
+//Health data validations from now here
     fun validateBloodPressure(bloodPressure: String): Boolean {
-        val bloodPressureRegex = Regex("^\\d+/\\d+$")
+        val bloodPressureRegex = Regex("^\\d+(\\.\\d+)?/\\d+(\\.\\d+)?$")
         return bloodPressure.matches(bloodPressureRegex)
     }
-//Health data validations from now here
+
     // Heart Rate validation
     fun validateHeartRate(heartRate: String): Boolean {
-        return heartRate.toIntOrNull()?.let { it in 40..200 } ?: false
+        return heartRate.toFloatOrNull()?.let { it in 40f..200f } ?: false
     }
 
     // Blood Sugar validation
     fun validateBloodSugar(bloodSugar: String): Boolean {
-        return bloodSugar.toIntOrNull()?.let { it in 70..300 } ?: false
+        return bloodSugar.toFloatOrNull()?.let { it in 70f..300f } ?: false
     }
 
     // Cholesterol validation
     fun validateCholesterol(cholesterol: String): Boolean {
-        return cholesterol.toIntOrNull()?.let { it in 100..300 } ?: false
+        return cholesterol.toFloatOrNull()?.let { it in 100f..300f } ?: false
     }
 
     // Validate health parameters

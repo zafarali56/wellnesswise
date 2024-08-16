@@ -3,11 +3,10 @@ package com.project.wellnesswise.data
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 class HomeViewModel : ViewModel() {
     private val TAG = HomeViewModel::class.simpleName
@@ -44,29 +43,31 @@ class HomeViewModel : ViewModel() {
 
                     if (snapshot != null && snapshot.exists()) {
                         try {
-                            bloodPressure.value = snapshot.getString("bloodPressure") ?: "N/A"
-                            heartRate.value = snapshot.getString("heartRate") ?: "N/A"
-                            bloodSugar.value = snapshot.getString("bloodSugar") ?: "N/A"
-                            cholesterol.value = snapshot.getString("cholesterol") ?: "N/A"
+                            snapshot.data?.let { data ->
+                                bloodPressure.value = data["bloodPressure"]?.toString() ?: "N/A"
+                                heartRate.value = (data["heartRate"] as? Number)?.toFloat()?.roundToInt()?.toString() ?: "N/A"
+                                bloodSugar.value = data["bloodSugar"]?.toString() ?: "N/A"
+                                cholesterol.value = data["cholesterol"]?.toString() ?: "N/A"
+                            }
                             Log.d(TAG, "Current data: ${snapshot.data}")
+                            Log.d(TAG, "BP: ${bloodPressure.value}, HR: ${heartRate.value}, BS: ${bloodSugar.value}, Chol: ${cholesterol.value}")
                         } catch (e: Exception) {
                             Log.e(TAG, "Error parsing Firestore data", e)
-                            // Set default values in case of error
-                            bloodPressure.value = "N/A"
-                            heartRate.value = "N/A"
-                            bloodSugar.value = "N/A"
-                            cholesterol.value = "N/A"
+                            setDefaultValues()
                         }
                     } else {
                         Log.d(TAG, "Current data: null")
-                        // Set default values if document doesn't exist
-                        bloodPressure.value = "N/A"
-                        heartRate.value = "N/A"
-                        bloodSugar.value = "N/A"
-                        cholesterol.value = "N/A"
+                        setDefaultValues()
                     }
                 }
         }
+    }
+
+    private fun setDefaultValues() {
+        bloodPressure.value = "N/A"
+        heartRate.value = "N/A"
+        bloodSugar.value = "N/A"
+        cholesterol.value = "N/A"
     }
 
     override fun onCleared() {
