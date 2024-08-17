@@ -1,7 +1,7 @@
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,9 +15,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material.icons.filled.MonitorHeart
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.icons.filled.BarChart
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.draw.shadow
+import androidx.compose.foundation.isSystemInDarkTheme
+
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.foundation.lazy.LazyColumn
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 import com.project.wellnesswise.R
+import com.project.wellnesswise.components.HealthMetricCard
 import com.project.wellnesswise.components.NavigationDrawer
 import com.project.wellnesswise.data.AuthViewModel
 import com.project.wellnesswise.data.HomeViewModel
@@ -32,69 +44,126 @@ fun HomeScreen(
     loginViewModel: LoginViewModel
 ) {
     val context = LocalContext.current
-    val bloodPressure by homeViewModel.bloodPressure.observeAsState("N/A")
-    val heartRate by homeViewModel.heartRate.observeAsState("N/A")
-    val bloodSugar by homeViewModel.bloodSugar.observeAsState("N/A")
+    val bloodPressure by homeViewModel.bloodPressure.collectAsStateWithLifecycle()
+    val heartRate by homeViewModel.heartRate.collectAsStateWithLifecycle()
+    val bloodSugar by homeViewModel.bloodSugar.collectAsStateWithLifecycle()
+    val isRefreshing by homeViewModel.isRefreshing.collectAsStateWithLifecycle()
 
     val primaryColor = colorResource(id = R.color.primary)
     val secondaryColor = colorResource(id = R.color.secondary)
     val lightRedColor = Color(0xFFFF9999) // Light red color for heart rate
 
+    // Remember the system UI controller
+    val systemUiController = rememberSystemUiController()
+    val statusBarColor = MaterialTheme.colorScheme.surface
+    val useDarkIcons = !isSystemInDarkTheme()
+
+    // Set the status bar color
+    LaunchedEffect(statusBarColor, useDarkIcons) {
+        systemUiController.setStatusBarColor(
+            color = statusBarColor,
+            darkIcons = useDarkIcons
+        )
+    }
+
     LaunchedEffect(Unit) {
         homeViewModel.checkForActiveSession()
     }
+
     NavigationDrawer(
         content = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                color = MaterialTheme.colorScheme.background
+            SwipeRefresh(
+                state = rememberSwipeRefreshState(isRefreshing),
+                onRefresh = { homeViewModel.refreshData() }
             ) {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        "Health Dashboard",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = primaryColor
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                    item {
 
-                    // Full-width heart rate card
-                    HealthMetricCard(
-                        title = "Heart Rate",
-                        value = heartRate,
-                        unit = "bpm",
-                        color = lightRedColor,
-                        icon = Icons.Filled.Favorite,
-                        modifier = Modifier.fillMaxWidth()
-                    )
 
-                    Spacer(modifier = Modifier.height(16.dp))
 
-                    // Row for blood pressure and blood sugar
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        // Blood Pressure card (half width)
+                        // Full-width heart rate card
                         HealthMetricCard(
-                            title = "Blood Pressure",
-                            value = bloodPressure,
-                            unit = "mmHg",
-                            color = primaryColor,
-                            icon = Icons.Filled.MonitorHeart,
-                            modifier = Modifier.weight(1f)
+                            title = "Heart Rate",
+                            value = heartRate,
+                            unit = "bpm",
+                            color = lightRedColor,
+                            icon = Icons.Filled.Favorite,
+                            modifier = Modifier.fillMaxWidth(),
+                            isLargeCard = true
                         )
 
-                        // Blood Sugar card (half width)
-                        HealthMetricCard(
-                            title = "Blood Sugar",
-                            value = bloodSugar,
-                            unit = "mg/dL",
-                            color = secondaryColor,
-                            icon = Icons.Filled.WaterDrop,
-                            modifier = Modifier.weight(1f)
-                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Row for blood pressure and blood sugar
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            // Blood Pressure card (half width)
+                            HealthMetricCard(
+                                title = "Blood Pressure",
+                                value = bloodPressure,
+                                unit = "mmHg",
+                                color = primaryColor,
+                                icon = Icons.Filled.MonitorHeart,
+                                modifier = Modifier.weight(1f),
+                                isLargeCard = false
+                            )
+
+                            // Blood Sugar card (half width)
+                            HealthMetricCard(
+                                title = "Blood Sugar",
+                                value = bloodSugar,
+                                unit = "mg/dL",
+                                color = secondaryColor,
+                                icon = Icons.Filled.WaterDrop,
+                                modifier = Modifier.weight(1f),
+                                isLargeCard = false
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        // Beautiful Data Visualization Button
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .shadow(
+                                    elevation = 6.dp,
+                                    shape = RoundedCornerShape(28.dp)
+                                )
+                        ) {
+                            Button(
+                                onClick = { /* TODO: Implement data visualization action */ },
+                                modifier = Modifier.fillMaxSize(),
+                                colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+                                shape = RoundedCornerShape(28.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.BarChart,
+                                        contentDescription = "Data Visualization",
+                                        modifier = Modifier.size(24.dp),
+                                        tint = Color.White
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(
+                                        "Data Visualization",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -102,61 +171,6 @@ fun HomeScreen(
         onLogoutClick = { authViewModel.logOut(registrationViewModel, loginViewModel) }
     )
 }
-@Composable
-fun HealthMetricCard(
-    title: String,
-    value: String,
-    unit: String,
-    color: Color,
-    icon: ImageVector,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier
-            .height(120.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.2f))
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = color,
-                modifier = Modifier.size(40.dp)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Row(verticalAlignment = Alignment.Bottom) {
-                    Text(
-                        text = value,
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = color
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = unit,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = color.copy(alpha = 0.7f),
-                        modifier = Modifier.alignByBaseline()
-                    )
-                }
-            }
-        }
-    }
-}
-
 @Composable
 @Preview
 fun HomeScreenPreview() {

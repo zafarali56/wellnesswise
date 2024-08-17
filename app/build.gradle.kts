@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.androidx.games.activity)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -80,6 +81,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.play.services.fitness)
     implementation(libs.play.services.auth)
+    implementation (libs.accompanist.swiperefresh)
 
 
 }

@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.project.wellnesswise.data.rules.Validator
 import com.project.wellnesswise.navigations.Screen
@@ -236,6 +237,12 @@ class RegistrationViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     val user = auth.currentUser
                     if (user != null) {
+                        val profileUpdates = UserProfileChangeRequest.Builder()
+                            .setDisplayName(fullName)
+                            .build()
+                        user.updateProfile(profileUpdates)
+                            .addOnCompleteListener { profileTask ->
+                                if (profileTask.isSuccessful)
                         // Send verification email
                         user.sendEmailVerification()
                             .addOnCompleteListener { verificationTask ->
@@ -255,7 +262,7 @@ class RegistrationViewModel : ViewModel() {
                 }
             }
     }
-
+            }
     fun checkEmailVerification() {
         val user = auth.currentUser
         user?.reload()?.addOnCompleteListener { task ->
@@ -285,6 +292,7 @@ class RegistrationViewModel : ViewModel() {
             }
         }
     }
+
 
     fun resetRegistrationUIState() {
         registrationUIState.value = RegistrationUIState()

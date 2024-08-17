@@ -1,4 +1,5 @@
 [versions]
+accompanistSwiperefresh = "0.27.0"
 agp = "8.5.1"
 firebaseBom = "33.1.2"
 healthConnectClient = "1.0.0-beta01"
@@ -21,10 +22,12 @@ roomKtx = "2.6.1"
 gamesActivity = "3.0.5"
 runtimeLivedata = "1.6.8"
 workRuntimeKtx = "2.9.1"
+lifecycleRuntimeComposeAndroid = "2.8.4"
 
 [libraries]
 
 
+accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistSwiperefresh" }
 accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version = "0.25.1" }
 
 androidx-health-connect-client = { module = "androidx.health:health-connect-client", version.ref = "healthConnectClient" }
@@ -57,6 +60,7 @@ play-services-fitness = { module = "com.google.android.gms:play-services-fitness
 play-services-wearable = { module = "com.google.android.gms:play-services-wearable", version.ref = "playServicesWearable" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
+androidx-lifecycle-runtime-compose-android = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose-android", version.ref = "lifecycleRuntimeComposeAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

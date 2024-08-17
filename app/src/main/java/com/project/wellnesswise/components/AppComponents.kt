@@ -2,8 +2,12 @@ package com.project.wellnesswise.components
 
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,12 +15,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 
 import androidx.compose.foundation.text.ClickableText
@@ -24,6 +32,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Home
 
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -54,7 +64,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
+
 import androidx.compose.ui.graphics.Color
 
 import androidx.compose.ui.res.colorResource
@@ -91,8 +101,15 @@ import kotlinx.coroutines.launch
 
 
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 
@@ -301,12 +318,7 @@ fun ButtonComponent (value: String, onButtonClicked: () -> Unit = {}, isEnabled 
                 .fillMaxWidth()
                 .heightIn(48.dp)
                 .background(
-                    brush = Brush.horizontalGradient(
-                        listOf(
-                            colorResource(id = R.color.primary),
-                            colorResource(id = R.color.secondary)
-                        )
-                    ),
+                    color = colorResource(id = R.color.primary),
                     shape = RoundedCornerShape(50.dp)
                 ),
                    contentAlignment = Alignment.Center
@@ -553,10 +565,6 @@ fun MedicalHistorySection(
         }
     }
 }
-
-
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppToolbar(onNavigationIconClick: () -> Unit) {
@@ -571,60 +579,182 @@ fun AppToolbar(onNavigationIconClick: () -> Unit) {
 }
 
 @Composable
-fun NavigationDrawer(content: @Composable () -> Unit, onLogoutClick: ()-> Unit) {
+fun NavigationDrawer(content: @Composable () -> Unit, onLogoutClick: () -> Unit) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val user = FirebaseAuth.getInstance().currentUser
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                // Add your navigation items here
-                Text(
-                    text = stringResource(id = R.string.Home),
-                    modifier = Modifier.padding(16.dp),
-                    fontSize = 20.sp,
-                )
-                Text(
-                    text = stringResource(id = R.string.Profile),
-                    modifier = Modifier.padding(16.dp),
-                    fontSize = 20.sp,
-                )
-                Text(
-                    text = stringResource(id = R.string.Logout),
-                    modifier = Modifier.padding(16.dp).clickable {onLogoutClick()},
-                    fontSize = 20.sp,
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Giant logo icon
+                    Image(
+                        painter = painterResource(id = R.drawable.iconfordrawer),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(Color.Gray)
+                    )
+                    // User name
+                    Text(
+                        text = user?.displayName ?: "User Name",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    // User email
+                    Text(
+                        text = user?.email ?: "user@example.com",
+                        fontSize = 16.sp,
+                        color = Color.Gray
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Navigation items
+                    listOf(
+                        Triple(stringResource(id = R.string.Home), Icons.Default.Home, {}),
+                        Triple(stringResource(id = R.string.Profile), Icons.Default.Person, {}),
+                        Triple(stringResource(id = R.string.Logout), Icons.Default.ExitToApp, onLogoutClick)
+                    ).forEach { (text, icon, onClick) ->
+                        NavigationItem(
+                            text = text,
+                            icon = icon,
+                            onClick = {
+                                onClick()
+                                scope.launch { drawerState.close() }
+                            }
+                        )
+                    }
+                }
             }
         },
         content = {
-            content()
-            AppToolbar(onNavigationIconClick = {
-                scope.launch {
-                    drawerState.open()
+            Scaffold(
+                topBar = {
+                    AppToolbar(onNavigationIconClick = {
+                        scope.launch {
+                            drawerState.open()
+                        }
+                    })
                 }
-            })
+            ) { innerPadding ->
+                Box(modifier = Modifier.padding(innerPadding)) {
+                    content()
+                }
+            }
         }
     )
 }
-
-
 @Composable
-fun HealthMetricCard(title: String, value: String, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier
-            .padding(4.dp)
+fun NavigationItem(text: String, icon: ImageVector, onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState() 
+
+
+    val primaryColor = MaterialTheme.colorScheme.primary // Get the primary color from the theme
+
+    Surface(
+        modifier = Modifier
             .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(26.dp),
+        color = if (isPressed) primaryColor.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)),
+        onClick = onClick,
+        interactionSource = interactionSource
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(vertical = 12.dp, horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+
         ) {
-            Text(text = title, style = MaterialTheme.typography.bodyLarge)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = value, style = MaterialTheme.typography.bodyLarge)
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = colorResource(id = R.color.primary)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+    }
+    }
+}
+
+@Composable
+fun HealthMetricCard(
+    title: String,
+    value: String,
+    unit: String,
+    color: Color,
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    isLargeCard: Boolean = true
+) {
+    Card(
+        modifier = modifier.height(if (isLargeCard) 120.dp else 100.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.2f))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier.size(if (isLargeCard) 40.dp else 20.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = title,
+                    style = if (isLargeCard)
+                        MaterialTheme.typography.titleMedium
+                    else
+                        MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Text(
+                        text = value,
+                        style = if (isLargeCard)
+                            MaterialTheme.typography.headlineMedium.copy(fontSize = 24.sp)
+                        else
+                            MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
+                        fontWeight = FontWeight.Bold,
+                        color = color
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = unit,
+                        style = if (isLargeCard)
+                            MaterialTheme.typography.bodyMedium
+                        else
+                            MaterialTheme.typography.bodySmall,
+                        color = color.copy(alpha = 0.7f),
+                        modifier = Modifier.alignByBaseline()
+                    )
+                }
+            }
         }
     }
 }
