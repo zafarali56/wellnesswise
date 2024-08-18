@@ -1,5 +1,5 @@
 package com.project.wellnesswise.app
-
+import DataVisualizationScreen
 import HealthDataScreen
 import HomeScreen
 import android.annotation.SuppressLint
@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.project.wellnesswise.data.AuthViewModel
+import com.project.wellnesswise.data.HealthDataViewModel
 import com.project.wellnesswise.data.HomeViewModel
 import com.project.wellnesswise.data.LoginViewModel
 import com.project.wellnesswise.data.RegistrationViewModel
@@ -42,7 +43,7 @@ fun WellnessWiseApp(
                 is Screen.MedicalHistoryScreen -> MedicalHistoryScreen(registrationViewModel)
                 is Screen.HomeScreen -> HomeScreen(homeViewModel, authViewModel, registrationViewModel, loginViewModel)
                 is Screen.EmailVerificationScreen -> EmailVerificationScreen(registrationViewModel)
-                is Screen.HealthDataScreen -> HealthDataScreen(registrationViewModel,onRequestGoogleFitPermission = onRequestGoogleFitPermission)
+                is Screen.HealthDataScreen -> HealthDataScreen(registrationViewModel,onRequestGoogleFitPermission = onRequestGoogleFitPermission, healthDataViewModel = HealthDataViewModel())
                 is Screen.DataVisualizationScreen -> DataVisualizationScreen()
 
             }

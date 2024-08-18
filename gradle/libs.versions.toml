@@ -1,6 +1,7 @@
 [versions]
 accompanistSwiperefresh = "0.27.0"
 agp = "8.5.1"
+compose = "1.6.5"
 firebaseBom = "33.1.2"
 healthConnectClient = "1.0.0-beta01"
 kotlin = "1.9.0"
@@ -35,6 +36,7 @@ androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "l
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+compose = { module = "com.patrykandpatrick.vico:compose", version.ref = "compose" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

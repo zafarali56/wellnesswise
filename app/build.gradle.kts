@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.play.services.fitness)
     implementation(libs.play.services.auth)
     implementation (libs.accompanist.swiperefresh)
-
+    implementation (libs.compose)
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
 }
