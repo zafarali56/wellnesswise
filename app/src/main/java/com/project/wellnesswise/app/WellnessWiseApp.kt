@@ -2,6 +2,7 @@ package com.project.wellnesswise.app
 
 import HealthDataScreen
 import HomeScreen
+import android.annotation.SuppressLint
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
@@ -16,6 +17,7 @@ import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import com.project.wellnesswise.screens.*
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun WellnessWiseApp(
     registrationViewModel: RegistrationViewModel,
@@ -41,6 +43,7 @@ fun WellnessWiseApp(
                 is Screen.HomeScreen -> HomeScreen(homeViewModel, authViewModel, registrationViewModel, loginViewModel)
                 is Screen.EmailVerificationScreen -> EmailVerificationScreen(registrationViewModel)
                 is Screen.HealthDataScreen -> HealthDataScreen(registrationViewModel,onRequestGoogleFitPermission = onRequestGoogleFitPermission)
+                is Screen.DataVisualizationScreen -> DataVisualizationScreen()
 
             }
         }

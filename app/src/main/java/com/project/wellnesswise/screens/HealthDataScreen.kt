@@ -7,12 +7,17 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,6 +25,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.fitness.data.Field
@@ -30,16 +37,20 @@ import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.HealthDataTypes
 import com.google.android.gms.fitness.data.HealthFields
+import com.project.wellnesswise.R
+import com.project.wellnesswise.components.HealthDataTextField
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 @Composable
+
 fun HealthDataScreen(
     registrationViewModel: RegistrationViewModel,
     onRequestGoogleFitPermission: () -> Unit
 ) {
+    val primaryColor = colorResource(id = R.color.primary)
     val uiState by registrationViewModel.registrationUIState
     val isSyncing by registrationViewModel.isSyncing
     val syncMessage by registrationViewModel.syncMessage
@@ -71,7 +82,7 @@ fun HealthDataScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text("Health Data", style = MaterialTheme.typography.headlineMedium)
+        Text("Health Data", style = MaterialTheme.typography.headlineMedium.copy(color = MaterialTheme.colorScheme.primary))
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
@@ -80,8 +91,17 @@ fun HealthDataScreen(
                     handleGoogleFitSync(context, registrationViewModel, fitnessOptions, googleSignInLauncher)
                 }
             },
-            enabled = !isSyncing
+            enabled = !isSyncing,
+
+            colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+
         ) {
+            Icon(
+                imageVector = Icons.Default.Sync,
+                contentDescription = "Sync",
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(Modifier.width(8.dp))
             Text(if (isSyncing) "Syncing..." else "Sync with Google Fit")
         }
         syncMessage?.let { message ->
@@ -94,51 +114,52 @@ fun HealthDataScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
+        HealthDataTextField(
             value = uiState.bloodPressure,
             onValueChange = { registrationViewModel.updateHealthParameters(bloodPressure = it) },
-            label = { Text("Blood Pressure (e.g. 120/80)") },
-            modifier = Modifier.fillMaxWidth()
+            label = "Blood Pressure (e.g. 120/80)",
+            isError = uiState.bloodPressureError,
+            errorMessage = "Invalid blood pressure format"
         )
-        if (uiState.bloodPressureError) {
-            Text("Invalid blood pressure format", color = MaterialTheme.colorScheme.error)
-        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
+        HealthDataTextField(
             value = uiState.heartRate,
             onValueChange = { registrationViewModel.updateHealthParameters(heartRate = it) },
-            label = { Text("Heart Rate (e.g. 70)") },
-            modifier = Modifier.fillMaxWidth()
+            label = "Heart Rate (e.g. 70)",
+            isError = uiState.heartRateError,
+            errorMessage = "Invalid heart rate"
         )
-        if (uiState.heartRateError) {
-            Text("Invalid heart rate", color = MaterialTheme.colorScheme.error)
-        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
+        HealthDataTextField(
             value = uiState.bloodSugar,
             onValueChange = { registrationViewModel.updateHealthParameters(bloodSugar = it) },
-            label = { Text("Blood Sugar (e.g. 100)") },
-            modifier = Modifier.fillMaxWidth()
+            label = "Blood Sugar (e.g. 100)",
+            isError = uiState.bloodSugarError,
+            errorMessage = "Invalid blood sugar value"
         )
-        if (uiState.bloodSugarError) {
-            Text("Invalid blood sugar value", color = MaterialTheme.colorScheme.error)
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
+        Text(
+            "Put cholesterol manually please",
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = FontWeight.Bold,
+                color = primaryColor
+            ),
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        HealthDataTextField(
             value = uiState.cholesterol,
             onValueChange = { registrationViewModel.updateHealthParameters(cholesterol = it) },
-            label = { Text("Cholesterol (e.g. 200)") },
-            modifier = Modifier.fillMaxWidth()
+            label = "Cholesterol (e.g. 200)",
+            isError = uiState.cholesterolError,
+            errorMessage = "Invalid cholesterol value"
         )
-        if (uiState.cholesterolError) {
-            Text("Invalid cholesterol value", color = MaterialTheme.colorScheme.error)
-        }
 
         Spacer(modifier = Modifier.height(16.dp))
         Button(
@@ -147,8 +168,16 @@ fun HealthDataScreen(
                 HealthDataSyncWorker.startPeriodicSync(context)
                 WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
             },
-            modifier = Modifier.fillMaxWidth()
+
+            colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+
         ) {
+            Icon(
+                imageVector = Icons.Default.Save,
+                contentDescription = "Save",
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(Modifier.width(8.dp))
             Text("Submit Health Data")
         }
     }
@@ -244,6 +273,8 @@ private suspend fun syncWithGoogleFit(
         registrationViewModel.setIsSyncing(false)
     }
 }
+
+
 @Composable
 @Preview
 fun HealthDataScreenPreview() {

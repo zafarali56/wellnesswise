@@ -1,4 +1,4 @@
-import androidx.compose.foundation.background
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -35,6 +35,8 @@ import com.project.wellnesswise.data.AuthViewModel
 import com.project.wellnesswise.data.HomeViewModel
 import com.project.wellnesswise.data.LoginViewModel
 import com.project.wellnesswise.data.RegistrationViewModel
+import com.project.wellnesswise.navigations.Screen
+import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 
 @Composable
 fun HomeScreen(
@@ -53,12 +55,10 @@ fun HomeScreen(
     val secondaryColor = colorResource(id = R.color.secondary)
     val lightRedColor = Color(0xFFFF9999) // Light red color for heart rate
 
-    // Remember the system UI controller
     val systemUiController = rememberSystemUiController()
     val statusBarColor = MaterialTheme.colorScheme.surface
     val useDarkIcons = !isSystemInDarkTheme()
 
-    // Set the status bar color
     LaunchedEffect(statusBarColor, useDarkIcons) {
         systemUiController.setStatusBarColor(
             color = statusBarColor,
@@ -69,7 +69,6 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         homeViewModel.checkForActiveSession()
     }
-
     NavigationDrawer(
         content = {
             SwipeRefresh(
@@ -82,10 +81,6 @@ fun HomeScreen(
                         .padding(16.dp)
                 ) {
                     item {
-
-
-
-                        // Full-width heart rate card
                         HealthMetricCard(
                             title = "Heart Rate",
                             value = heartRate,
@@ -98,12 +93,10 @@ fun HomeScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Row for blood pressure and blood sugar
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            // Blood Pressure card (half width)
                             HealthMetricCard(
                                 title = "Blood Pressure",
                                 value = bloodPressure,
@@ -114,7 +107,6 @@ fun HomeScreen(
                                 isLargeCard = false
                             )
 
-                            // Blood Sugar card (half width)
                             HealthMetricCard(
                                 title = "Blood Sugar",
                                 value = bloodSugar,
@@ -128,7 +120,6 @@ fun HomeScreen(
 
                         Spacer(modifier = Modifier.height(24.dp))
 
-                        // Beautiful Data Visualization Button
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -139,7 +130,7 @@ fun HomeScreen(
                                 )
                         ) {
                             Button(
-                                onClick = { /* TODO: Implement data visualization action */ },
+                                onClick = { WellnessWiseAppRouter.navigateTo(Screen.DataVisualizationScreen) },
                                 modifier = Modifier.fillMaxSize(),
                                 colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
                                 shape = RoundedCornerShape(28.dp)
