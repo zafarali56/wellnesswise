@@ -25,6 +25,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.filled.Analytics
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
@@ -50,10 +51,11 @@ fun HomeScreen(
     val heartRate by homeViewModel.heartRate.collectAsStateWithLifecycle()
     val bloodSugar by homeViewModel.bloodSugar.collectAsStateWithLifecycle()
     val isRefreshing by homeViewModel.isRefreshing.collectAsStateWithLifecycle()
-
+    val cholesterol by homeViewModel.cholesterol.collectAsStateWithLifecycle()
     val primaryColor = colorResource(id = R.color.primary)
     val secondaryColor = colorResource(id = R.color.secondary)
-    val lightRedColor = Color(0xFFFF9999) // Light red color for heart rate
+    val lightRedColor = Color(0xFFE53935)
+    val lightBlueColor = Color(0xFF1E88E5)
 
     val systemUiController = rememberSystemUiController()
     val statusBarColor = MaterialTheme.colorScheme.surface
@@ -154,7 +156,20 @@ fun HomeScreen(
                                     )
                                 }
                             }
+
+
+
                         }
+                        Spacer(modifier = Modifier.height(24.dp))
+                        HealthMetricCard(
+                            title = "Cholesterol",
+                            value = cholesterol,
+                            unit = "mg/dL",
+                            color = lightBlueColor,
+                            icon = Icons.Filled.Analytics,
+                            modifier = Modifier.fillMaxWidth(),
+                            isLargeCard = false
+                        )
                     }
                 }
             }

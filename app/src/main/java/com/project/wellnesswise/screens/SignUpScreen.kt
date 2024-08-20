@@ -61,140 +61,187 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp)
-        ) {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                item {
-                    HeadingTextComponent(value = stringResource(id = R.string.Create_an_account))
-                    Spacer(modifier = Modifier.height(20.dp))
-                }
-                item {
-                    MyTextField(
-                        labelValue = stringResource(id = R.string.Email),
-                        initialValue = registrationUIState.email,
-                        onTextSelected = {
-                            registrationViewModel.onEvent(UIEvent.EmailChanged(it))
-                        }
-                    )
-                    if (validationResults["email"] == false) {
-                        Text(text = "Invalid email", color = Color.Red)
+        )  {   LazyColumn(modifier = Modifier.fillMaxSize()) {
+            item {
+                HeadingTextComponent(value = stringResource(id = R.string.Create_an_account))
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+            item {
+                MyTextField(
+                    labelValue = stringResource(id = R.string.Email),
+                    initialValue = registrationUIState.email,
+                    onTextSelected = {
+                        registrationViewModel.onEvent(UIEvent.EmailChanged(it))
                     }
+                )
+                Text(
+                    text = "Enter a valid email address",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                if (validationResults["email"] == false) {
+                    Text(text = "Invalid email", color = Color.Red)
                 }
-                item {
-                    MyTextField(
-                        labelValue = stringResource(id = R.string.FullName),
-                        initialValue = registrationUIState.fullName,
-                        onTextSelected = {
-                            registrationViewModel.onEvent(UIEvent.FullNameChanged(it))
-                        }
-                    )
-                    if (validationResults["fullName"] == false) {
-                        Text(text = "Invalid full name", color = Color.Red)
+            }
+            item {
+                MyTextField(
+                    labelValue = stringResource(id = R.string.FullName),
+                    initialValue = registrationUIState.fullName,
+                    onTextSelected = {
+                        registrationViewModel.onEvent(UIEvent.FullNameChanged(it))
                     }
+                )
+                Text(
+                    text = "Provide your full name",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                if (validationResults["fullName"] == false) {
+                    Text(text = "Invalid full name", color = Color.Red)
                 }
-                item {
-                    MyNumberField(
-                        labelValue = stringResource(id = R.string.Age),
-                        initialValue = registrationUIState.age.toString(),
-                        onTextSelected = {
-                            registrationViewModel.onEvent(UIEvent.AgeChanged(it ?: 0))
-                        }
-                    )
-                    if (validationResults["age"] == false) {
-                        Text(text = "Invalid age", color = Color.Red)
+            }
+            item {
+                MyNumberField(
+                    labelValue = stringResource(id = R.string.Age),
+                    initialValue = registrationUIState.age.toString(),
+                    onTextSelected = {
+                        registrationViewModel.onEvent(UIEvent.AgeChanged(it ?: 0))
                     }
+                )
+                Text(
+                    text = "Enter an age between 1-120",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                if (validationResults["age"] == false) {
+                    Text(text = "Invalid age", color = Color.Red)
                 }
-                item {
-                    Spacer(modifier = Modifier.height(6.dp))
-                    GenderSelection(
-                        initialGender = registrationUIState.gender,
-                        onGenderSelected = { gender ->
-                            registrationViewModel.onEvent(UIEvent.GenderChanged(gender))
-                        }
-                    )
-                    if (validationResults["gender"] == false) {
-                        Text(text = "Invalid gender", color = Color.Red)
+            }
+            item {
+                Spacer(modifier = Modifier.height(6.dp))
+                GenderSelection(
+                    initialGender = registrationUIState.gender,
+                    onGenderSelected = { gender ->
+                        registrationViewModel.onEvent(UIEvent.GenderChanged(gender))
                     }
+                )
+                Text(
+                    text = "Select your gender",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                if (validationResults["gender"] == false) {
+                    Text(text = "Invalid gender", color = Color.Red)
                 }
-                item {
-                    MyNumberField(
-                        labelValue = stringResource(id = R.string.Height),
-                        initialValue = registrationUIState.height.toString(),
-                        onTextSelected = {
-                            registrationViewModel.onEvent(UIEvent.HeightChanged(it ?: 0))
-                        }
-                    )
-                    if (validationResults["height"] == false) {
-                        Text(text = "Invalid height", color = Color.Red)
+            }
+            item {
+                MyNumberField(
+                    labelValue = stringResource(id = R.string.Height),
+                    initialValue = registrationUIState.height.toString(),
+                    onTextSelected = {
+                        registrationViewModel.onEvent(UIEvent.HeightChanged(it ?: 0))
                     }
+                )
+                Text(
+                    text = "Enter a height between 50-300 cm",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                if (validationResults["height"] == false) {
+                    Text(text = "Invalid height", color = Color.Red)
                 }
-                item {
-                    MyNumberField(
-                        labelValue = stringResource(id = R.string.Weight),
-                        initialValue = registrationUIState.weight.toString(),
-                        onTextSelected = {
-                            registrationViewModel.onEvent(UIEvent.WeightChanged(it ?: 0))
-                        }
-                    )
-                    if (validationResults["weight"] == false) {
-                        Text(text = "Invalid weight", color = Color.Red)
+            }
+            item {
+                MyNumberField(
+                    labelValue = stringResource(id = R.string.Weight),
+                    initialValue = registrationUIState.weight.toString(),
+                    onTextSelected = {
+                        registrationViewModel.onEvent(UIEvent.WeightChanged(it ?: 0))
                     }
+                )
+                Text(
+                    text = "Enter a weight between 30-500 kg",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                if (validationResults["weight"] == false) {
+                    Text(text = "Invalid weight", color = Color.Red)
                 }
-                item {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    HabbitAndMedHistoryButton(
-                        text = stringResource(id = R.string.Habits),
-                        onClick = { WellnessWiseAppRouter.navigateTo(Screen.HabitsScreen) }
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    HabbitAndMedHistoryButton(
-                        text = stringResource(id = R.string.MedicalHistory),
-                        onClick = { WellnessWiseAppRouter.navigateTo(Screen.MedicalHistoryScreen) }
-                    )
-                    if (validationResults["habits"] == false) {
-                        Text(text = "Select at least one habit", color = Color.Red)
+            }
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+                HabbitAndMedHistoryButton(
+                    text = stringResource(id = R.string.Habits),
+                    onClick = { WellnessWiseAppRouter.navigateTo(Screen.HabitsScreen) }
+                )
+                Text(
+                    text = "Select at least one habit",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                HabbitAndMedHistoryButton(
+                    text = stringResource(id = R.string.MedicalHistory),
+                    onClick = { WellnessWiseAppRouter.navigateTo(Screen.MedicalHistoryScreen) }
+                )
+                Text(
+                    text = "Provide your medical history",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                if (validationResults["habits"] == false) {
+                    Text(text = "Select at least one habit", color = Color.Red)
+                }
+                if (validationResults["medicalHistory"] == false) {
+                    Text(text = "Provide medical history", color = Color.Red)
+                }
+            }
+            item {
+                Spacer(modifier = Modifier.height(4.dp))
+                MyPasswordField(
+                    labelValue = stringResource(id = R.string.Password),
+                    initialValue = registrationUIState.password,
+                    onTextSelected = {
+                        registrationViewModel.onEvent(UIEvent.PasswordChanged(it))
                     }
-                    if (validationResults["medicalHistory"] == false) {
-                        Text(text = "Provide medical history", color = Color.Red)
+                )
+                Text(
+                    text = "Create a strong password (8+ chars, uppercase, lowercase, number, special char)",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                if (validationResults["password"] == false) {
+                    Text(text = "Invalid password", color = Color.Red)
+                }
+            }
+            item {
+                CheckBoxComponent(
+                    value = "I accept the privacy policy and terms of service",
+                    checked = registrationUIState.isPolicyAccepted,
+                    onCheckedChange = {
+                        registrationViewModel.onEvent(UIEvent.PolicyAcceptedChanged(it))
+                    },
+                    onTextSelected = {
+                        WellnessWiseAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
                     }
-                }
-                item {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    MyPasswordField(
-                        labelValue = stringResource(id = R.string.Password),
-                        initialValue = registrationUIState.password,
-                        onTextSelected = {
-                            registrationViewModel.onEvent(UIEvent.PasswordChanged(it))
-                        }
-                    )
-                    if (validationResults["password"] == false) {
-                        Text(text = "Invalid password", color = Color.Red)
-                    }
-                }
-                item {
-                    CheckBoxComponent(
-                        value = "I accept the privacy policy and terms of service",
-                        checked = registrationUIState.isPolicyAccepted,
-                        onCheckedChange = {
-                            registrationViewModel.onEvent(UIEvent.PolicyAcceptedChanged(it))
-                        },
-                        onTextSelected = {
-                            WellnessWiseAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
-                        }
-                    )
-
-
-                }
-                item {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    ButtonComponent(
-                        value = stringResource(id = R.string.Register),
-                        onButtonClicked = {
-                            registrationViewModel.onEvent(UIEvent.RegisterButtonClicked)
-                        },
-                        isEnabled = Validator.isValidRegistrationUIState(registrationUIState)
-                    )
-                    DividerTextComponent(value = "OR")
-                }
+                )
+                Text(
+                    text = "You must accept the privacy policy and terms of service",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+                ButtonComponent(
+                    value = stringResource(id = R.string.Register),
+                    onButtonClicked = {
+                        registrationViewModel.onEvent(UIEvent.RegisterButtonClicked)
+                    },
+                    isEnabled = Validator.isValidRegistrationUIState(registrationViewModel.registrationUIState.value)
+                )
+                DividerTextComponent(value = "OR")
+            }
                 item {
                     ClickableLoginTextComponent(
                         tryingToLogin = true,

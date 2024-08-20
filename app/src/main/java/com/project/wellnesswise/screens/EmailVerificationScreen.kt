@@ -12,8 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import com.project.wellnesswise.components.ButtonComponent
 import com.project.wellnesswise.data.RegistrationViewModel
-import com.project.wellnesswise.navigations.Screen
-import com.project.wellnesswise.navigations.WellnessWiseAppRouter
+
 import kotlinx.coroutines.delay
 
 @Composable

@@ -75,7 +75,7 @@ class DataVisualizationViewModel : ViewModel() {
     private fun parseBloodPressure(value: Any?): String {
         return when (value) {
             is String -> value
-            is Number -> "${value.toInt()}/80" // Default diastolic if only systolic is provided
+            is Number -> "${value.toInt()}/80"
             else -> "120/80"
         }
     }
@@ -83,7 +83,7 @@ class DataVisualizationViewModel : ViewModel() {
     private fun parseCholesterol(value: Any?): String {
         return when (value) {
             is String -> value
-            is Number -> "${value.toInt()},50,150" // Default HDL and triglycerides if only LDL is provided
+            is Number -> "${value.toInt()},50,150"
             else -> "100,50,150"
         }
     }
