@@ -243,26 +243,26 @@ class RegistrationViewModel : ViewModel() {
                         user.updateProfile(profileUpdates)
                             .addOnCompleteListener { profileTask ->
                                 if (profileTask.isSuccessful)
-                        // Send verification email
-                        user.sendEmailVerification()
-                            .addOnCompleteListener { verificationTask ->
-                                if (verificationTask.isSuccessful) {
-                                    Log.d(TAG, "Verification email sent")
-                                    signUpInProgress.value = false
-                                    WellnessWiseAppRouter.navigateTo(Screen.EmailVerificationScreen)
-                                } else {
-                                    signUpInProgress.value = false
-                                    Log.w(TAG, "Error sending verification email", verificationTask.exception)
-                                }
+                                // Send verification email
+                                    user.sendEmailVerification()
+                                        .addOnCompleteListener { verificationTask ->
+                                            if (verificationTask.isSuccessful) {
+                                                Log.d(TAG, "Verification email sent")
+                                                signUpInProgress.value = false
+                                                WellnessWiseAppRouter.navigateTo(Screen.EmailVerificationScreen)
+                                            } else {
+                                                signUpInProgress.value = false
+                                                Log.w(TAG, "Error sending verification email", verificationTask.exception)
+                                            }
+                                        }
                             }
+                    } else {
+                        signUpInProgress.value = false
+                        Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     }
-                } else {
-                    signUpInProgress.value = false
-                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
                 }
             }
     }
-            }
     fun checkEmailVerification() {
         val user = auth.currentUser
         user?.reload()?.addOnCompleteListener { task ->

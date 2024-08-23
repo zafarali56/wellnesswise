@@ -2,6 +2,7 @@ package com.project.wellnesswise.app
 import DataVisualizationScreen
 import HealthDataScreen
 import HomeScreen
+import HomeViewModel
 import android.annotation.SuppressLint
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.project.wellnesswise.data.AuthViewModel
 import com.project.wellnesswise.data.HealthDataViewModel
-import com.project.wellnesswise.data.HomeViewModel
 import com.project.wellnesswise.data.LoginViewModel
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen

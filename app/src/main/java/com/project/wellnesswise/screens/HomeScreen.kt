@@ -33,12 +33,10 @@ import com.project.wellnesswise.R
 import com.project.wellnesswise.components.HealthMetricCard
 import com.project.wellnesswise.components.NavigationDrawer
 import com.project.wellnesswise.data.AuthViewModel
-import com.project.wellnesswise.data.HomeViewModel
 import com.project.wellnesswise.data.LoginViewModel
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
-
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel,
@@ -71,106 +69,101 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         homeViewModel.checkForActiveSession()
     }
+
     NavigationDrawer(
         content = {
             SwipeRefresh(
                 state = rememberSwipeRefreshState(isRefreshing),
-                onRefresh = { homeViewModel.refreshData() }
+                onRefresh = { homeViewModel.refreshData() },
+                modifier = Modifier.fillMaxSize()
             ) {
-                LazyColumn(
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp)
                 ) {
-                    item {
+                    HealthMetricCard(
+                        title = "Heart Rate",
+                        value = heartRate,
+                        unit = "bpm",
+                        color = lightRedColor,
+                        icon = Icons.Filled.Favorite,
+                        modifier = Modifier.fillMaxWidth(),
+                        isLargeCard = true
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
                         HealthMetricCard(
-                            title = "Heart Rate",
-                            value = heartRate,
-                            unit = "bpm",
-                            color = lightRedColor,
-                            icon = Icons.Filled.Favorite,
-                            modifier = Modifier.fillMaxWidth(),
-                            isLargeCard = true
+                            title = "Blood Pressure",
+                            value = bloodPressure,
+                            unit = "mmHg",
+                            color = primaryColor,
+                            icon = Icons.Filled.MonitorHeart,
+                            modifier = Modifier.weight(1f),
+                            isLargeCard = false
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            HealthMetricCard(
-                                title = "Blood Pressure",
-                                value = bloodPressure,
-                                unit = "mmHg",
-                                color = primaryColor,
-                                icon = Icons.Filled.MonitorHeart,
-                                modifier = Modifier.weight(1f),
-                                isLargeCard = false
-                            )
-
-                            HealthMetricCard(
-                                title = "Blood Sugar",
-                                value = bloodSugar,
-                                unit = "mg/dL",
-                                color = secondaryColor,
-                                icon = Icons.Filled.WaterDrop,
-                                modifier = Modifier.weight(1f),
-                                isLargeCard = false
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp)
-                                .shadow(
-                                    elevation = 6.dp,
-                                    shape = RoundedCornerShape(28.dp)
-                                )
-                        ) {
-                            Button(
-                                onClick = { WellnessWiseAppRouter.navigateTo(Screen.DataVisualizationScreen) },
-                                modifier = Modifier.fillMaxSize(),
-                                colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-                                shape = RoundedCornerShape(28.dp)
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.BarChart,
-                                        contentDescription = "Data Visualization",
-                                        modifier = Modifier.size(24.dp),
-                                        tint = Color.White
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Text(
-                                        "Data Visualization",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = Color.White,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            }
-
-
-
-                        }
-                        Spacer(modifier = Modifier.height(24.dp))
                         HealthMetricCard(
-                            title = "Cholesterol",
-                            value = cholesterol,
+                            title = "Blood Sugar",
+                            value = bloodSugar,
                             unit = "mg/dL",
-                            color = lightBlueColor,
-                            icon = Icons.Filled.Analytics,
-                            modifier = Modifier.fillMaxWidth(),
+                            color = secondaryColor,
+                            icon = Icons.Filled.WaterDrop,
+                            modifier = Modifier.weight(1f),
                             isLargeCard = false
                         )
                     }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Button(
+                        onClick = { WellnessWiseAppRouter.navigateTo(Screen.DataVisualizationScreen) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .shadow(
+                                elevation = 6.dp,
+                                shape = RoundedCornerShape(28.dp)
+                            ),
+                        colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+                        shape = RoundedCornerShape(28.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.BarChart,
+                                contentDescription = "Data Visualization",
+                                modifier = Modifier.size(24.dp),
+                                tint = Color.White
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                "Data Visualization",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    HealthMetricCard(
+                        title = "Cholesterol",
+                        value = cholesterol,
+                        unit = "mg/dL",
+                        color = lightBlueColor,
+                        icon = Icons.Filled.Analytics,
+                        modifier = Modifier.fillMaxWidth(),
+                        isLargeCard = false
+                    )
                 }
             }
         },
