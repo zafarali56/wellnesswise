@@ -20,7 +20,10 @@ class RegistrationViewModel : ViewModel() {
         private set
     var validationResults = mutableStateOf(emptyMap<String, Boolean>())
         private set
-
+    private val _dataSourcePreference = mutableStateOf<DataSourcePreference>(DataSourcePreference.MANUAL)
+    val dataSourcePreference: State<DataSourcePreference> = _dataSourcePreference
+    private val _isManualInput = mutableStateOf(true)
+    val isManualInput: State<Boolean> = _isManualInput
     private val _emailAlreadyInUse = mutableStateOf(false)
     val emailAlreadyInUse: State<Boolean> = _emailAlreadyInUse
 
@@ -58,7 +61,12 @@ class RegistrationViewModel : ViewModel() {
         validateHealthParameters(newState)
     }
 
-
+    fun setDataSourcePreference(preference: DataSourcePreference) {
+        _dataSourcePreference.value = preference
+    }
+    fun setInputMode(isManual: Boolean) {
+        _isManualInput.value = isManual
+    }
     private fun validateHealthParameters(state: RegistrationUIState) {
         val validationResults = Validator.validateHealthParameters(
             state.bloodPressure,
@@ -74,7 +82,7 @@ class RegistrationViewModel : ViewModel() {
             cholesterolError = !validationResults["cholesterol"]!!
         )
     }
-    fun sendHealthDataToFirestore(navigateToHome: Boolean = false) {
+    fun sendHealthDataToFirestore(isManualInput: Boolean, navigateToHome: Boolean = false) {
         setIsSyncing(true)
         setSyncMessage(null)
         val uiState = registrationUIState.value
@@ -84,7 +92,8 @@ class RegistrationViewModel : ViewModel() {
                 "bloodPressure" to (uiState.bloodPressure.takeIf { it.isNotBlank() } ?: "N/A"),
                 "heartRate" to (uiState.heartRate.takeIf { it.isNotBlank() } ?: "N/A"),
                 "bloodSugar" to (uiState.bloodSugar.takeIf { it.isNotBlank() } ?: "N/A"),
-                "cholesterol" to (uiState.cholesterol.takeIf { it.isNotBlank() } ?: "N/A")
+                "cholesterol" to (uiState.cholesterol.takeIf { it.isNotBlank() } ?: "N/A"),
+                "dataSourcePreference" to if (isManualInput) "MANUAL" else "GOOGLE_FIT"
             )
             firestore.collection("users").document(user.uid)
                 .set(healthData, com.google.firebase.firestore.SetOptions.merge())
@@ -128,7 +137,7 @@ class RegistrationViewModel : ViewModel() {
             }
 
             if (dataUpdated) {
-                sendHealthDataToFirestore()
+                sendHealthDataToFirestore(isManualInput = false)
                 setSyncMessage("Data synced successfully from Google Fit")
             } else {
                 setSyncMessage("No new data found in Google Fit")
@@ -315,5 +324,9 @@ class RegistrationViewModel : ViewModel() {
         validationResults.value = emptyMap()
         signUpInProgress.value = false
         _emailAlreadyInUse.value = false
+    }
+
+    enum class DataSourcePreference {
+        MANUAL, GOOGLE_FIT
     }
 }

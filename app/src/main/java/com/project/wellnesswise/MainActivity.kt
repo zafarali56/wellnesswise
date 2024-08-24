@@ -2,6 +2,7 @@ package com.project.wellnesswise
 
 import HealthDataSyncWorker
 import HomeViewModel
+import LoginViewModel
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -26,7 +27,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.project.wellnesswise.app.WellnessWiseApp
 import com.project.wellnesswise.data.AuthViewModel
-import com.project.wellnesswise.data.LoginViewModel
 import com.project.wellnesswise.data.RegistrationViewModel
 import java.util.concurrent.TimeUnit
 

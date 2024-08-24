@@ -1,5 +1,6 @@
 package com.project.wellnesswise.screens
 
+import LoginViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,7 +17,6 @@ import com.project.wellnesswise.components.HeadingTextComponent
 import com.project.wellnesswise.components.NavigationDrawer
 import com.project.wellnesswise.components.UserImage
 import com.project.wellnesswise.data.AuthViewModel
-import com.project.wellnesswise.data.LoginViewModel
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler

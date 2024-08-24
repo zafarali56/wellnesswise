@@ -33,7 +33,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 
 import androidx.compose.material.icons.filled.Visibility
@@ -771,7 +770,6 @@ fun HealthMetricCard(
 }
 
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HealthDataTextField(
@@ -779,7 +777,8 @@ fun HealthDataTextField(
     onValueChange: (String) -> Unit,
     label: String,
     isError: Boolean,
-    errorMessage: String
+    errorMessage: String,
+    enabled: Boolean
 ) {
     Column {
         OutlinedTextField(
@@ -790,14 +789,27 @@ fun HealthDataTextField(
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = colorResource(id = R.color.primary),
                 focusedLabelColor = colorResource(id = R.color.primary),
-                cursorColor = colorResource(id = R.color.primary)
+                cursorColor = colorResource(id = R.color.primary),
+                disabledBorderColor = colorResource(id = R.color.gray_300),
+                disabledLabelColor = colorResource(id = R.color.gray_500),
+                disabledTextColor = colorResource(id = R.color.gray_700)
             ),
-            isError = isError
+            isError = isError,
+            enabled = enabled,
+            readOnly = !enabled
         )
-        if (isError) {
+        if (isError && enabled) {
             Text(
                 text = errorMessage,
                 color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+            )
+        }
+        if (!enabled) {
+            Text(
+                text = "This field is synced with Google Fit",
+                color = colorResource(id = R.color.gray_500),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(start = 16.dp, top = 4.dp)
             )

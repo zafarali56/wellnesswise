@@ -3,6 +3,8 @@ import DataVisualizationScreen
 import HealthDataScreen
 import HomeScreen
 import HomeViewModel
+import LoginScreen
+import LoginViewModel
 import android.annotation.SuppressLint
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.project.wellnesswise.data.AuthViewModel
 import com.project.wellnesswise.data.HealthDataViewModel
-import com.project.wellnesswise.data.LoginViewModel
+
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
@@ -43,7 +45,7 @@ fun WellnessWiseApp(
                 is Screen.MedicalHistoryScreen -> MedicalHistoryScreen(registrationViewModel)
                 is Screen.HomeScreen -> HomeScreen( homeViewModel, authViewModel)
                 is Screen.EmailVerificationScreen -> EmailVerificationScreen(registrationViewModel)
-                is Screen.HealthDataScreen -> HealthDataScreen(registrationViewModel,onRequestGoogleFitPermission = onRequestGoogleFitPermission, healthDataViewModel = HealthDataViewModel())
+                is Screen.HealthDataScreen -> HealthDataScreen(registrationViewModel, loginViewModel,healthDataViewModel = HealthDataViewModel())
                 is Screen.DataVisualizationScreen -> DataVisualizationScreen()
                 is Screen.UserProfileScreen -> UserProfileScreen(authViewModel)
             }

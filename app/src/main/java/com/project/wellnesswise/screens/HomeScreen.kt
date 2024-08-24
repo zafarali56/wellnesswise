@@ -28,7 +28,6 @@ import com.project.wellnesswise.R
 import com.project.wellnesswise.components.HealthMetricCard
 import com.project.wellnesswise.components.NavigationDrawer
 import com.project.wellnesswise.data.AuthViewModel
-import com.project.wellnesswise.data.LoginViewModel
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter

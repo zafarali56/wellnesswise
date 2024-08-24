@@ -1,56 +1,32 @@
-package com.project.wellnesswise.screens
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.wellnesswise.R
-import com.project.wellnesswise.components.ButtonComponent
-import com.project.wellnesswise.components.ClickableLoginTextComponent
-import com.project.wellnesswise.components.HeadingTextComponent
-import com.project.wellnesswise.components.MyPasswordField
-import com.project.wellnesswise.components.MyTextField
-import com.project.wellnesswise.components.UnderLinedTextComponent
+import com.project.wellnesswise.components.*
 import com.project.wellnesswise.data.LoginUIEvent
-import com.project.wellnesswise.data.LoginViewModel
 import com.project.wellnesswise.data.rules.Validator
 import com.project.wellnesswise.navigations.Screen
-import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 
 @Composable
 fun LoginScreen(loginViewModel: LoginViewModel) {
-
-    val systemUiController = rememberSystemUiController()
-    val useDarkIcons = MaterialTheme.colorScheme.surface.luminance() > 0.5f
-
-    SideEffect {
-        systemUiController.setSystemBarsColor(
-            color = Color.Transparent,
-            darkIcons = useDarkIcons
-        )
-    }
-
     val loginUIState = loginViewModel.loginUIState.value
     val errorMessage = loginViewModel.errorMessage.value
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        loginViewModel.resetLoginUIState()
+    }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Surface(
@@ -63,7 +39,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(10.dp)
-                    .imePadding() // Add this modifier to handle keyboard padding
+                    .imePadding()
             ) {
                 item {
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -85,21 +61,22 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                         initialValue = loginUIState.email,
                         onTextSelected = {
                             loginViewModel.onEvent(LoginUIEvent.EmailChangedLogin(it))
-                        }
+                        },
+                        isError = !Validator.validateEmail(loginUIState.email)
                     )
                     MyPasswordField(
                         labelValue = stringResource(id = R.string.Password),
                         initialValue = loginUIState.password,
                         onTextSelected = {
                             loginViewModel.onEvent(LoginUIEvent.PasswordChangedLogin(it))
-                        }
+                        },
+                        isError = !Validator.validatePassword(loginUIState.password)
                     )
                     Spacer(modifier = Modifier.height(30.dp))
                     ButtonComponent(
                         value = stringResource(id = R.string.Login),
                         onButtonClicked = {
                             loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked)
-                            // Handle login logic here
                         },
                         isEnabled = Validator.isValidLoginUIState(loginUIState)
                     )
@@ -111,7 +88,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                     if (errorMessage != null) {
                         Text(
                             text = errorMessage,
-                            color = Color.Red,
+                            color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(top = 16.dp)
                         )
                     }
@@ -124,15 +101,22 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                 color = colorResource(id = R.color.primary)
             )
         }
+
+        if (loginViewModel.needsGoogleFitPermissions.value) {
+            GoogleFitPermissionRequest(
+                onPermissionResult = { permissionGranted ->
+                    loginViewModel.onGoogleFitPermissionResult(permissionGranted)
+                },
+                onDismissRequest = {
+                    loginViewModel.onGoogleFitPermissionDismissed()
+                }
+            )
+        }
     }
 
-    SystemBackButtonHandler {
-        WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
+    LaunchedEffect(loginViewModel.isLoggedIn.value) {
+        if (loginViewModel.isLoggedIn.value) {
+            loginViewModel.checkGoogleFitPermissions(context)
+        }
     }
-}
-
-@Composable
-@Preview
-fun LoginScreenPreview() {
-    LoginScreen(viewModel())
 }
