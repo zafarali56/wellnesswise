@@ -41,11 +41,11 @@ fun WellnessWiseApp(
                 is Screen.LoginScreen -> LoginScreen(loginViewModel)
                 is Screen.HabitsScreen -> HabitsScreen(registrationViewModel)
                 is Screen.MedicalHistoryScreen -> MedicalHistoryScreen(registrationViewModel)
-                is Screen.HomeScreen -> HomeScreen(homeViewModel, authViewModel, registrationViewModel, loginViewModel)
+                is Screen.HomeScreen -> HomeScreen( homeViewModel, authViewModel)
                 is Screen.EmailVerificationScreen -> EmailVerificationScreen(registrationViewModel)
                 is Screen.HealthDataScreen -> HealthDataScreen(registrationViewModel,onRequestGoogleFitPermission = onRequestGoogleFitPermission, healthDataViewModel = HealthDataViewModel())
                 is Screen.DataVisualizationScreen -> DataVisualizationScreen()
-
+                is Screen.UserProfileScreen -> UserProfileScreen(authViewModel)
             }
         }
     }

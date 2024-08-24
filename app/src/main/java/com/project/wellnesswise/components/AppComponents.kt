@@ -32,6 +32,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 
@@ -147,12 +148,12 @@ fun HeadingTextComponent(value: String) {
     )
 }
 
-
 @Composable
 fun MyTextField(
     labelValue: String,
     initialValue: String,
-    onTextSelected: (String) -> Unit
+    onTextSelected: (String) -> Unit,
+    isError: Boolean = false
 ) {
     val textValue = remember { mutableStateOf(initialValue) }
 
@@ -162,16 +163,18 @@ fun MyTextField(
             .clip(componentShapes.small),
         label = { Text(text = labelValue) },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = colorResource(id = R.color.primary),
-            focusedLabelColor = colorResource(id = R.color.primary),
-            cursorColor = colorResource(id = R.color.primary),
+            focusedBorderColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
+            unfocusedBorderColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.gray_100),
+            focusedLabelColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
+            cursorColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
         ),
         keyboardActions = KeyboardActions.Default,
         value = textValue.value,
         onValueChange = {
             textValue.value = it
             onTextSelected(it)
-        }
+        },
+        isError = isError
     )
 }
 
@@ -180,7 +183,8 @@ fun MyNumberField(
     labelValue: String,
     initialValue: String,
     keyboardType: KeyboardType = KeyboardType.Number,
-    onTextSelected: (Int?) -> Unit
+    onTextSelected: (Int?) -> Unit,
+    isError: Boolean = false
 ) {
     val textValue = remember { mutableStateOf(initialValue) }
 
@@ -190,9 +194,10 @@ fun MyNumberField(
             .clip(componentShapes.small),
         label = { Text(text = labelValue) },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = colorResource(id = R.color.primary),
-            focusedLabelColor = colorResource(id = R.color.primary),
-            cursorColor = colorResource(id = R.color.primary),
+            focusedBorderColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
+            unfocusedBorderColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.gray_100),
+            focusedLabelColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
+            cursorColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
         ),
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         keyboardActions = KeyboardActions.Default,
@@ -202,14 +207,17 @@ fun MyNumberField(
                 textValue.value = it
                 onTextSelected(it.toIntOrNull())
             }
-        }
+        },
+        isError = isError
     )
 }
+
 @Composable
 fun MyPasswordField(
     labelValue: String,
     initialValue: String,
-    onTextSelected: (String) -> Unit
+    onTextSelected: (String) -> Unit,
+    isError: Boolean = false
 ) {
     val password = remember { mutableStateOf(initialValue) }
     val passwordVisible = remember { mutableStateOf(false) }
@@ -220,9 +228,10 @@ fun MyPasswordField(
             .clip(componentShapes.small),
         label = { Text(text = labelValue) },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = colorResource(id = R.color.primary),
-            focusedLabelColor = colorResource(id = R.color.primary),
-            cursorColor = colorResource(id = R.color.primary),
+            focusedBorderColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
+            unfocusedBorderColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.gray_100),
+            focusedLabelColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
+            cursorColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
         ),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         value = password.value,
@@ -245,10 +254,10 @@ fun MyPasswordField(
                 Icon(imageVector = iconImage, contentDescription = description)
             }
         },
-        visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation()
+        visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+        isError = isError
     )
 }
-
 
 @Composable
 fun ClickableTextComponent(value: String, onTextSelected: (String) -> Unit = {}) {
@@ -451,7 +460,6 @@ fun GenderSelection(
 }
 
 
-
 @Composable
 fun HabitSelection(
     registrationViewModel: RegistrationViewModel,
@@ -461,12 +469,16 @@ fun HabitSelection(
     var selectedHabits by remember { mutableStateOf(registrationViewModel.registrationUIState.value.habits) }
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         habits.forEach { habit ->
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
@@ -485,12 +497,16 @@ fun HabitSelection(
                         uncheckedColor = Color.Gray
                     )
                 )
-                Text(text = habit.name, style = MaterialTheme.typography.bodyMedium)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = habit.name.replace("_", " ").lowercase().capitalize(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
             }
         }
     }
 }
-
 @Composable
 fun HabbitAndMedHistoryButton(text: String, onClick: () -> Unit) {
     Box(
@@ -498,7 +514,7 @@ fun HabbitAndMedHistoryButton(text: String, onClick: () -> Unit) {
             .fillMaxWidth()
             .background(
                 color = colorResource(id = R.color.primary),
-                shape = RoundedCornerShape(5.dp)
+                shape = RoundedCornerShape(15.dp)
             )
             .clickable { onClick() }
             .padding(17.dp)
@@ -580,7 +596,7 @@ fun AppToolbar(onNavigationIconClick: () -> Unit) {
 }
 
 @Composable
-fun NavigationDrawer(content: @Composable () -> Unit, onLogoutClick: () -> Unit) {
+fun NavigationDrawer(content: @Composable () -> Unit, onProfileClick: () -> Unit, onHomeClick: () -> Unit,  onLogoutClick: () -> Unit) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val user = FirebaseAuth.getInstance().currentUser
@@ -597,14 +613,7 @@ fun NavigationDrawer(content: @Composable () -> Unit, onLogoutClick: () -> Unit)
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     // Giant logo icon
-                    Image(
-                        painter = painterResource(id = R.drawable.iconfordrawer),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .background(Color.Gray)
-                    )
+                    UserImage()
                     // User name
                     Text(
                         text = user?.displayName ?: "User Name",
@@ -622,9 +631,10 @@ fun NavigationDrawer(content: @Composable () -> Unit, onLogoutClick: () -> Unit)
 
                     // Navigation items
                     listOf(
-                        Triple(stringResource(id = R.string.Home), Icons.Default.Home, {}),
-                        Triple(stringResource(id = R.string.Profile), Icons.Default.Person, {}),
-                        Triple(stringResource(id = R.string.Logout), Icons.Default.ExitToApp, onLogoutClick)
+                        Triple(stringResource(id = R.string.Home), Icons.Default.Home ,onHomeClick ),
+                        Triple(stringResource(id = R.string.Profile), Icons.Default.Person , onProfileClick ),
+                        Triple(stringResource(id = R.string.Logout),
+                            Icons.AutoMirrored.Filled.ExitToApp, onLogoutClick)
                     ).forEach { (text, icon, onClick) ->
                         NavigationItem(
                             text = text,
@@ -793,4 +803,16 @@ fun HealthDataTextField(
             )
         }
     }
+}
+
+@Composable
+fun UserImage (){
+    Image(
+        painter = painterResource(id = R.drawable.iconfordrawer),
+        contentDescription = null,
+        modifier = Modifier
+            .size(100.dp)
+            .clip(CircleShape)
+            .background(Color.Gray)
+    )
 }

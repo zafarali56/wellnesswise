@@ -16,19 +16,14 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.BarChart
-
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.draw.shadow
 import androidx.compose.foundation.isSystemInDarkTheme
-
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.filled.Analytics
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-
 import com.project.wellnesswise.R
 import com.project.wellnesswise.components.HealthMetricCard
 import com.project.wellnesswise.components.NavigationDrawer
@@ -41,9 +36,8 @@ import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 fun HomeScreen(
     homeViewModel: HomeViewModel,
     authViewModel: AuthViewModel,
-    registrationViewModel: RegistrationViewModel,
-    loginViewModel: LoginViewModel
-) {
+
+    ) {
     val context = LocalContext.current
     val bloodPressure by homeViewModel.bloodPressure.collectAsStateWithLifecycle()
     val heartRate by homeViewModel.heartRate.collectAsStateWithLifecycle()
@@ -167,13 +161,19 @@ fun HomeScreen(
                 }
             }
         },
-        onLogoutClick = { authViewModel.logOut(registrationViewModel, loginViewModel) }
+        onLogoutClick = { authViewModel.logOut()},
+        onProfileClick = { WellnessWiseAppRouter.navigateTo(Screen.UserProfileScreen) },
+        onHomeClick = { WellnessWiseAppRouter.navigateTo(Screen.HomeScreen) }
     )
 }
 @Composable
 @Preview
 fun HomeScreenPreview() {
     MaterialTheme {
-        HomeScreen(HomeViewModel(), AuthViewModel(), RegistrationViewModel(), LoginViewModel())
+        HomeScreen(
+            HomeViewModel(),
+            AuthViewModel(RegistrationViewModel(), LoginViewModel()),
+
+        )
     }
 }

@@ -65,8 +65,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val registrationViewModel: RegistrationViewModel = viewModel()
             val loginViewModel: LoginViewModel = viewModel()
-            val authViewModel: AuthViewModel = viewModel()
-
+            val authViewModel: AuthViewModel = viewModel { AuthViewModel(registrationViewModel, loginViewModel) }
             WellnessWiseApp(
                 homeViewModel = homeViewModel,
                 registrationViewModel = registrationViewModel,

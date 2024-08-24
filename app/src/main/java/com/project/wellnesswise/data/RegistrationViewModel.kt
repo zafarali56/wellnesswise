@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.project.wellnesswise.data.rules.Validator
@@ -19,6 +20,9 @@ class RegistrationViewModel : ViewModel() {
         private set
     var validationResults = mutableStateOf(emptyMap<String, Boolean>())
         private set
+
+    private val _emailAlreadyInUse = mutableStateOf(false)
+    val emailAlreadyInUse: State<Boolean> = _emailAlreadyInUse
 
     private val _isSyncing = mutableStateOf(false)
     val isSyncing: State<Boolean> = _isSyncing
@@ -101,14 +105,6 @@ class RegistrationViewModel : ViewModel() {
         }
     }
 
-
-
-    fun updateHeartRate(heartRate: Float) {
-        registrationUIState.value = registrationUIState.value.copy(
-            heartRate = heartRate.toString()
-        )
-        sendHealthDataToFirestore()
-    }
     fun syncWithGoogleFit(heartRate: Float?, bloodPressure: String?, bloodSugar: Float?) {
         viewModelScope.launch {
             setIsSyncing(true)
@@ -145,54 +141,47 @@ class RegistrationViewModel : ViewModel() {
     fun onEvent(event: UIEvent) {
         when (event) {
             is UIEvent.EmailChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    email = event.email
-                )
+                registrationUIState.value = registrationUIState.value.copy(email = event.email)
+                _emailAlreadyInUse.value = false
+                validateField("email")
             }
             is UIEvent.FullNameChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    fullName = event.fullName
-                )
+                registrationUIState.value = registrationUIState.value.copy(fullName = event.fullName)
+                validateField("fullName")
             }
             is UIEvent.AgeChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    age = event.age
-                )
+                registrationUIState.value = registrationUIState.value.copy(age = event.age)
+                validateField("age")
             }
             is UIEvent.GenderChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    gender = event.gender
-                )
+                registrationUIState.value = registrationUIState.value.copy(gender = event.gender)
+                validateField("gender")
             }
             is UIEvent.HeightChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    height = event.height
-                )
+                registrationUIState.value = registrationUIState.value.copy(height = event.height)
+                validateField("height")
             }
             is UIEvent.WeightChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    weight = event.weight
-                )
+                registrationUIState.value = registrationUIState.value.copy(weight = event.weight)
+                validateField("weight")
             }
             is UIEvent.HabitsChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    habits = event.habits
-                )
+                registrationUIState.value = registrationUIState.value.copy(habits = event.habits)
+                validateField("habits")
             }
             is UIEvent.MedicalHistoryChanged -> {
                 val updatedMedicalHistory = registrationUIState.value.medicalHistory.toMutableMap()
                 updatedMedicalHistory[event.question] = event.answer
                 registrationUIState.value = registrationUIState.value.copy(medicalHistory = updatedMedicalHistory)
+                validateField("medicalHistory")
             }
             is UIEvent.PasswordChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    password = event.password
-                )
+                registrationUIState.value = registrationUIState.value.copy(password = event.password)
+                validateField("password")
             }
             is UIEvent.PolicyAcceptedChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(
-                    isPolicyAccepted = event.isPolicyAccepted
-                )
+                registrationUIState.value = registrationUIState.value.copy(isPolicyAccepted = event.isPolicyAccepted)
+                validateField("policyAccepted")
             }
             is UIEvent.RegisterButtonClicked -> {
                 updateValidationResults()
@@ -215,7 +204,23 @@ class RegistrationViewModel : ViewModel() {
             }
         }
     }
-
+    private fun validateField(fieldName: String) {
+        val currentValidationResults = validationResults.value.toMutableMap()
+        currentValidationResults[fieldName] = when (fieldName) {
+            "email" -> Validator.validateEmail(registrationUIState.value.email)
+            "fullName" -> Validator.validateFullName(registrationUIState.value.fullName)
+            "age" -> Validator.validateAge(registrationUIState.value.age)
+            "gender" -> Validator.validateGender(registrationUIState.value.gender)
+            "height" -> Validator.validateHeight(registrationUIState.value.height)
+            "weight" -> Validator.validateWeight(registrationUIState.value.weight)
+            "habits" -> Validator.validateHabits(registrationUIState.value.habits)
+            "medicalHistory" -> Validator.validateMedicalHistory(registrationUIState.value.medicalHistory)
+            "password" -> Validator.validatePassword(registrationUIState.value.password)
+            "policyAccepted" -> Validator.validatePolicyAccepted(registrationUIState.value.isPolicyAccepted)
+            else -> true
+        }
+        validationResults.value = currentValidationResults
+    }
     private fun updateValidationResults() {
         validationResults.value = Validator.validateRegistrationUIState(registrationUIState.value)
     }
@@ -242,8 +247,7 @@ class RegistrationViewModel : ViewModel() {
                             .build()
                         user.updateProfile(profileUpdates)
                             .addOnCompleteListener { profileTask ->
-                                if (profileTask.isSuccessful)
-                                // Send verification email
+                                if (profileTask.isSuccessful) {
                                     user.sendEmailVerification()
                                         .addOnCompleteListener { verificationTask ->
                                             if (verificationTask.isSuccessful) {
@@ -252,12 +256,24 @@ class RegistrationViewModel : ViewModel() {
                                                 WellnessWiseAppRouter.navigateTo(Screen.EmailVerificationScreen)
                                             } else {
                                                 signUpInProgress.value = false
-                                                Log.w(TAG, "Error sending verification email", verificationTask.exception)
+                                                Log.w(
+                                                    TAG,
+                                                    "Error sending verification email",
+                                                    verificationTask.exception
+                                                )
                                             }
                                         }
+                                }
                             }
                     } else {
                         signUpInProgress.value = false
+                        Log.w(TAG, "createUserWithEmail:failure", task.exception)
+                    }
+                } else {
+                    signUpInProgress.value = false
+                    if (task.exception is FirebaseAuthUserCollisionException) {
+                        _emailAlreadyInUse.value = true
+                    } else {
                         Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     }
                 }
@@ -298,5 +314,6 @@ class RegistrationViewModel : ViewModel() {
         registrationUIState.value = RegistrationUIState()
         validationResults.value = emptyMap()
         signUpInProgress.value = false
+        _emailAlreadyInUse.value = false
     }
 }
