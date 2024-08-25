@@ -25,8 +25,8 @@ import androidx.compose.material.icons.filled.Analytics
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.project.wellnesswise.R
-import com.project.wellnesswise.components.HealthMetricCard
-import com.project.wellnesswise.components.NavigationDrawer
+import com.project.wellnesswise.components.ui.HealthMetricCard
+import com.project.wellnesswise.components.ui.NavigationDrawer
 import com.project.wellnesswise.data.AuthViewModel
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
@@ -171,7 +171,7 @@ fun HomeScreenPreview() {
     MaterialTheme {
         HomeScreen(
             HomeViewModel(),
-            AuthViewModel(RegistrationViewModel(), LoginViewModel()),
+            AuthViewModel(RegistrationViewModel(), LoginViewModel(), HealthDataViewModel()),
 
         )
     }

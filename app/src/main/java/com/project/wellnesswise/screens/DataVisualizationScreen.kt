@@ -23,11 +23,11 @@ import androidx.compose.ui.unit.dp
 
 import androidx.lifecycle.viewmodel.compose.viewModel
 
-import com.project.wellnesswise.components.BloodPressureChart
-import com.project.wellnesswise.components.BloodSugarChart
-import com.project.wellnesswise.components.CholesterolChart
-import com.project.wellnesswise.components.HeartRateChart
-import com.project.wellnesswise.components.NormalTextComponent
+import com.project.wellnesswise.components.ui.BloodPressureChart
+import com.project.wellnesswise.components.ui.BloodSugarChart
+import com.project.wellnesswise.components.ui.CholesterolChart
+import com.project.wellnesswise.components.ui.HeartRateChart
+import com.project.wellnesswise.components.ui.NormalTextComponent
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter

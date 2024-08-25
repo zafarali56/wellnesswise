@@ -1,6 +1,7 @@
 package com.project.wellnesswise
 
 import HealthDataSyncWorker
+import HealthDataViewModel
 import HomeViewModel
 import LoginViewModel
 import android.content.BroadcastReceiver
@@ -65,15 +66,19 @@ class MainActivity : ComponentActivity() {
         setContent {
             val registrationViewModel: RegistrationViewModel = viewModel()
             val loginViewModel: LoginViewModel = viewModel()
-            val authViewModel: AuthViewModel = viewModel { AuthViewModel(registrationViewModel, loginViewModel) }
+            val healthDataViewModel: HealthDataViewModel = viewModel()
+            val authViewModel: AuthViewModel = viewModel { AuthViewModel(registrationViewModel, loginViewModel, healthDataViewModel) }
+
             WellnessWiseApp(
                 homeViewModel = homeViewModel,
                 registrationViewModel = registrationViewModel,
                 loginViewModel = loginViewModel,
                 authViewModel = authViewModel,
+                healthDataViewModel = healthDataViewModel,
                 onRequestGoogleFitPermission = {
                     requestGoogleFitPermissions()
-                }
+                },
+
             )
         }
     }

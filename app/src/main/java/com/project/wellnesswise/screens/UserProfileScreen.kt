@@ -1,5 +1,6 @@
 package com.project.wellnesswise.screens
 
+import HealthDataViewModel
 import LoginViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,9 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.project.wellnesswise.components.HeadingTextComponent
-import com.project.wellnesswise.components.NavigationDrawer
-import com.project.wellnesswise.components.UserImage
+import com.project.wellnesswise.components.ui.HeadingTextComponent
+import com.project.wellnesswise.components.ui.NavigationDrawer
+import com.project.wellnesswise.components.ui.UserImage
 import com.project.wellnesswise.data.AuthViewModel
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
@@ -61,5 +62,5 @@ fun UserProfileScreen(authViewModel: AuthViewModel) {
 @Preview
 fun UserProfilePreview ()
 {
-    UserProfileScreen(AuthViewModel(RegistrationViewModel(), LoginViewModel()))
+    UserProfileScreen(AuthViewModel(RegistrationViewModel(), LoginViewModel(), HealthDataViewModel()))
 }

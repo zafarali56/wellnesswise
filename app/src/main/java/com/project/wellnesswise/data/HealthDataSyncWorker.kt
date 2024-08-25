@@ -4,12 +4,10 @@ import androidx.work.*
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.DataType
-import com.google.android.gms.fitness.data.Field
-import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.data.HealthDataTypes
-import com.google.android.gms.fitness.data.HealthFields
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.project.wellnesswise.components.data.HealthDataUtils
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.TimeUnit
 
@@ -20,6 +18,7 @@ class HealthDataSyncWorker(
 
     companion object {
         private const val TAG = "HealthDataSyncWorker"
+        private const val WORK_NAME = "healthDataSync"
 
         fun startPeriodicSync(context: Context) {
             val constraints = Constraints.Builder()
@@ -32,17 +31,10 @@ class HealthDataSyncWorker(
                 .build()
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-                "healthDataSync",
+                WORK_NAME,
                 ExistingPeriodicWorkPolicy.REPLACE,
                 syncRequest
             )
-
-            // Schedule an immediate sync
-            val immediateSync = OneTimeWorkRequestBuilder<HealthDataSyncWorker>()
-                .setConstraints(constraints)
-                .build()
-
-            WorkManager.getInstance(context).enqueue(immediateSync)
         }
     }
 
@@ -60,77 +52,66 @@ class HealthDataSyncWorker(
             return Result.failure()
         }
 
-        try {
-            val healthData = fetchHealthData(account)
-            updateFirestore(healthData)
-            return Result.success()
+        return try {
+            val googleFitData = HealthDataUtils.fetchHealthData(applicationContext, account)
+            val existingData = fetchExistingHealthData()
+            val mergedData = mergeHealthData(existingData, googleFitData)
+            updateFirestore(mergedData)
+            Result.success()
         } catch (e: Exception) {
             Log.e(TAG, "Error syncing health data", e)
-            return Result.retry()
+            Result.retry()
         }
     }
 
-    private suspend fun fetchHealthData(account: com.google.android.gms.auth.api.signin.GoogleSignInAccount): Map<String, Any> {
-        val healthData = mutableMapOf<String, Any>()
-
-        // Read heart rate
-        val heartRateResult = Fitness.getHistoryClient(applicationContext, account)
-            .readDailyTotal(DataType.TYPE_HEART_RATE_BPM)
-            .await()
-        if (!heartRateResult.isEmpty) {
-            healthData["heartRate"] = heartRateResult.dataPoints.firstOrNull()
-                ?.getValue(Field.FIELD_AVERAGE)?.asFloat() ?: 0f
+    private suspend fun fetchExistingHealthData(): Map<String, Any> {
+        val user = FirebaseAuth.getInstance().currentUser
+        return if (user != null) {
+            val document = FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(user.uid)
+                .get()
+                .await()
+            document.data ?: emptyMap()
+        } else {
+            emptyMap()
         }
+    }
 
-        val endTime = System.currentTimeMillis()
-        val startTime = endTime - 15 * 60 * 1000 // 15 minutes ago
-        val readRequest = com.google.android.gms.fitness.request.DataReadRequest.Builder()
-            .read(HealthDataTypes.TYPE_BLOOD_PRESSURE)
-            .read(HealthDataTypes.TYPE_BLOOD_GLUCOSE)
-            .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-            .build()
+    private fun mergeHealthData(existingData: Map<String, Any>, googleFitData: Map<String, Any>): Map<String, Any> {
+        val mergedData = existingData.toMutableMap()
 
-        val dataResponse = Fitness.getHistoryClient(applicationContext, account)
-            .readData(readRequest)
-            .await()
+        // Check global data source preference
+        val globalDataSource = mergedData["dataSourcePreference"] as? String ?: "MANUAL"
 
-        for (dataSet in dataResponse.dataSets) {
-            when (dataSet.dataType) {
-                HealthDataTypes.TYPE_BLOOD_PRESSURE -> {
-                    for (dataPoint in dataSet.dataPoints.sortedByDescending { it.getEndTime(TimeUnit.MILLISECONDS) }) {
-                        val systolic = dataPoint.getValue(HealthFields.FIELD_BLOOD_PRESSURE_SYSTOLIC).asFloat()
-                        val diastolic = dataPoint.getValue(HealthFields.FIELD_BLOOD_PRESSURE_DIASTOLIC).asFloat()
-                        healthData["bloodPressure"] = "${systolic.toInt()}/${diastolic.toInt()}"
-                        break // Take the most recent reading
-                    }
-                }
-                HealthDataTypes.TYPE_BLOOD_GLUCOSE -> {
-                    for (dataPoint in dataSet.dataPoints.sortedByDescending { it.getEndTime(TimeUnit.MILLISECONDS) }) {
-                        healthData["bloodSugar"] = dataPoint.getValue(HealthFields.FIELD_BLOOD_GLUCOSE_LEVEL).asFloat()
-                        break // Take the most recent reading
-                    }
+        if (globalDataSource == "GOOGLE_FIT") {
+            // If global preference is Google Fit, update all data from Google Fit
+            for ((key, value) in googleFitData) {
+                mergedData[key] = value
+                mergedData["${key}Source"] = "GOOGLE_FIT"
+            }
+        } else {
+            // If global preference is manual, only update Google Fit sourced data
+            for ((key, value) in googleFitData) {
+                val sourceKey = "${key}Source"
+                if (sourceKey !in mergedData || mergedData[sourceKey] == "GOOGLE_FIT") {
+                    mergedData[key] = value
+                    mergedData[sourceKey] = "GOOGLE_FIT"
                 }
             }
         }
 
-        healthData["lastUpdated"] = com.google.firebase.Timestamp.now()
-
-        return healthData
+        return mergedData
     }
 
     private suspend fun updateFirestore(healthData: Map<String, Any>) {
         val user = FirebaseAuth.getInstance().currentUser
         if (user != null) {
-            if (healthData.isNotEmpty()) {
-                FirebaseFirestore.getInstance().collection("users").document(user.uid)
-                    .set(healthData, com.google.firebase.firestore.SetOptions.merge())
-                    .await()
-                Log.d(TAG, "Health data updated successfully: $healthData")
-            } else {
-                Log.d(TAG, "No new health data to update")
-            }
+            FirebaseFirestore.getInstance().collection("users").document(user.uid)
+                .set(healthData, com.google.firebase.firestore.SetOptions.merge())
+                .await()
+            Log.d(TAG, "Health data updated successfully: $healthData")
         } else {
-            Log.e(TAG, "User not authenticated")
             throw Exception("User not authenticated")
         }
     }

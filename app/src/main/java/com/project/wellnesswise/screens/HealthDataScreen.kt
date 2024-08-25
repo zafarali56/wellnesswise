@@ -16,27 +16,24 @@ import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.HealthDataTypes
 import com.project.wellnesswise.R
-import com.project.wellnesswise.components.HealthDataTextField
-import com.project.wellnesswise.data.HealthDataViewModel
+import com.project.wellnesswise.components.ui.HealthDataTextField
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import kotlinx.coroutines.launch
-
 @Composable
 fun HealthDataScreen(
-    registrationViewModel: RegistrationViewModel,
-    loginViewModel: LoginViewModel,
-    healthDataViewModel: HealthDataViewModel
+    healthDataViewModel: HealthDataViewModel,
+    loginViewModel: LoginViewModel
 ) {
     val primaryColor = colorResource(id = R.color.primary)
-    val uiState by registrationViewModel.registrationUIState
-    val isSyncing by registrationViewModel.isSyncing
-    val syncMessage by registrationViewModel.syncMessage
+    val healthData by healthDataViewModel.healthData.collectAsState()
+    val isSyncing by healthDataViewModel.isSyncing.collectAsState()
+    val syncMessage by healthDataViewModel.syncMessage.collectAsState()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    var isManualInput by remember { mutableStateOf(true) }
+    var isManualInput by remember { mutableStateOf(healthData["dataSourcePreference"] != "GOOGLE_FIT") }
 
     val fitnessOptions = remember {
         FitnessOptions.builder()
@@ -51,19 +48,22 @@ fun HealthDataScreen(
     ) { result ->
         if (result.resultCode == android.app.Activity.RESULT_OK) {
             coroutineScope.launch {
-                healthDataViewModel.syncWithGoogleFit(context, registrationViewModel, fitnessOptions)
+                healthDataViewModel.syncWithGoogleFit(context, fitnessOptions)
+                isManualInput = false
             }
         } else {
-            registrationViewModel.setSyncMessage("Failed to obtain Google Fit permissions")
+            healthDataViewModel.setSyncMessage("Failed to obtain Google Fit permissions")
         }
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text("Health Data", style = MaterialTheme.typography.headlineMedium.copy(color = MaterialTheme.colorScheme.primary))
+        Text(
+            "Health Data",
+            style = MaterialTheme.typography.headlineMedium.copy(color = MaterialTheme.colorScheme.primary)
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
@@ -82,7 +82,11 @@ fun HealthDataScreen(
                 onClick = {
                     isManualInput = false
                     coroutineScope.launch {
-                        healthDataViewModel.handleGoogleFitSync(context, registrationViewModel, fitnessOptions, googleSignInLauncher)
+                        healthDataViewModel.handleGoogleFitSync(
+                            context,
+                            fitnessOptions,
+                            googleSignInLauncher
+                        )
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
@@ -97,10 +101,10 @@ fun HealthDataScreen(
 
         if (isManualInput) {
             HealthDataTextField(
-                value = uiState.bloodPressure,
-                onValueChange = { registrationViewModel.updateHealthParameters(bloodPressure = it) },
+                value = healthData["bloodPressure"] as? String ?: "",
+                onValueChange = { healthDataViewModel.updateManualHealthData(bloodPressure = it) },
                 label = "Blood Pressure (e.g. 120/80)",
-                isError = uiState.bloodPressureError,
+                isError = false, // Add validation logic if needed
                 errorMessage = "Invalid blood pressure format",
                 enabled = true
             )
@@ -108,10 +112,10 @@ fun HealthDataScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             HealthDataTextField(
-                value = uiState.heartRate,
-                onValueChange = { registrationViewModel.updateHealthParameters(heartRate = it) },
+                value = healthData["heartRate"] as? String ?: "",
+                onValueChange = { healthDataViewModel.updateManualHealthData(heartRate = it) },
                 label = "Heart Rate (e.g. 70)",
-                isError = uiState.heartRateError,
+                isError = false, // Add validation logic if needed
                 errorMessage = "Invalid heart rate",
                 enabled = true
             )
@@ -119,10 +123,10 @@ fun HealthDataScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             HealthDataTextField(
-                value = uiState.bloodSugar,
-                onValueChange = { registrationViewModel.updateHealthParameters(bloodSugar = it) },
+                value = healthData["bloodSugar"] as? String ?: "",
+                onValueChange = { healthDataViewModel.updateManualHealthData(bloodSugar = it) },
                 label = "Blood Sugar (e.g. 100)",
-                isError = uiState.bloodSugarError,
+                isError = false, // Add validation logic if needed
                 errorMessage = "Invalid blood sugar value",
                 enabled = true
             )
@@ -131,9 +135,9 @@ fun HealthDataScreen(
                 CircularProgressIndicator(color = primaryColor)
             } else {
                 Text("Data synced from Google Fit:")
-                Text("Blood Pressure: ${uiState.bloodPressure}")
-                Text("Heart Rate: ${uiState.heartRate}")
-                Text("Blood Sugar: ${uiState.bloodSugar}")
+                Text("Blood Pressure: ${healthData["bloodPressure"] ?: "N/A"}")
+                Text("Heart Rate: ${healthData["heartRate"] ?: "N/A"}")
+                Text("Blood Sugar: ${healthData["bloodSugar"] ?: "N/A"}")
             }
         }
 
@@ -149,10 +153,10 @@ fun HealthDataScreen(
         )
 
         HealthDataTextField(
-            value = uiState.cholesterol,
-            onValueChange = { registrationViewModel.updateHealthParameters(cholesterol = it) },
+            value = healthData["cholesterol"] as? String ?: "",
+            onValueChange = { healthDataViewModel.updateManualHealthData(cholesterol = it) },
             label = "Cholesterol (e.g. 200)",
-            isError = uiState.cholesterolError,
+            isError = false, // Add validation logic if needed
             errorMessage = "Invalid cholesterol value",
             enabled = true
         )
@@ -161,9 +165,12 @@ fun HealthDataScreen(
 
         Button(
             onClick = {
-                registrationViewModel.sendHealthDataToFirestore(isManualInput)
-                if (!isManualInput) {
-                    HealthDataSyncWorker.startPeriodicSync(context)
+                if (isManualInput) {
+                    healthDataViewModel.sendManualHealthDataToFirestore()
+                } else {
+                    coroutineScope.launch {
+                        healthDataViewModel.syncWithGoogleFit(context, fitnessOptions)
+                    }
                 }
                 WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
             },
@@ -176,21 +183,13 @@ fun HealthDataScreen(
                 modifier = Modifier.size(24.dp)
             )
             Spacer(Modifier.width(8.dp))
-            Text("Submit Health Data")
+            Text(if (isManualInput) "Submit Health Data" else "Sync with Google Fit")
         }
 
-        syncMessage?.let { message ->
-            Text(
-                text = message,
-                color = if (message.startsWith("Error")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-        }
     }
 }
-
 @Composable
 @Preview
 fun HealthDataScreenPreview() {
-    HealthDataScreen(RegistrationViewModel(), LoginViewModel(), HealthDataViewModel())
+    HealthDataScreen(HealthDataViewModel(), LoginViewModel())
 }

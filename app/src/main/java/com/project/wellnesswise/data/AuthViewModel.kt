@@ -1,5 +1,6 @@
 package com.project.wellnesswise.data
 
+import HealthDataViewModel
 import LoginViewModel
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -10,7 +11,8 @@ import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 
 class AuthViewModel(
     private val registrationViewModel: RegistrationViewModel,
-    private val loginViewModel: LoginViewModel
+    private val loginViewModel: LoginViewModel,
+    private val healthDataViewModel: HealthDataViewModel
 ) : ViewModel() {
     private val TAG = AuthViewModel::class.simpleName
     private val firebaseAuth = FirebaseAuth.getInstance()
@@ -23,6 +25,7 @@ class AuthViewModel(
                 WellnessWiseAppRouter.navigateTo(Screen.LoginScreen)
                 registrationViewModel.resetRegistrationUIState()
                 loginViewModel.resetLoginUIState()
+                healthDataViewModel.resetHealthData()
             } else {
                 Log.d(TAG, "Logout failed")
             }

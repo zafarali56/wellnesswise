@@ -1,113 +1,180 @@
-package com.project.wellnesswise.data
-
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.FitnessOptions
-import com.google.android.gms.fitness.data.DataType
-import com.google.android.gms.fitness.data.Field
-import com.google.android.gms.fitness.data.HealthDataTypes
-import com.google.android.gms.fitness.data.HealthFields
-
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.project.wellnesswise.components.data.HealthDataUtils
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-
 class HealthDataViewModel : ViewModel() {
-    public suspend fun handleGoogleFitSync(
+    private val _isSyncing = MutableStateFlow(false)
+    val isSyncing: StateFlow<Boolean> = _isSyncing
+
+    private val _syncMessage = MutableStateFlow<String?>(null)
+    val syncMessage: StateFlow<String?> = _syncMessage
+
+    private val _healthData = MutableStateFlow<Map<String, Any>>(emptyMap())
+    val healthData: StateFlow<Map<String, Any>> = _healthData
+
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
+    init {
+        loadUserHealthData()
+    }
+
+    private fun loadUserHealthData() {
+        viewModelScope.launch {
+            val user = auth.currentUser
+            if (user != null) {
+                try {
+                    val document = firestore.collection("users").document(user.uid).get().await()
+                    if (document.exists()) {
+                        _healthData.value = document.data ?: emptyMap()
+                    } else {
+                        _healthData.value = emptyMap()
+                    }
+                } catch (e: Exception) {
+                    Log.e("HealthDataViewModel", "Error loading user health data", e)
+                }
+            } else {
+                _healthData.value = emptyMap()
+            }
+        }
+    }
+
+    fun handleGoogleFitSync(
         context: Context,
-        registrationViewModel: RegistrationViewModel,
         fitnessOptions: FitnessOptions,
         googleSignInLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
     ) {
-        val account = GoogleSignIn.getAccountForExtension(context, fitnessOptions)
+        viewModelScope.launch {
+            val account = GoogleSignIn.getAccountForExtension(context, fitnessOptions)
 
-        if (!GoogleSignIn.hasPermissions(account, fitnessOptions)) {
-            try {
-                registrationViewModel.setIsSyncing(true)
-                registrationViewModel.setSyncMessage("Requesting Google Fit permissions...")
+            if (!GoogleSignIn.hasPermissions(account, fitnessOptions)) {
+                try {
+                    _isSyncing.value = true
+                    setSyncMessage("Requesting Google Fit permissions...")
 
-                val signInOptions = GoogleSignInOptions.Builder()
-                    .addExtension(fitnessOptions)
-                    .build()
-                val intent = GoogleSignIn.getClient(context, signInOptions).signInIntent
-                googleSignInLauncher.launch(intent)
-            } catch (e: Exception) {
-                registrationViewModel.setSyncMessage("Error requesting Google Fit permissions: ${e.message}")
-            } finally {
-                registrationViewModel.setIsSyncing(false)
+                    val signInOptions = GoogleSignInOptions.Builder()
+                        .addExtension(fitnessOptions)
+                        .build()
+                    val intent = GoogleSignIn.getClient(context, signInOptions).signInIntent
+                    googleSignInLauncher.launch(intent)
+                } catch (e: Exception) {
+                    setSyncMessage("Error requesting Google Fit permissions: ${e.message}")
+                } finally {
+                    _isSyncing.value = false
+                }
+            } else {
+                syncWithGoogleFit(context, fitnessOptions)
             }
-        } else {
-            syncWithGoogleFit(context, registrationViewModel, fitnessOptions)
         }
+    }
+
+    fun updateManualHealthData(
+        bloodPressure: String? = null,
+        heartRate: String? = null,
+        bloodSugar: String? = null,
+        cholesterol: String? = null
+    ) {
+        val currentData = _healthData.value.toMutableMap()
+        bloodPressure?.let {
+            currentData["bloodPressure"] = it
+            currentData["bloodPressureSource"] = "MANUAL"
+        }
+        heartRate?.let {
+            currentData["heartRate"] = it
+            currentData["heartRateSource"] = "MANUAL"
+        }
+        bloodSugar?.let {
+            currentData["bloodSugar"] = it
+            currentData["bloodSugarSource"] = "MANUAL"
+        }
+        cholesterol?.let {
+            currentData["cholesterol"] = it
+            currentData["cholesterolSource"] = "MANUAL"
+        }
+        currentData["dataSourcePreference"] = "MANUAL"
+        _healthData.value = currentData
     }
 
     suspend fun syncWithGoogleFit(
-        context: android.content.Context,
-        registrationViewModel: RegistrationViewModel,
+        context: Context,
         fitnessOptions: FitnessOptions
     ) {
         try {
-            registrationViewModel.setIsSyncing(true)
-            registrationViewModel.setSyncMessage("Syncing with Google Fit...")
+            _isSyncing.value = true
+            setSyncMessage("Syncing with Google Fit...")
 
             val account = GoogleSignIn.getAccountForExtension(context, fitnessOptions)
+            val googleFitData = HealthDataUtils.fetchHealthData(context, account)
 
-            var heartRate: Float? = null
-            var bloodPressure: String? = null
-            var bloodSugar: Float? = null
-
-            // Read heart rate
-            val heartRateResult = Fitness.getHistoryClient(context, account)
-                .readDailyTotal(DataType.TYPE_HEART_RATE_BPM)
-                .await()
-            if (!heartRateResult.isEmpty) {
-                heartRate = heartRateResult.dataPoints.firstOrNull()
-                    ?.getValue(Field.FIELD_AVERAGE)?.asFloat()
+            // Update all data from Google Fit
+            val updatedData = _healthData.value.toMutableMap()
+            for ((key, value) in googleFitData) {
+                updatedData[key] = value
+                updatedData["${key}Source"] = "GOOGLE_FIT"
             }
+            updatedData["dataSourcePreference"] = "GOOGLE_FIT"
+            _healthData.value = updatedData
 
-            // Read blood pressure and blood sugar
-            val endTime = System.currentTimeMillis()
-            val startTime = endTime - 24 * 60 * 60 * 1000 // 24 hours ago
-            val readRequest = com.google.android.gms.fitness.request.DataReadRequest.Builder()
-                .read(HealthDataTypes.TYPE_BLOOD_PRESSURE)
-                .read(HealthDataTypes.TYPE_BLOOD_GLUCOSE)
-                .setTimeRange(startTime, endTime, java.util.concurrent.TimeUnit.MILLISECONDS)
-                .build()
+            updateFirestore(updatedData)
 
-            val dataResponse = Fitness.getHistoryClient(context, account)
-                .readData(readRequest)
-                .await()
-
-            for (dataSet in dataResponse.dataSets) {
-                when (dataSet.dataType) {
-                    HealthDataTypes.TYPE_BLOOD_PRESSURE -> {
-                        for (dataPoint in dataSet.dataPoints.sortedByDescending { it.getEndTime(java.util.concurrent.TimeUnit.MILLISECONDS) }) {
-                            val systolic = dataPoint.getValue(HealthFields.FIELD_BLOOD_PRESSURE_SYSTOLIC).asFloat()
-                            val diastolic = dataPoint.getValue(HealthFields.FIELD_BLOOD_PRESSURE_DIASTOLIC).asFloat()
-                            bloodPressure = "${systolic.toInt()}/${diastolic.toInt()}"
-                            break // Take the most recent reading
-                        }
-                    }
-                    HealthDataTypes.TYPE_BLOOD_GLUCOSE -> {
-                        for (dataPoint in dataSet.dataPoints.sortedByDescending { it.getEndTime(java.util.concurrent.TimeUnit.MILLISECONDS) }) {
-                            bloodSugar = dataPoint.getValue(HealthFields.FIELD_BLOOD_GLUCOSE_LEVEL).asFloat()
-                            break // Take the most recent reading
-                        }
-                    }
-                }
-            }
-
-            registrationViewModel.syncWithGoogleFit(heartRate, bloodPressure, bloodSugar)
+            setSyncMessage("Sync completed successfully")
         } catch (e: Exception) {
-            registrationViewModel.setSyncMessage("Error syncing with Google Fit: ${e.message}")
+            Log.e("HealthDataViewModel", "Error syncing health data", e)
+            setSyncMessage("Error syncing with Google Fit: ${e.message}")
         } finally {
-            registrationViewModel.setIsSyncing(false)
+            _isSyncing.value = false
         }
     }
 
+    fun sendManualHealthDataToFirestore() {
+        viewModelScope.launch {
+            try {
+                _isSyncing.value = true
+                setSyncMessage("Updating health data...")
+                updateFirestore(_healthData.value)
+                setSyncMessage("Health data updated successfully")
+            } catch (e: Exception) {
+                Log.e("HealthDataViewModel", "Error updating health data", e)
+                setSyncMessage("Error updating health data: ${e.message}")
+            } finally {
+                _isSyncing.value = false
+            }
+        }
+    }
+
+    private suspend fun updateFirestore(healthData: Map<String, Any>) {
+        val user = auth.currentUser
+        if (user != null) {
+            firestore.collection("users").document(user.uid)
+                .set(healthData, com.google.firebase.firestore.SetOptions.merge())
+                .await()
+            Log.d("HealthDataViewModel", "Health data updated successfully: $healthData")
+        } else {
+            throw Exception("User not authenticated")
+        }
+    }
+
+    fun setSyncMessage(message: String?) {
+        _syncMessage.value = message
+    }
+
+    fun resetHealthData() {
+        _healthData.value = emptyMap()
+        _syncMessage.value = null
+        _isSyncing.value = false
+    }
 }

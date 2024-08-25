@@ -12,7 +12,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.project.wellnesswise.R
-import com.project.wellnesswise.components.*
+import com.project.wellnesswise.components.ui.ButtonComponent
+import com.project.wellnesswise.components.ui.ClickableLoginTextComponent
+import com.project.wellnesswise.components.ui.GoogleFitPermissionRequest
+import com.project.wellnesswise.components.ui.HeadingTextComponent
+import com.project.wellnesswise.components.ui.MyPasswordField
+import com.project.wellnesswise.components.ui.MyTextField
+import com.project.wellnesswise.components.ui.UnderLinedTextComponent
 import com.project.wellnesswise.data.LoginUIEvent
 import com.project.wellnesswise.data.rules.Validator
 import com.project.wellnesswise.navigations.Screen

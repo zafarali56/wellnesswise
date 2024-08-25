@@ -1,4 +1,4 @@
-package com.project.wellnesswise.components
+package com.project.wellnesswise.components.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize

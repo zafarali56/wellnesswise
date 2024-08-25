@@ -1,4 +1,4 @@
-package com.project.wellnesswise.components
+package com.project.wellnesswise.components.ui
 
 
 import android.util.Log

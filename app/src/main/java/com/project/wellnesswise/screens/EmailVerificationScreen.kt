@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
-import com.project.wellnesswise.components.ButtonComponent
+import com.project.wellnesswise.components.ui.ButtonComponent
 import com.project.wellnesswise.data.RegistrationViewModel
 
 import kotlinx.coroutines.delay

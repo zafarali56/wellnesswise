@@ -53,7 +53,7 @@ class HomeViewModel : ViewModel() {
     }
 
     private fun setupFirestoreListener(userId: String) {
-        removeFirestoreListener() // Always remove existing listener before setting up a new one
+        removeFirestoreListener()
 
         firestoreListener = firestore.collection("users").document(userId)
             .addSnapshotListener { snapshot, e ->
