@@ -13,30 +13,38 @@ import java.util.concurrent.TimeUnit
 object HealthDataUtils {
     suspend fun fetchHealthData(
         context: Context,
-        account: GoogleSignInAccount
+        account: GoogleSignInAccount,
     ): Map<String, Any> {
         val healthData = mutableMapOf<String, Any>()
 
         // Read heart rate
-        val heartRateResult = Fitness.getHistoryClient(context, account)
-            .readDailyTotal(DataType.TYPE_HEART_RATE_BPM)
-            .await()
+        val heartRateResult =
+            Fitness
+                .getHistoryClient(context, account)
+                .readDailyTotal(DataType.TYPE_HEART_RATE_BPM)
+                .await()
         if (!heartRateResult.isEmpty) {
-            healthData["heartRate"] = heartRateResult.dataPoints.firstOrNull()
-                ?.getValue(Field.FIELD_AVERAGE)?.asFloat() ?: 0f
+            healthData["heartRate"] = heartRateResult.dataPoints
+                .firstOrNull()
+                ?.getValue(Field.FIELD_AVERAGE)
+                ?.asFloat() ?: 0f
         }
 
         val endTime = System.currentTimeMillis()
         val startTime = endTime - 24 * 60 * 60 * 1000 // 24 hours ago
-        val readRequest = com.google.android.gms.fitness.request.DataReadRequest.Builder()
-            .read(HealthDataTypes.TYPE_BLOOD_PRESSURE)
-            .read(HealthDataTypes.TYPE_BLOOD_GLUCOSE)
-            .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-            .build()
+        val readRequest =
+            com.google.android.gms.fitness.request.DataReadRequest
+                .Builder()
+                .read(HealthDataTypes.TYPE_BLOOD_PRESSURE)
+                .read(HealthDataTypes.TYPE_BLOOD_GLUCOSE)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .build()
 
-        val dataResponse = Fitness.getHistoryClient(context, account)
-            .readData(readRequest)
-            .await()
+        val dataResponse =
+            Fitness
+                .getHistoryClient(context, account)
+                .readData(readRequest)
+                .await()
 
         for (dataSet in dataResponse.dataSets) {
             when (dataSet.dataType) {
@@ -57,7 +65,9 @@ object HealthDataUtils {
             }
         }
 
-        healthData["lastUpdated"] = com.google.firebase.Timestamp.now()
+        healthData["lastUpdated"] =
+            com.google.firebase.Timestamp
+                .now()
 
         return healthData
     }

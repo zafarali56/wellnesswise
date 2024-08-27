@@ -55,30 +55,36 @@ class HomeViewModel : ViewModel() {
     private fun setupFirestoreListener(userId: String) {
         removeFirestoreListener()
 
-        firestoreListener = firestore.collection("users").document(userId)
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e)
-                    return@addSnapshotListener
-                }
+        firestoreListener =
+            firestore
+                .collection("users")
+                .document(userId)
+                .addSnapshotListener { snapshot, e ->
+                    if (e != null) {
+                        Log.w(TAG, "Listen failed.", e)
+                        return@addSnapshotListener
+                    }
 
-                if (snapshot != null && snapshot.exists()) {
-                    try {
-                        snapshot.data?.let { data ->
-                            viewModelScope.launch {
-                                updateHealthData(data)
+                    if (snapshot != null && snapshot.exists()) {
+                        try {
+                            snapshot.data?.let { data ->
+                                viewModelScope.launch {
+                                    updateHealthData(data)
+                                }
                             }
+                            Log.d(
+                                TAG,
+                                "Data updated: BP: ${_bloodPressure.value}, HR: ${_heartRate.value}, BS: ${_bloodSugar.value}, Chol: ${_cholesterol.value}",
+                            )
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Error parsing Firestore data", e)
+                            setDefaultValues()
                         }
-                        Log.d(TAG, "Data updated: BP: ${_bloodPressure.value}, HR: ${_heartRate.value}, BS: ${_bloodSugar.value}, Chol: ${_cholesterol.value}")
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error parsing Firestore data", e)
+                    } else {
+                        Log.d(TAG, "Current data: null")
                         setDefaultValues()
                     }
-                } else {
-                    Log.d(TAG, "Current data: null")
-                    setDefaultValues()
                 }
-            }
     }
 
     private fun removeFirestoreListener() {
@@ -92,7 +98,12 @@ class HomeViewModel : ViewModel() {
                 _isRefreshing.value = true
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
-                    val snapshot = firestore.collection("users").document(currentUser.uid).get().await()
+                    val snapshot =
+                        firestore
+                            .collection("users")
+                            .document(currentUser.uid)
+                            .get()
+                            .await()
                     if (snapshot.exists()) {
                         snapshot.data?.let { data ->
                             updateHealthData(data)
@@ -114,11 +125,12 @@ class HomeViewModel : ViewModel() {
 
     private fun updateHealthData(data: Map<String, Any>) {
         _bloodPressure.value = data["bloodPressure"]?.toString() ?: "N/A"
-        _heartRate.value = when (val hrData = data["heartRate"]) {
-            is Number -> hrData.toFloat().roundToInt().toString()
-            is String -> hrData.toIntOrNull()?.toString() ?: "N/A"
-            else -> "N/A"
-        }
+        _heartRate.value =
+            when (val hrData = data["heartRate"]) {
+                is Number -> hrData.toFloat().roundToInt().toString()
+                is String -> hrData.toIntOrNull()?.toString() ?: "N/A"
+                else -> "N/A"
+            }
         _bloodSugar.value = data["bloodSugar"]?.toString() ?: "N/A"
         _cholesterol.value = data["cholesterol"]?.toString() ?: "N/A"
     }

@@ -29,10 +29,8 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.project.wellnesswise.app.WellnessWiseApp
 import com.project.wellnesswise.data.AuthViewModel
 import com.project.wellnesswise.data.RegistrationViewModel
-import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
-
     private lateinit var googleFitPermissionLauncher: ActivityResultLauncher<Intent>
     private var onPermissionGranted: (() -> Unit)? = null
     private lateinit var updateReceiver: BroadcastReceiver
@@ -78,17 +76,18 @@ class MainActivity : ComponentActivity() {
                 onRequestGoogleFitPermission = {
                     requestGoogleFitPermissions()
                 },
-
             )
         }
     }
 
     private fun configureFirestore() {
         val firestore = FirebaseFirestore.getInstance()
-        val settings = FirebaseFirestoreSettings.Builder()
-            .setPersistenceEnabled(true)
-            .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
-            .build()
+        val settings =
+            FirebaseFirestoreSettings
+                .Builder()
+                .setPersistenceEnabled(true)
+                .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+                .build()
         firestore.firestoreSettings = settings
     }
 
@@ -96,39 +95,45 @@ class MainActivity : ComponentActivity() {
         HealthDataSyncWorker.startPeriodicSync(this)
 
         // Schedule an immediate sync
-        val immediateSync = OneTimeWorkRequestBuilder<HealthDataSyncWorker>()
-            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-            .build()
+        val immediateSync =
+            OneTimeWorkRequestBuilder<HealthDataSyncWorker>()
+                .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                .build()
         WorkManager.getInstance(this).enqueue(immediateSync)
     }
 
     private fun setupGoogleFitPermissionLauncher() {
-        googleFitPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            if (result.resultCode == RESULT_OK) {
-                Log.i(TAG, "Google Fit permissions granted")
-                onPermissionGranted?.invoke()
-                scheduleHealthDataSync() // Trigger a sync after permissions are granted
-            } else {
-                Log.e(TAG, "Google Fit permissions not granted")
+        googleFitPermissionLauncher =
+            registerForActivityResult(
+                ActivityResultContracts.StartActivityForResult(),
+            ) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    Log.i(TAG, "Google Fit permissions granted")
+                    onPermissionGranted?.invoke()
+                    scheduleHealthDataSync() // Trigger a sync after permissions are granted
+                } else {
+                    Log.e(TAG, "Google Fit permissions not granted")
+                }
             }
-        }
     }
 
     private fun requestGoogleFitPermissions() {
-        val fitnessOptions = FitnessOptions.builder()
-            .addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ)
-            .addDataType(HealthDataTypes.TYPE_BLOOD_PRESSURE, FitnessOptions.ACCESS_READ)
-            .addDataType(HealthDataTypes.TYPE_BLOOD_GLUCOSE, FitnessOptions.ACCESS_READ)
-            .build()
+        val fitnessOptions =
+            FitnessOptions
+                .builder()
+                .addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ)
+                .addDataType(HealthDataTypes.TYPE_BLOOD_PRESSURE, FitnessOptions.ACCESS_READ)
+                .addDataType(HealthDataTypes.TYPE_BLOOD_GLUCOSE, FitnessOptions.ACCESS_READ)
+                .build()
 
         val account = GoogleSignIn.getAccountForExtension(this, fitnessOptions)
 
         if (!GoogleSignIn.hasPermissions(account, fitnessOptions)) {
-            val signInOptions = GoogleSignInOptions.Builder()
-                .addExtension(fitnessOptions)
-                .build()
+            val signInOptions =
+                GoogleSignInOptions
+                    .Builder()
+                    .addExtension(fitnessOptions)
+                    .build()
             googleFitPermissionLauncher.launch(GoogleSignIn.getClient(this, signInOptions).signInIntent)
         } else {
             Log.i(TAG, "Google Fit permissions already granted")
@@ -138,14 +143,18 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun registerUpdateReceiver() {
-        updateReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                if (intent?.action == "com.project.wellnesswise.HEALTH_DATA_UPDATED") {
-                    Log.d(TAG, "Received health data update broadcast")
-                    homeViewModel.refreshData()
+        updateReceiver =
+            object : BroadcastReceiver() {
+                override fun onReceive(
+                    context: Context?,
+                    intent: Intent?,
+                ) {
+                    if (intent?.action == "com.project.wellnesswise.HEALTH_DATA_UPDATED") {
+                        Log.d(TAG, "Received health data update broadcast")
+                        homeViewModel.refreshData()
+                    }
                 }
             }
-        }
         registerReceiver(updateReceiver, IntentFilter("com.project.wellnesswise.HEALTH_DATA_UPDATED"))
     }
 
@@ -163,9 +172,10 @@ class MainActivity : ComponentActivity() {
         homeViewModel.checkForActiveSession()
 
         // Trigger an immediate sync when the app comes to the foreground
-        val immediateSync = OneTimeWorkRequestBuilder<HealthDataSyncWorker>()
-            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-            .build()
+        val immediateSync =
+            OneTimeWorkRequestBuilder<HealthDataSyncWorker>()
+                .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                .build()
         WorkManager.getInstance(this).enqueue(immediateSync)
     }
 

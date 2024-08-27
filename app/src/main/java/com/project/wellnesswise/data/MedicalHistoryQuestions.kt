@@ -8,7 +8,7 @@ data class MedicalHistoryQuestion(
 val medicalHistoryQuestions = listOf(
     MedicalHistoryQuestion(
         question = "Do you have any allergies?",
-        suggestedAnswers = listOf("Yes", "No")
+        suggestedAnswers = listOf("Yes", "No", "Don't know" )
     ),
     MedicalHistoryQuestion(
         question = "Have you had any surgeries?",

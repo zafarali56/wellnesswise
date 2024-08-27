@@ -3,6 +3,7 @@ package com.project.wellnesswise.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -32,7 +33,7 @@ fun MedicalHistoryScreen(registrationViewModel: RegistrationViewModel) {
                         WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
                     }) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
                         )
                     }
@@ -58,7 +59,6 @@ fun MedicalHistoryScreen(registrationViewModel: RegistrationViewModel) {
                     .padding(horizontal = 16.dp)
             ) {
                 item {
-                    Spacer(modifier = Modifier.height(16.dp))
                     MedicalHistorySection(
                         registrationViewModel = registrationViewModel,
                         questions = medicalHistoryQuestions

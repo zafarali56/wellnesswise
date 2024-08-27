@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.project.wellnesswise.data.AuthViewModel
-
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
@@ -28,7 +27,7 @@ fun WellnessWiseApp(
     authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel,
     healthDataViewModel: HealthDataViewModel,
-    onRequestGoogleFitPermission: () -> Unit
+    onRequestGoogleFitPermission: () -> Unit,
 ) {
     homeViewModel.checkForActiveSession()
 
@@ -40,11 +39,11 @@ fun WellnessWiseApp(
         Crossfade(targetState = WellnessWiseAppRouter.currentScreen, label = "") { currentState ->
             when (currentState.value) {
                 is Screen.SignUpScreen -> SignUpScreen(registrationViewModel)
-                is Screen.TermsAndConditionsScreen -> TermsAndConditionsScreen(registrationViewModel)
+                is Screen.TermsAndConditionsScreen -> TermsAndConditionsScreen()
                 is Screen.LoginScreen -> LoginScreen(loginViewModel)
                 is Screen.HabitsScreen -> HabitsScreen(registrationViewModel)
                 is Screen.MedicalHistoryScreen -> MedicalHistoryScreen(registrationViewModel)
-                is Screen.HomeScreen -> HomeScreen( homeViewModel, authViewModel)
+                is Screen.HomeScreen -> HomeScreen(homeViewModel, authViewModel)
                 is Screen.EmailVerificationScreen -> EmailVerificationScreen(registrationViewModel)
                 is Screen.HealthDataScreen -> HealthDataScreen(healthDataViewModel, loginViewModel)
                 is Screen.DataVisualizationScreen -> DataVisualizationScreen()

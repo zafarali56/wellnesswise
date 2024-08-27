@@ -19,7 +19,7 @@ import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 
 @Composable
-fun TermsAndConditionsScreen(registrationViewModel: RegistrationViewModel) {
+fun TermsAndConditionsScreen() {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -36,5 +36,5 @@ fun TermsAndConditionsScreen(registrationViewModel: RegistrationViewModel) {
 @Preview
 @Composable
 fun TermsAndConditionsPreview() {
-    TermsAndConditionsScreen(viewModel())
+    TermsAndConditionsScreen()
 }

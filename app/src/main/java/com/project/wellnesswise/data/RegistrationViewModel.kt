@@ -36,6 +36,7 @@ class RegistrationViewModel : ViewModel() {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+
     fun setIsSyncing(syncing: Boolean) {
         _isSyncing.value = syncing
     }
@@ -43,19 +44,21 @@ class RegistrationViewModel : ViewModel() {
     fun setSyncMessage(message: String?) {
         _syncMessage.value = message
     }
+
     fun updateHealthParameters(
         bloodPressure: String? = null,
         heartRate: String? = null,
         bloodSugar: String? = null,
-        cholesterol: String? = null
+        cholesterol: String? = null,
     ) {
         val currentState = registrationUIState.value
-        val newState = currentState.copy(
-            bloodPressure = bloodPressure ?: currentState.bloodPressure,
-            heartRate = heartRate ?: currentState.heartRate,
-            bloodSugar = bloodSugar ?: currentState.bloodSugar,
-            cholesterol = cholesterol ?: currentState.cholesterol
-        )
+        val newState =
+            currentState.copy(
+                bloodPressure = bloodPressure ?: currentState.bloodPressure,
+                heartRate = heartRate ?: currentState.heartRate,
+                bloodSugar = bloodSugar ?: currentState.bloodSugar,
+                cholesterol = cholesterol ?: currentState.cholesterol,
+            )
 
         registrationUIState.value = newState
         validateHealthParameters(newState)
@@ -64,47 +67,60 @@ class RegistrationViewModel : ViewModel() {
     fun setDataSourcePreference(preference: DataSourcePreference) {
         _dataSourcePreference.value = preference
     }
+
     fun setInputMode(isManual: Boolean) {
         _isManualInput.value = isManual
     }
-    private fun validateHealthParameters(state: RegistrationUIState) {
-        val validationResults = Validator.validateHealthParameters(
-            state.bloodPressure,
-            state.heartRate,
-            state.bloodSugar,
-            state.cholesterol
-        )
 
-        registrationUIState.value = state.copy(
-            bloodPressureError = !validationResults["bloodPressure"]!!,
-            heartRateError = !validationResults["heartRate"]!!,
-            bloodSugarError = !validationResults["bloodSugar"]!!,
-            cholesterolError = !validationResults["cholesterol"]!!
-        )
+    private fun validateHealthParameters(state: RegistrationUIState) {
+        val validationResults =
+            Validator.validateHealthParameters(
+                state.bloodPressure,
+                state.heartRate,
+                state.bloodSugar,
+                state.cholesterol,
+            )
+
+        registrationUIState.value =
+            state.copy(
+                bloodPressureError = !validationResults["bloodPressure"]!!,
+                heartRateError = !validationResults["heartRate"]!!,
+                bloodSugarError = !validationResults["bloodSugar"]!!,
+                cholesterolError = !validationResults["cholesterol"]!!,
+            )
     }
-    fun sendHealthDataToFirestore(isManualInput: Boolean, navigateToHome: Boolean = false) {
+
+    fun sendHealthDataToFirestore(
+        isManualInput: Boolean,
+        navigateToHome: Boolean = false,
+    ) {
         setIsSyncing(true)
         setSyncMessage(null)
         val uiState = registrationUIState.value
         val user = auth.currentUser
         if (user != null) {
-            val healthData = mapOf(
-                "bloodPressure" to (uiState.bloodPressure.takeIf { it.isNotBlank() } ?: "N/A"),
-                "heartRate" to (uiState.heartRate.takeIf { it.isNotBlank() } ?: "N/A"),
-                "bloodSugar" to (uiState.bloodSugar.takeIf { it.isNotBlank() } ?: "N/A"),
-                "cholesterol" to (uiState.cholesterol.takeIf { it.isNotBlank() } ?: "N/A"),
-                "dataSourcePreference" to if (isManualInput) "MANUAL" else "GOOGLE_FIT"
-            )
-            firestore.collection("users").document(user.uid)
-                .set(healthData, com.google.firebase.firestore.SetOptions.merge())
-                .addOnSuccessListener {
+            val healthData =
+                mapOf(
+                    "bloodPressure" to (uiState.bloodPressure.takeIf { it.isNotBlank() } ?: "N/A"),
+                    "heartRate" to (uiState.heartRate.takeIf { it.isNotBlank() } ?: "N/A"),
+                    "bloodSugar" to (uiState.bloodSugar.takeIf { it.isNotBlank() } ?: "N/A"),
+                    "cholesterol" to (uiState.cholesterol.takeIf { it.isNotBlank() } ?: "N/A"),
+                    "dataSourcePreference" to if (isManualInput) "MANUAL" else "GOOGLE_FIT",
+                )
+            firestore
+                .collection("users")
+                .document(user.uid)
+                .set(
+                    healthData,
+                    com.google.firebase.firestore.SetOptions
+                        .merge(),
+                ).addOnSuccessListener {
                     setIsSyncing(false)
                     setSyncMessage("Health data updated successfully")
                     if (navigateToHome) {
                         WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
                     }
-                }
-                .addOnFailureListener { e ->
+                }.addOnFailureListener { e ->
                     setIsSyncing(false)
                     setSyncMessage("Error updating health data: ${e.localizedMessage}")
                 }
@@ -114,7 +130,11 @@ class RegistrationViewModel : ViewModel() {
         }
     }
 
-    fun syncWithGoogleFit(heartRate: Float?, bloodPressure: String?, bloodSugar: Float?) {
+    fun syncWithGoogleFit(
+        heartRate: Float?,
+        bloodPressure: String?,
+        bloodSugar: Float?,
+    ) {
         viewModelScope.launch {
             setIsSyncing(true)
             setSyncMessage(null)
@@ -204,7 +224,7 @@ class RegistrationViewModel : ViewModel() {
                         height = registrationUIState.value.height,
                         weight = registrationUIState.value.weight,
                         habits = registrationUIState.value.habits,
-                        medicalHistory = registrationUIState.value.medicalHistory
+                        medicalHistory = registrationUIState.value.medicalHistory,
                     )
                 } else {
                     // Show validation errors
@@ -213,23 +233,26 @@ class RegistrationViewModel : ViewModel() {
             }
         }
     }
+
     private fun validateField(fieldName: String) {
         val currentValidationResults = validationResults.value.toMutableMap()
-        currentValidationResults[fieldName] = when (fieldName) {
-            "email" -> Validator.validateEmail(registrationUIState.value.email)
-            "fullName" -> Validator.validateFullName(registrationUIState.value.fullName)
-            "age" -> Validator.validateAge(registrationUIState.value.age)
-            "gender" -> Validator.validateGender(registrationUIState.value.gender)
-            "height" -> Validator.validateHeight(registrationUIState.value.height)
-            "weight" -> Validator.validateWeight(registrationUIState.value.weight)
-            "habits" -> Validator.validateHabits(registrationUIState.value.habits)
-            "medicalHistory" -> Validator.validateMedicalHistory(registrationUIState.value.medicalHistory)
-            "password" -> Validator.validatePassword(registrationUIState.value.password)
-            "policyAccepted" -> Validator.validatePolicyAccepted(registrationUIState.value.isPolicyAccepted)
-            else -> true
-        }
+        currentValidationResults[fieldName] =
+            when (fieldName) {
+                "email" -> Validator.validateEmail(registrationUIState.value.email)
+                "fullName" -> Validator.validateFullName(registrationUIState.value.fullName)
+                "age" -> Validator.validateAge(registrationUIState.value.age)
+                "gender" -> Validator.validateGender(registrationUIState.value.gender)
+                "height" -> Validator.validateHeight(registrationUIState.value.height)
+                "weight" -> Validator.validateWeight(registrationUIState.value.weight)
+                "habits" -> Validator.validateHabits(registrationUIState.value.habits)
+                "medicalHistory" -> Validator.validateMedicalHistory(registrationUIState.value.medicalHistory)
+                "password" -> Validator.validatePassword(registrationUIState.value.password)
+                "policyAccepted" -> Validator.validatePolicyAccepted(registrationUIState.value.isPolicyAccepted)
+                else -> true
+            }
         validationResults.value = currentValidationResults
     }
+
     private fun updateValidationResults() {
         validationResults.value = Validator.validateRegistrationUIState(registrationUIState.value)
     }
@@ -243,21 +266,26 @@ class RegistrationViewModel : ViewModel() {
         height: Number,
         weight: Number,
         habits: List<Habit>,
-        medicalHistory: Map<String, String>
+        medicalHistory: Map<String, String>,
     ) {
         signUpInProgress.value = true
-        auth.createUserWithEmailAndPassword(email, password)
+        auth
+            .createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
                     if (user != null) {
-                        val profileUpdates = UserProfileChangeRequest.Builder()
-                            .setDisplayName(fullName)
-                            .build()
-                        user.updateProfile(profileUpdates)
+                        val profileUpdates =
+                            UserProfileChangeRequest
+                                .Builder()
+                                .setDisplayName(fullName)
+                                .build()
+                        user
+                            .updateProfile(profileUpdates)
                             .addOnCompleteListener { profileTask ->
                                 if (profileTask.isSuccessful) {
-                                    user.sendEmailVerification()
+                                    user
+                                        .sendEmailVerification()
                                         .addOnCompleteListener { verificationTask ->
                                             if (verificationTask.isSuccessful) {
                                                 Log.d(TAG, "Verification email sent")
@@ -268,7 +296,7 @@ class RegistrationViewModel : ViewModel() {
                                                 Log.w(
                                                     TAG,
                                                     "Error sending verification email",
-                                                    verificationTask.exception
+                                                    verificationTask.exception,
                                                 )
                                             }
                                         }
@@ -288,27 +316,30 @@ class RegistrationViewModel : ViewModel() {
                 }
             }
     }
+
     fun checkEmailVerification() {
         val user = auth.currentUser
         user?.reload()?.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 if (user.isEmailVerified) {
-                    val userData = mapOf(
-                        "fullName" to registrationUIState.value.fullName,
-                        "age" to registrationUIState.value.age,
-                        "gender" to registrationUIState.value.gender.name,
-                        "height" to registrationUIState.value.height,
-                        "weight" to registrationUIState.value.weight,
-                        "habits" to registrationUIState.value.habits.map { it.name },
-                        "medicalHistory" to registrationUIState.value.medicalHistory
-                    )
-                    firestore.collection("users").document(user.uid)
+                    val userData =
+                        mapOf(
+                            "fullName" to registrationUIState.value.fullName,
+                            "age" to registrationUIState.value.age,
+                            "gender" to registrationUIState.value.gender.name,
+                            "height" to registrationUIState.value.height,
+                            "weight" to registrationUIState.value.weight,
+                            "habits" to registrationUIState.value.habits.map { it.name },
+                            "medicalHistory" to registrationUIState.value.medicalHistory,
+                        )
+                    firestore
+                        .collection("users")
+                        .document(user.uid)
                         .set(userData)
                         .addOnSuccessListener {
                             Log.d(TAG, "User data stored successfully")
                             WellnessWiseAppRouter.navigateTo(Screen.HealthDataScreen)
-                        }
-                        .addOnFailureListener { e ->
+                        }.addOnFailureListener { e ->
                             Log.w(TAG, "Error storing user data", e)
                         }
                 }
@@ -318,7 +349,6 @@ class RegistrationViewModel : ViewModel() {
         }
     }
 
-
     fun resetRegistrationUIState() {
         registrationUIState.value = RegistrationUIState()
         validationResults.value = emptyMap()
@@ -327,6 +357,7 @@ class RegistrationViewModel : ViewModel() {
     }
 
     enum class DataSourcePreference {
-        MANUAL, GOOGLE_FIT
+        MANUAL,
+        GOOGLE_FIT,
     }
 }

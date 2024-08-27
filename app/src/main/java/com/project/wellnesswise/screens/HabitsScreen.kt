@@ -55,10 +55,9 @@ fun HabitsScreen(registrationViewModel: RegistrationViewModel) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 28.dp)
+                    .padding(horizontal = 22.dp)
             ) {
                 item {
-                    Spacer(modifier = Modifier.height(16.dp))
                     HabitSelection(
                         registrationViewModel = registrationViewModel,
                         onHabitsSelected = { habits ->

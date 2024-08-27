@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ui.ButtonComponent
@@ -125,4 +126,10 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
             loginViewModel.checkGoogleFitPermissions(context)
         }
     }
+}
+
+@Preview
+@Composable
+fun LoginScreenPreview() {
+    LoginScreen(LoginViewModel())
 }

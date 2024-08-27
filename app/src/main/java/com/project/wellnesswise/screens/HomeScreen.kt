@@ -1,29 +1,29 @@
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.MonitorHeart
+import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.WaterDrop
-import androidx.compose.material.icons.filled.MonitorHeart
-import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.foundation.layout.size
-import androidx.compose.ui.draw.shadow
-import androidx.compose.foundation.isSystemInDarkTheme
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.material.icons.filled.Analytics
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ui.HealthMetricCard
 import com.project.wellnesswise.components.ui.NavigationDrawer
@@ -31,12 +31,12 @@ import com.project.wellnesswise.data.AuthViewModel
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
+
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel,
     authViewModel: AuthViewModel,
-
-    ) {
+) {
     val context = LocalContext.current
     val bloodPressure by homeViewModel.bloodPressure.collectAsStateWithLifecycle()
     val heartRate by homeViewModel.heartRate.collectAsStateWithLifecycle()
@@ -55,10 +55,9 @@ fun HomeScreen(
     LaunchedEffect(statusBarColor, useDarkIcons) {
         systemUiController.setStatusBarColor(
             color = statusBarColor,
-            darkIcons = useDarkIcons
+            darkIcons = useDarkIcons,
         )
     }
-
     LaunchedEffect(Unit) {
         homeViewModel.checkForActiveSession()
     }
@@ -68,12 +67,13 @@ fun HomeScreen(
             SwipeRefresh(
                 state = rememberSwipeRefreshState(isRefreshing),
                 onRefresh = { homeViewModel.refreshData() },
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
                 ) {
                     HealthMetricCard(
                         title = "Heart Rate",
@@ -82,14 +82,14 @@ fun HomeScreen(
                         color = lightRedColor,
                         icon = Icons.Filled.Favorite,
                         modifier = Modifier.fillMaxWidth(),
-                        isLargeCard = true
+                        isLargeCard = true,
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         HealthMetricCard(
                             title = "Blood Pressure",
@@ -98,7 +98,7 @@ fun HomeScreen(
                             color = primaryColor,
                             icon = Icons.Filled.MonitorHeart,
                             modifier = Modifier.weight(1f),
-                            isLargeCard = false
+                            isLargeCard = false,
                         )
 
                         HealthMetricCard(
@@ -108,7 +108,7 @@ fun HomeScreen(
                             color = secondaryColor,
                             icon = Icons.Filled.WaterDrop,
                             modifier = Modifier.weight(1f),
-                            isLargeCard = false
+                            isLargeCard = false,
                         )
                     }
 
@@ -116,32 +116,33 @@ fun HomeScreen(
 
                     Button(
                         onClick = { WellnessWiseAppRouter.navigateTo(Screen.DataVisualizationScreen) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .shadow(
-                                elevation = 6.dp,
-                                shape = RoundedCornerShape(28.dp)
-                            ),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .shadow(
+                                    elevation = 6.dp,
+                                    shape = RoundedCornerShape(28.dp),
+                                ),
                         colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-                        shape = RoundedCornerShape(28.dp)
+                        shape = RoundedCornerShape(28.dp),
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
+                            horizontalArrangement = Arrangement.Center,
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.BarChart,
                                 contentDescription = "Data Visualization",
                                 modifier = Modifier.size(24.dp),
-                                tint = Color.White
+                                tint = Color.White,
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
                                 "Data Visualization",
                                 style = MaterialTheme.typography.titleMedium,
                                 color = Color.White,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
                             )
                         }
                     }
@@ -155,16 +156,17 @@ fun HomeScreen(
                         color = lightBlueColor,
                         icon = Icons.Filled.Analytics,
                         modifier = Modifier.fillMaxWidth(),
-                        isLargeCard = false
+                        isLargeCard = false,
                     )
                 }
             }
         },
-        onLogoutClick = { authViewModel.logOut()},
+        onLogoutClick = { authViewModel.logOut() },
         onProfileClick = { WellnessWiseAppRouter.navigateTo(Screen.UserProfileScreen) },
-        onHomeClick = { WellnessWiseAppRouter.navigateTo(Screen.HomeScreen) }
+        onHomeClick = { WellnessWiseAppRouter.navigateTo(Screen.HomeScreen) },
     )
 }
+
 @Composable
 @Preview
 fun HomeScreenPreview() {
@@ -172,7 +174,6 @@ fun HomeScreenPreview() {
         HomeScreen(
             HomeViewModel(),
             AuthViewModel(RegistrationViewModel(), LoginViewModel(), HealthDataViewModel()),
-
         )
     }
 }

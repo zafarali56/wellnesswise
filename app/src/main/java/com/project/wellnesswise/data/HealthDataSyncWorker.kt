@@ -13,37 +13,41 @@ import java.util.concurrent.TimeUnit
 
 class HealthDataSyncWorker(
     context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
-
     companion object {
         private const val TAG = "HealthDataSyncWorker"
         private const val WORK_NAME = "healthDataSync"
 
         fun startPeriodicSync(context: Context) {
-            val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
+            val constraints =
+                Constraints
+                    .Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
 
-            val syncRequest = PeriodicWorkRequestBuilder<HealthDataSyncWorker>(15, TimeUnit.MINUTES)
-                .setConstraints(constraints)
-                .setBackoffCriteria(BackoffPolicy.LINEAR, 5, TimeUnit.MINUTES)
-                .build()
+            val syncRequest =
+                PeriodicWorkRequestBuilder<HealthDataSyncWorker>(15, TimeUnit.MINUTES)
+                    .setConstraints(constraints)
+                    .setBackoffCriteria(BackoffPolicy.LINEAR, 5, TimeUnit.MINUTES)
+                    .build()
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK_NAME,
                 ExistingPeriodicWorkPolicy.REPLACE,
-                syncRequest
+                syncRequest,
             )
         }
     }
 
     override suspend fun doWork(): Result {
-        val fitnessOptions = FitnessOptions.builder()
-            .addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ)
-            .addDataType(HealthDataTypes.TYPE_BLOOD_PRESSURE, FitnessOptions.ACCESS_READ)
-            .addDataType(HealthDataTypes.TYPE_BLOOD_GLUCOSE, FitnessOptions.ACCESS_READ)
-            .build()
+        val fitnessOptions =
+            FitnessOptions
+                .builder()
+                .addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ)
+                .addDataType(HealthDataTypes.TYPE_BLOOD_PRESSURE, FitnessOptions.ACCESS_READ)
+                .addDataType(HealthDataTypes.TYPE_BLOOD_GLUCOSE, FitnessOptions.ACCESS_READ)
+                .build()
 
         val account = GoogleSignIn.getAccountForExtension(applicationContext, fitnessOptions)
 
@@ -67,18 +71,23 @@ class HealthDataSyncWorker(
     private suspend fun fetchExistingHealthData(): Map<String, Any> {
         val user = FirebaseAuth.getInstance().currentUser
         return if (user != null) {
-            val document = FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(user.uid)
-                .get()
-                .await()
+            val document =
+                FirebaseFirestore
+                    .getInstance()
+                    .collection("users")
+                    .document(user.uid)
+                    .get()
+                    .await()
             document.data ?: emptyMap()
         } else {
             emptyMap()
         }
     }
 
-    private fun mergeHealthData(existingData: Map<String, Any>, googleFitData: Map<String, Any>): Map<String, Any> {
+    private fun mergeHealthData(
+        existingData: Map<String, Any>,
+        googleFitData: Map<String, Any>,
+    ): Map<String, Any> {
         val mergedData = existingData.toMutableMap()
 
         // Check global data source preference
@@ -91,7 +100,6 @@ class HealthDataSyncWorker(
                 mergedData["${key}Source"] = "GOOGLE_FIT"
             }
         } else {
-            // If global preference is manual, only update Google Fit sourced data
             for ((key, value) in googleFitData) {
                 val sourceKey = "${key}Source"
                 if (sourceKey !in mergedData || mergedData[sourceKey] == "GOOGLE_FIT") {
@@ -107,9 +115,15 @@ class HealthDataSyncWorker(
     private suspend fun updateFirestore(healthData: Map<String, Any>) {
         val user = FirebaseAuth.getInstance().currentUser
         if (user != null) {
-            FirebaseFirestore.getInstance().collection("users").document(user.uid)
-                .set(healthData, com.google.firebase.firestore.SetOptions.merge())
-                .await()
+            FirebaseFirestore
+                .getInstance()
+                .collection("users")
+                .document(user.uid)
+                .set(
+                    healthData,
+                    com.google.firebase.firestore.SetOptions
+                        .merge(),
+                ).await()
             Log.d(TAG, "Health data updated successfully: $healthData")
         } else {
             throw Exception("User not authenticated")

@@ -1,6 +1,7 @@
 package com.project.wellnesswise.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,30 +45,41 @@ import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 @Composable
 fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
     val systemUiController = rememberSystemUiController()
-    val useDarkIcons = MaterialTheme.colorScheme.surface.luminance() > 0.5f
+    val statusBarColor = Color.White
+    val useDarkIcons = !isSystemInDarkTheme()
 
-    SideEffect {
-        systemUiController.setSystemBarsColor(
-            color = Color.Transparent,
-            darkIcons = useDarkIcons
+    LaunchedEffect(statusBarColor, useDarkIcons) {
+        systemUiController.setStatusBarColor(
+            color = statusBarColor,
+            darkIcons = useDarkIcons,
         )
     }
 
     val validationResults = registrationViewModel.validationResults.value
     val registrationUIState = registrationViewModel.registrationUIState.value
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center, ){
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(20.dp)
-        )  {   LazyColumn {
+                .background(Color.White)
+                .padding(horizontal = 20.dp)
+        )  {   LazyColumn(modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)) {
             item {
+                Spacer(modifier = Modifier.height(10.dp))
                 HeadingTextComponent(value = stringResource(id = R.string.Create_an_account))
-                Spacer(modifier = Modifier.height(20.dp))
+
             }
             item {
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "Enter a valid email address",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
                 MyTextField(
                     labelValue = stringResource(id = R.string.Email),
                     initialValue = registrationUIState.email,
@@ -75,17 +88,21 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                     },
                     isError = validationResults["email"] == false
                 )
-                Text(
-                    text = "Enter a valid email address",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
+                Spacer(modifier = Modifier.height(4.dp))
+
                 if  (registrationViewModel.emailAlreadyInUse.value) {
                     Text (text = "Email already in use", color = Color.Red)
                 }
             }
             item {
                 Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = "Provide your full name",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
                 MyTextField(
                     labelValue = stringResource(id = R.string.FullName),
                     initialValue = registrationUIState.fullName,
@@ -94,14 +111,17 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                     },
                     isError = validationResults["fullName"] == false
                 )
-                Text(
-                    text = "Provide your full name",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
+
             }
             item {
                 Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = "Enter an age between 1-120",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
                 MyNumberField(
                     labelValue = stringResource(id = R.string.Age),
                     initialValue = registrationUIState.age.toString(),
@@ -110,32 +130,35 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                     },
                     isError = validationResults["age"] == false
                 )
-                Text(
-                    text = "Enter an age between 1-120",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
+
             }
             item {
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = "Select your gender",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
                 GenderSelection(
                     initialGender = registrationUIState.gender,
                     onGenderSelected = { gender ->
                         registrationViewModel.onEvent(UIEvent.GenderChanged(gender))
                     }
                 )
-                Text(
-                    text = "Select your gender",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-                if (validationResults["gender"] == false) {
-                    Text(text = "Invalid gender", color = Color.Red)
-                }
+
             }
             item {
                 Spacer(modifier = Modifier.height(10.dp))
+
+
+                Text(
+                    text = "Enter a height between 50-300 cm",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
                 MyNumberField(
                     labelValue = stringResource(id = R.string.Height),
                     initialValue = registrationUIState.height.toString(),
@@ -144,15 +167,17 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                     },
                     isError = validationResults["height"] == false
                 )
-                Text(
-                    text = "Enter a height between 50-300 cm",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
+
             }
 
             item {
                 Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "Enter a weight between 30-500 kg",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
                 MyNumberField(
                     labelValue = stringResource(id = R.string.Weight),
                     initialValue = registrationUIState.weight.toString(),
@@ -162,33 +187,35 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
 
                 )
 
-                Text(
-                    text = "Enter a weight between 30-500 kg",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
+
             }
             item {
                 Spacer(modifier = Modifier.height(10.dp))
-                HabbitAndMedHistoryButton(
-                    text = stringResource(id = R.string.Habits),
-                    onClick = { WellnessWiseAppRouter.navigateTo(Screen.HabitsScreen) }
-                )
                 Text(
                     text = "Select at least one habit",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
+                Spacer(modifier = Modifier.height(4.dp))
+                HabbitAndMedHistoryButton(
+                    text = stringResource(id = R.string.Habits),
+                    onClick = { WellnessWiseAppRouter.navigateTo(Screen.HabitsScreen) }
+                )
+
+
                 Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "Please provide medical history",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
                 HabbitAndMedHistoryButton(
                     text = stringResource(id = R.string.MedicalHistory),
                     onClick = { WellnessWiseAppRouter.navigateTo(Screen.MedicalHistoryScreen) }
                 )
-                Text(
-                    text = "Provide your medical history",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
+
+
                 if (validationResults["habits"] == false) {
                     Text(text = "Select at least one habit", color = Color.Red)
                 }
@@ -197,6 +224,12 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                 }
             }
             item {
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "Create a strong password (8+ chars, uppercase, lowercase, number, special char)",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
                 Spacer(modifier = Modifier.height(4.dp))
                 MyPasswordField(
                     labelValue = stringResource(id = R.string.Password),
@@ -206,13 +239,18 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                     },
                     isError = validationResults["password"] == false
                 )
+
+
+            }
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+
                 Text(
-                    text = "Create a strong password (8+ chars, uppercase, lowercase, number, special char)",
+                    text = "You must accept the privacy policy and terms of service",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
-            }
-            item {
+                Spacer(modifier = Modifier.height(4.dp))
                 CheckBoxComponent(
                     value = "I accept the privacy policy and terms of service",
                     checked = registrationUIState.isPolicyAccepted,
@@ -223,11 +261,7 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                         WellnessWiseAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
                     }
                 )
-                Text(
-                    text = "You must accept the privacy policy and terms of service",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
+
             }
             item {
                 Spacer(modifier = Modifier.height(10.dp))
@@ -240,7 +274,8 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                 )
                 DividerTextComponent(value = "OR")
             }
-                item {
+            item{
+                Spacer(modifier = Modifier.height(10.dp))
                     ClickableLoginTextComponent(
                         tryingToLogin = true,
                         onTextSelected = {
