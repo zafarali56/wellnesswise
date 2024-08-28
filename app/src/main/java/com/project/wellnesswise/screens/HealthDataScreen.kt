@@ -16,6 +16,7 @@ import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.HealthDataTypes
 import com.project.wellnesswise.R
+import com.project.wellnesswise.components.ui.HeadingTextComponent
 import com.project.wellnesswise.components.ui.HealthDataTextField
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
@@ -28,6 +29,7 @@ fun HealthDataScreen(
 ) {
     val primaryColor = colorResource(id = R.color.primary)
     val healthData by healthDataViewModel.healthData.collectAsState()
+    val cholesterol by healthDataViewModel.cholesterol.collectAsState()
     val isSyncing by healthDataViewModel.isSyncing.collectAsState()
     val syncMessage by healthDataViewModel.syncMessage.collectAsState()
     val context = LocalContext.current
@@ -58,12 +60,9 @@ fun HealthDataScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            "Health Data",
-            style = MaterialTheme.typography.headlineMedium.copy(color = MaterialTheme.colorScheme.primary)
-        )
+        HeadingTextComponent(value = "Health Data")
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
@@ -73,10 +72,10 @@ fun HealthDataScreen(
             Button(
                 onClick = { isManualInput = true },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isManualInput) primaryColor else MaterialTheme.colorScheme.secondary
+                    containerColor = if (isManualInput) colorResource(id = R.color.primary) else colorResource(id = R.color.secondary)
                 )
             ) {
-                Text("Manual Input")
+                Text("Manual Input", fontWeight = FontWeight.Bold)
             }
             Button(
                 onClick = {
@@ -90,10 +89,10 @@ fun HealthDataScreen(
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (!isManualInput) primaryColor else MaterialTheme.colorScheme.secondary
+                    containerColor = if (!isManualInput) colorResource(id = R.color.primary) else colorResource(id = R.color.secondary)
                 )
             ) {
-                Text("Google Fit Sync")
+                Text("Google Fit Sync", fontWeight = FontWeight.Bold)
             }
         }
 
@@ -153,25 +152,20 @@ fun HealthDataScreen(
         )
 
         HealthDataTextField(
-            value = healthData["cholesterol"] as? String ?: "",
-            onValueChange = { healthDataViewModel.updateManualHealthData(cholesterol = it) },
+            value = cholesterol,
+            onValueChange = { healthDataViewModel.updateCholesterol(it) },
             label = "Cholesterol (e.g. 200)",
-            isError = false, // Add validation logic if needed
+            isError = false,
             errorMessage = "Invalid cholesterol value",
             enabled = true
         )
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
-                if (isManualInput) {
-                    healthDataViewModel.sendManualHealthDataToFirestore()
-                } else {
-                    coroutineScope.launch {
-                        healthDataViewModel.syncWithGoogleFit(context, fitnessOptions)
-                    }
-                }
+                healthDataViewModel.sendHealthDataToFirestore()
                 WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
             },
             colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
@@ -183,9 +177,8 @@ fun HealthDataScreen(
                 modifier = Modifier.size(24.dp)
             )
             Spacer(Modifier.width(8.dp))
-            Text(if (isManualInput) "Submit Health Data" else "Sync with Google Fit")
+            Text("Save Health Data")
         }
-
     }
 }
 @Composable

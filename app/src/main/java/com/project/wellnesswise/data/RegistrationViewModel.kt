@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.UserProfileChangeRequest
@@ -13,159 +12,24 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.project.wellnesswise.data.rules.Validator
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
-import kotlinx.coroutines.launch
 
 class RegistrationViewModel : ViewModel() {
     var registrationUIState = mutableStateOf(RegistrationUIState())
         private set
     var validationResults = mutableStateOf(emptyMap<String, Boolean>())
         private set
-    private val _dataSourcePreference = mutableStateOf<DataSourcePreference>(DataSourcePreference.MANUAL)
-    val dataSourcePreference: State<DataSourcePreference> = _dataSourcePreference
-    private val _isManualInput = mutableStateOf(true)
-    val isManualInput: State<Boolean> = _isManualInput
+
     private val _emailAlreadyInUse = mutableStateOf(false)
     val emailAlreadyInUse: State<Boolean> = _emailAlreadyInUse
 
-    private val _isSyncing = mutableStateOf(false)
-    val isSyncing: State<Boolean> = _isSyncing
-
-    private val _syncMessage = mutableStateOf<String?>(null)
-    val syncMessage: State<String?> = _syncMessage
     var signUpInProgress = mutableStateOf(false)
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 
-    fun setIsSyncing(syncing: Boolean) {
-        _isSyncing.value = syncing
-    }
 
-    fun setSyncMessage(message: String?) {
-        _syncMessage.value = message
-    }
 
-    fun updateHealthParameters(
-        bloodPressure: String? = null,
-        heartRate: String? = null,
-        bloodSugar: String? = null,
-        cholesterol: String? = null,
-    ) {
-        val currentState = registrationUIState.value
-        val newState =
-            currentState.copy(
-                bloodPressure = bloodPressure ?: currentState.bloodPressure,
-                heartRate = heartRate ?: currentState.heartRate,
-                bloodSugar = bloodSugar ?: currentState.bloodSugar,
-                cholesterol = cholesterol ?: currentState.cholesterol,
-            )
 
-        registrationUIState.value = newState
-        validateHealthParameters(newState)
-    }
-
-    fun setDataSourcePreference(preference: DataSourcePreference) {
-        _dataSourcePreference.value = preference
-    }
-
-    fun setInputMode(isManual: Boolean) {
-        _isManualInput.value = isManual
-    }
-
-    private fun validateHealthParameters(state: RegistrationUIState) {
-        val validationResults =
-            Validator.validateHealthParameters(
-                state.bloodPressure,
-                state.heartRate,
-                state.bloodSugar,
-                state.cholesterol,
-            )
-
-        registrationUIState.value =
-            state.copy(
-                bloodPressureError = !validationResults["bloodPressure"]!!,
-                heartRateError = !validationResults["heartRate"]!!,
-                bloodSugarError = !validationResults["bloodSugar"]!!,
-                cholesterolError = !validationResults["cholesterol"]!!,
-            )
-    }
-
-    fun sendHealthDataToFirestore(
-        isManualInput: Boolean,
-        navigateToHome: Boolean = false,
-    ) {
-        setIsSyncing(true)
-        setSyncMessage(null)
-        val uiState = registrationUIState.value
-        val user = auth.currentUser
-        if (user != null) {
-            val healthData =
-                mapOf(
-                    "bloodPressure" to (uiState.bloodPressure.takeIf { it.isNotBlank() } ?: "N/A"),
-                    "heartRate" to (uiState.heartRate.takeIf { it.isNotBlank() } ?: "N/A"),
-                    "bloodSugar" to (uiState.bloodSugar.takeIf { it.isNotBlank() } ?: "N/A"),
-                    "cholesterol" to (uiState.cholesterol.takeIf { it.isNotBlank() } ?: "N/A"),
-                    "dataSourcePreference" to if (isManualInput) "MANUAL" else "GOOGLE_FIT",
-                )
-            firestore
-                .collection("users")
-                .document(user.uid)
-                .set(
-                    healthData,
-                    com.google.firebase.firestore.SetOptions
-                        .merge(),
-                ).addOnSuccessListener {
-                    setIsSyncing(false)
-                    setSyncMessage("Health data updated successfully")
-                    if (navigateToHome) {
-                        WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
-                    }
-                }.addOnFailureListener { e ->
-                    setIsSyncing(false)
-                    setSyncMessage("Error updating health data: ${e.localizedMessage}")
-                }
-        } else {
-            setIsSyncing(false)
-            setSyncMessage("Error: User not signed in")
-        }
-    }
-
-    fun syncWithGoogleFit(
-        heartRate: Float?,
-        bloodPressure: String?,
-        bloodSugar: Float?,
-    ) {
-        viewModelScope.launch {
-            setIsSyncing(true)
-            setSyncMessage(null)
-
-            var dataUpdated = false
-
-            heartRate?.let {
-                updateHealthParameters(heartRate = it.toString())
-                dataUpdated = true
-            }
-
-            bloodPressure?.let {
-                updateHealthParameters(bloodPressure = it)
-                dataUpdated = true
-            }
-
-            bloodSugar?.let {
-                updateHealthParameters(bloodSugar = it.toString())
-                dataUpdated = true
-            }
-
-            if (dataUpdated) {
-                sendHealthDataToFirestore(isManualInput = false)
-                setSyncMessage("Data synced successfully from Google Fit")
-            } else {
-                setSyncMessage("No new data found in Google Fit")
-            }
-
-            setIsSyncing(false)
-        }
-    }
 
     fun onEvent(event: UIEvent) {
         when (event) {

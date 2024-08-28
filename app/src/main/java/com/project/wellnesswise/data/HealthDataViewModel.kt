@@ -26,13 +26,16 @@ class HealthDataViewModel : ViewModel() {
     private val _healthData = MutableStateFlow<Map<String, Any>>(emptyMap())
     val healthData: StateFlow<Map<String, Any>> = _healthData
 
+    private val _cholesterol = MutableStateFlow<String>("")
+    val cholesterol: StateFlow<String> = _cholesterol
+
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
 
     init {
         loadUserHealthData()
     }
-
     private fun loadUserHealthData() {
         viewModelScope.launch {
             val user = auth.currentUser
@@ -40,15 +43,19 @@ class HealthDataViewModel : ViewModel() {
                 try {
                     val document = firestore.collection("users").document(user.uid).get().await()
                     if (document.exists()) {
-                        _healthData.value = document.data ?: emptyMap()
+                        val data = document.data ?: emptyMap()
+                        _healthData.value = data.filter { it.key != "cholesterol" }
+                        _cholesterol.value = data["cholesterol"] as? String ?: ""
                     } else {
                         _healthData.value = emptyMap()
+                        _cholesterol.value = ""
                     }
                 } catch (e: Exception) {
                     Log.e("HealthDataViewModel", "Error loading user health data", e)
                 }
             } else {
                 _healthData.value = emptyMap()
+                _cholesterol.value = ""
             }
         }
     }
@@ -86,7 +93,6 @@ class HealthDataViewModel : ViewModel() {
         bloodPressure: String? = null,
         heartRate: String? = null,
         bloodSugar: String? = null,
-        cholesterol: String? = null
     ) {
         val currentData = _healthData.value.toMutableMap()
         bloodPressure?.let {
@@ -101,12 +107,13 @@ class HealthDataViewModel : ViewModel() {
             currentData["bloodSugar"] = it
             currentData["bloodSugarSource"] = "MANUAL"
         }
-        cholesterol?.let {
-            currentData["cholesterol"] = it
-            currentData["cholesterolSource"] = "MANUAL"
-        }
+
         currentData["dataSourcePreference"] = "MANUAL"
         _healthData.value = currentData
+    }
+
+    fun updateCholesterol(cholesterol: String) {
+        _cholesterol.value = cholesterol
     }
 
     suspend fun syncWithGoogleFit(
@@ -120,13 +127,14 @@ class HealthDataViewModel : ViewModel() {
             val account = GoogleSignIn.getAccountForExtension(context, fitnessOptions)
             val googleFitData = HealthDataUtils.fetchHealthData(context, account)
 
-            // Update all data from Google Fit
-            val updatedData = _healthData.value.toMutableMap()
-            for ((key, value) in googleFitData) {
-                updatedData[key] = value
-                updatedData["${key}Source"] = "GOOGLE_FIT"
-            }
+            val updatedData = googleFitData.flatMap { (key, value) ->
+                listOf(
+                    key to value,
+                    "${key}Source" to "GOOGLE_FIT"
+                )
+            }.toMap().toMutableMap()
             updatedData["dataSourcePreference"] = "GOOGLE_FIT"
+
             _healthData.value = updatedData
 
             updateFirestore(updatedData)
@@ -139,13 +147,14 @@ class HealthDataViewModel : ViewModel() {
             _isSyncing.value = false
         }
     }
-
-    fun sendManualHealthDataToFirestore() {
+    fun sendHealthDataToFirestore() {
         viewModelScope.launch {
             try {
                 _isSyncing.value = true
                 setSyncMessage("Updating health data...")
-                updateFirestore(_healthData.value)
+                val combinedData = _healthData.value.toMutableMap()
+                combinedData["cholesterol"] = _cholesterol.value
+                updateFirestore(combinedData)
                 setSyncMessage("Health data updated successfully")
             } catch (e: Exception) {
                 Log.e("HealthDataViewModel", "Error updating health data", e)
@@ -155,7 +164,6 @@ class HealthDataViewModel : ViewModel() {
             }
         }
     }
-
     private suspend fun updateFirestore(healthData: Map<String, Any>) {
         val user = auth.currentUser
         if (user != null) {
@@ -176,5 +184,6 @@ class HealthDataViewModel : ViewModel() {
         _healthData.value = emptyMap()
         _syncMessage.value = null
         _isSyncing.value = false
+        _cholesterol.value = ""
     }
 }
