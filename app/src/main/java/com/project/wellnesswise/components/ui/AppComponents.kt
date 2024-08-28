@@ -45,6 +45,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedTextField
@@ -142,8 +143,8 @@ fun MyTextField(
     OutlinedTextField(
         modifier =
             Modifier
-                .fillMaxWidth()
-                .clip(componentShapes.small),
+                .fillMaxWidth(),
+        shape = shapes.small, // This line adds rounded corners
         label = { Text(text = labelValue) },
         colors =
             OutlinedTextFieldDefaults.colors(
@@ -175,8 +176,9 @@ fun MyNumberField(
     OutlinedTextField(
         modifier =
             Modifier
-                .fillMaxWidth()
-                .clip(componentShapes.small),
+                .fillMaxWidth(),
+
+        shape = shapes.small,
         label = { Text(text = labelValue) },
         colors =
             OutlinedTextFieldDefaults.colors(
@@ -211,8 +213,8 @@ fun MyPasswordField(
     OutlinedTextField(
         modifier =
             Modifier
-                .fillMaxWidth()
-                .clip(componentShapes.small),
+                .fillMaxWidth(),
+        shape = shapes.small,
         label = { Text(text = labelValue) },
         colors =
             OutlinedTextFieldDefaults.colors(
@@ -541,7 +543,7 @@ fun HabbitAndMedHistoryButton(
                 .fillMaxWidth()
                 .background(
                     color = colorResource(id = R.color.primary),
-                    shape = RoundedCornerShape(15.dp),
+                    shape = RoundedCornerShape(11.dp),
                 ).clickable { onClick() }
                 .padding(17.dp),
     ) {
@@ -837,6 +839,7 @@ fun HealthDataTextField(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
+            shape = shapes.small,
             label = { Text(label) },
             modifier = Modifier.fillMaxWidth(),
             colors =

@@ -1,6 +1,5 @@
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,7 +27,6 @@ class LoginViewModel : ViewModel() {
         private set
     private val _dataSourcePreference = mutableStateOf<RegistrationViewModel.DataSourcePreference>(
         RegistrationViewModel.DataSourcePreference.MANUAL)
-    val dataSourcePreference: State<RegistrationViewModel.DataSourcePreference> = _dataSourcePreference
 
     var logInProgress = mutableStateOf(false)
     var needsGoogleFitPermissions = mutableStateOf(false)
@@ -47,12 +45,13 @@ class LoginViewModel : ViewModel() {
         when (event) {
             is LoginUIEvent.EmailChangedLogin -> {
                 loginUIState.value = loginUIState.value.copy(email = event.email)
+                updateValidationResults()
             }
             is LoginUIEvent.PasswordChangedLogin -> {
                 loginUIState.value = loginUIState.value.copy(password = event.password)
+                updateValidationResults()
             }
             is LoginUIEvent.LoginButtonClicked -> {
-                updateValidationResults()
                 if (Validator.isValidLoginUIState(loginUIState.value)) {
                     login()
                 } else {

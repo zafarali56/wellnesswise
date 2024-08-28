@@ -1,3 +1,4 @@
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -30,6 +31,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
     val loginUIState = loginViewModel.loginUIState.value
     val errorMessage = loginViewModel.errorMessage.value
     val context = LocalContext.current
+    val validationResults = loginViewModel.validationResults.value
 
     LaunchedEffect(Unit) {
         loginViewModel.resetLoginUIState()
@@ -53,7 +55,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                         Image(
                             painter = painterResource(id = R.drawable.img),
                             contentDescription = "Logo",
-                            modifier = Modifier.size(310.dp)
+                            modifier = Modifier.size(250.dp)
                         )
                     }
                     HeadingTextComponent(value = stringResource(id = R.string.Login))
@@ -69,7 +71,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                         onTextSelected = {
                             loginViewModel.onEvent(LoginUIEvent.EmailChangedLogin(it))
                         },
-                        isError = !Validator.validateEmail(loginUIState.email)
+                        isError = validationResults["email"] == false
                     )
                     MyPasswordField(
                         labelValue = stringResource(id = R.string.Password),
@@ -77,7 +79,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                         onTextSelected = {
                             loginViewModel.onEvent(LoginUIEvent.PasswordChangedLogin(it))
                         },
-                        isError = !Validator.validatePassword(loginUIState.password)
+                        isError = validationResults["password"] == false
                     )
                     Spacer(modifier = Modifier.height(30.dp))
                     ButtonComponent(
@@ -93,11 +95,10 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                         WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
                     })
                     if (errorMessage != null) {
-                        Text(
-                            text = errorMessage,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(top = 16.dp)
-                        )
+                        val context = LocalContext.current
+                        LaunchedEffect(errorMessage) {
+                            Toast.makeText(context, "Invalid credentials! Please try again", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }

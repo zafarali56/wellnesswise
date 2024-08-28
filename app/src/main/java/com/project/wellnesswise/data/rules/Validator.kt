@@ -83,12 +83,18 @@ object Validator {
 
     // Validate login UI state
     fun validateLoginUIState(loginUIState: LoginUIState): Map<String, Boolean> {
-        val emailValid = loginUIState.email.isNotBlank()
-        val passwordValid = loginUIState.password.isNotBlank()
+        fun validateEmail(email: String): Boolean {
+            val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+            return email.matches(emailRegex)
+        }
+        fun validatePassword(password: String): Boolean {
+            val passwordRegex = Regex("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$")
+            return password.matches(passwordRegex)
+        }
 
         return mapOf(
-            "email" to emailValid,
-            "password" to passwordValid
+            "email" to validateEmail(loginUIState.email),
+            "password" to validatePassword(loginUIState.password)
         )
     }
 

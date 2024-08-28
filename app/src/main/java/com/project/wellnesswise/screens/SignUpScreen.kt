@@ -68,12 +68,12 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
             .fillMaxSize()
             .background(Color.White)) {
             item {
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(40.dp))
                 HeadingTextComponent(value = stringResource(id = R.string.Create_an_account))
-
+                Spacer(modifier = Modifier.height(40.dp))
             }
             item {
-                Spacer(modifier = Modifier.height(10.dp))
+
                 Text(
                     text = "Enter a valid email address",
                     style = MaterialTheme.typography.bodySmall,
@@ -225,12 +225,8 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
             }
             item {
                 Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = "Create a strong password (8+ chars, uppercase, lowercase, number, special char)",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-                Spacer(modifier = Modifier.height(4.dp))
+
+
                 MyPasswordField(
                     labelValue = stringResource(id = R.string.Password),
                     initialValue = registrationUIState.password,
@@ -239,18 +235,16 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                     },
                     isError = validationResults["password"] == false
                 )
-
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Create a strong password (8+ chars, uppercase, lowercase, number, special char)",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
 
             }
             item {
                 Spacer(modifier = Modifier.height(10.dp))
-
-                Text(
-                    text = "You must accept the privacy policy and terms of service",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-                Spacer(modifier = Modifier.height(4.dp))
                 CheckBoxComponent(
                     value = "I accept the privacy policy and terms of service",
                     checked = registrationUIState.isPolicyAccepted,
