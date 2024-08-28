@@ -16,6 +16,7 @@ import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.HealthDataTypes
 import com.project.wellnesswise.R
+import com.project.wellnesswise.components.ui.ButtonComponent
 import com.project.wellnesswise.components.ui.HeadingTextComponent
 import com.project.wellnesswise.components.ui.HealthDataTextField
 import com.project.wellnesswise.data.RegistrationViewModel
@@ -62,6 +63,7 @@ fun HealthDataScreen(
             .fillMaxSize()
             .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(20.dp))
         HeadingTextComponent(value = "Health Data")
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -162,23 +164,9 @@ fun HealthDataScreen(
 
 
         Spacer(modifier = Modifier.height(16.dp))
+        ButtonComponent(value = "Submit", onButtonClicked = {   healthDataViewModel.sendHealthDataToFirestore()
+            WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)}, isEnabled = true)
 
-        Button(
-            onClick = {
-                healthDataViewModel.sendHealthDataToFirestore()
-                WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-            modifier = Modifier.align(Alignment.End)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Save,
-                contentDescription = "Save",
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(Modifier.width(8.dp))
-            Text("Save Health Data")
-        }
     }
 }
 @Composable
