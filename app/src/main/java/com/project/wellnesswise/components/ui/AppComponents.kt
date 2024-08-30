@@ -532,6 +532,17 @@ fun HabitSelection(
     }
 }
 
+
+fun formatHabitName(name: String): String {
+    return name.replace("_", " ")
+        .split(" ")
+        .joinToString(" ") { it.lowercase().capitalize() }
+}
+
+
+
+
+
 @Composable
 fun HabbitAndMedHistoryButton(
     text: String,

@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -16,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ui.ButtonComponent
 import com.project.wellnesswise.components.ui.ClickableLoginTextComponent
+import com.project.wellnesswise.components.ui.DividerTextComponent
 import com.project.wellnesswise.components.ui.GoogleFitPermissionRequest
 import com.project.wellnesswise.components.ui.HeadingTextComponent
 import com.project.wellnesswise.components.ui.MyPasswordField
@@ -37,15 +39,16 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
         loginViewModel.resetLoginUIState()
     }
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center,   ) {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+                .background(color = Color.White)
                 .padding(28.dp)
         ) {
             LazyColumn(
                 modifier = Modifier
+                    .background(color = Color.White)
                     .fillMaxSize()
                     .padding(10.dp)
                     .imePadding()
@@ -91,9 +94,8 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                     )
                     Spacer(modifier = Modifier.height(30.dp))
                     UnderLinedTextComponent(value = stringResource(id = R.string.Forgot_password))
-                    ClickableLoginTextComponent(tryingToLogin = false, onTextSelected = {
-                        WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
-                    })
+                    DividerTextComponent(value = "OR")
+
                     if (errorMessage != null) {
                         val context = LocalContext.current
                         LaunchedEffect(errorMessage) {
@@ -101,6 +103,14 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                         }
                     }
                 }
+
+                item () {
+                    Spacer(modifier = Modifier.height(50.dp))
+                    ClickableLoginTextComponent(tryingToLogin = false, onTextSelected = {
+                        WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
+                    })
+                }
+
             }
         }
 

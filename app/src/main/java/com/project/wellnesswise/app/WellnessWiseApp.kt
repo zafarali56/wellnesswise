@@ -6,6 +6,7 @@ import HomeScreen
 import HomeViewModel
 import LoginScreen
 import LoginViewModel
+import UserProfileScreen
 import android.annotation.SuppressLint
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,7 +33,7 @@ fun WellnessWiseApp(
     homeViewModel.checkForActiveSession()
 
     Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
-        if (homeViewModel.isUserLoggedIn.value == true) {
+        if (homeViewModel.isUserLoggedIn.value) {
             WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
         }
 
