@@ -1,5 +1,3 @@
-import androidx.compose.animation.*
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,11 +9,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseUser
@@ -31,56 +28,66 @@ fun MainProfileView(
     onMedicalHistoryClick: () -> Unit,
     onHabitsClick: () -> Unit
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-
-
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
-        item {
-            UserImage()
-            Spacer(Modifier.height(10.dp))
-            Text(
-                text = user?.displayName ?: "User Name",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Normal,
-            )
-            Spacer(Modifier.height(10.dp))
-        }
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                item {
+                    UserImage()
+                    Spacer(Modifier.height(10.dp))
+                    Text(
+                        text = user?.displayName ?: "User Name",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Normal,
+                    )
+                    Spacer(Modifier.height(10.dp))
+                }
 
-        item { UserDataBox(label = "Email", value = user?.email ?: "N/A") }
+                item { Text("Email: ${user?.email ?: "N/A"}") }
 
-        if (isLoading) {
-            item { Text("Loading user data...") }
-        } else {
-            userData?.let { data ->
-                item { UserDataBox(label = "Full Name", value = data["fullName"] as? String ?: "N/A") }
-                item { UserDataBox(label = "Age", value = (data["age"] as? Number)?.toString() ?: "N/A") }
-                item { UserDataBox(label = "Gender", value = data["gender"] as? String ?: "N/A") }
-                item { UserDataBox(label = "Height", value = (data["height"] as? Number)?.toString() ?: "N/A") }
+                if (isLoading) {
+                    item { Text("Loading user data...") }
+                } else {
+                    userData?.let { data ->
+                        item { Text("Full Name: ${data["fullName"] as? String ?: "N/A"}") }
+                        item { Text("Age: ${(data["age"] as? Number)?.toString() ?: "N/A"}") }
+                        item { Text("Gender: ${data["gender"] as? String ?: "N/A"}") }
+                        item { Text("Height: ${(data["height"] as? Number)?.toString() ?: "N/A"}") }
+                    }
+                }
 
-                    item {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(2.dp)
+                item {
+                    Spacer(Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Button(
+                            onClick = onHabitsClick,
+                            colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary))
                         ) {
-                            Button(
-                                onClick = onHabitsClick,
-
-                                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary))
-                            ) {
-                                Text("View Habits")
-                            }
-                            Button(
-
-                                onClick = onMedicalHistoryClick,
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary) )
-                            ) {
-                                Text("View Medical History")
-                            }
+                            Text("View Habits")
                         }
+                        Button(
+                            onClick = onMedicalHistoryClick,
+                            colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary))
+                        ) {
+                            Text("View Medical History")
+                        }
+                    }
                 }
             }
         }
@@ -89,115 +96,85 @@ fun MainProfileView(
 
 @Composable
 fun MedicalHistoryView(userData: Map<String, Any>?, onBack: () -> Unit) {
-    Column {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-            }
-            Text(
-                "Medical History",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(16.dp)
-            )
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        IconButton(onClick = onBack) {
+            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
         }
-
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = 25.dp, vertical = 15.dp)
+        Text(
+            "Medical History",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .clip(RoundedCornerShape(16.dp)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
-            val medicalHistory = userData?.get("medicalHistory") as? Map<String, String>
-            medicalHistory?.forEach { (question, answer) ->
-                item {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                val medicalHistory = userData?.get("medicalHistory") as? Map<String, String>
+                medicalHistory?.forEach { (question, answer) ->
+                    item {
                         Text(
-                            text = "$question",
+                            text = question,
                             fontWeight = FontWeight.Normal,
-                            modifier = Modifier.weight(1f),
                             fontFamily = FontFamily.Serif,
-                            fontSize = 20.sp
+                            fontSize = 18.sp
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "Ans: $answer",
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.weight(1f), fontFamily = FontFamily.Serif, fontSize = 20.sp
+                            fontFamily = FontFamily.Serif,
+                            fontSize = 16.sp
                         )
-
-                    Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
                 }
             }
         }
     }
 }
-
 @Composable
 fun HabitsView(userData: Map<String, Any>?, onBack: () -> Unit) {
-    Column {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-            }
-            Text(
-                "Habits",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(16.dp)
-            )
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        IconButton(onClick = onBack) {
+            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
         }
-
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+        Text(
+            "Habits",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .clip(RoundedCornerShape(16.dp)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
-            val habits = userData?.get("habits") as? List<String>
-            habits?.let {
-                items(it) { habit ->
-                    UserDataBox(label = "Habit", value = formatHabitName(habit))
-                    Spacer(modifier = Modifier.height(2.dp))
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                val habits = userData?.get("habits") as? List<String>
+                habits?.let {
+                    items(it) { habit ->
+                        Text(
+                            text = formatHabitName(habit),
+                            fontSize = 18.sp,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                    }
                 }
             }
-        }
-    }
-}
-@Composable
-fun UserDataBox(label: String, value: String) {
-    Box(
-        modifier = Modifier
-            .padding(vertical = 5.dp)
-            .fillMaxWidth()
-            .border(
-                width = 1.9.dp,
-                color = colorResource(id = R.color.gray_300),
-                shape = RoundedCornerShape(25.dp)
-            )
-            .padding(horizontal = 12.dp, vertical = 10.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Row(
-            Modifier
-                .padding(vertical = 2.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-
-        ) {
-            Text(
-                text = "$label:",
-                fontWeight = FontWeight.W500,
-                fontSize = 20.sp,
-                modifier = Modifier.padding(end = 4.dp)
-            )
-            Text(
-                text = value,
-                fontWeight = FontWeight.W400,
-                fontSize = 20.sp
-            )
         }
     }
 }
