@@ -78,7 +78,7 @@ fun MainProfileView(
 
                 item {
                     Spacer(Modifier.height(5.dp))
-                    Text("Email: ${user?.email ?: "N/A"}", fontFamily = FontFamily.Serif)
+                    Text("Email: ${user?.email ?: "N/A"}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
                     Spacer(modifier = Modifier.height(5.dp))
                 }
 
@@ -86,41 +86,34 @@ fun MainProfileView(
                     item { Text("Loading user data...") }
                 } else {
                     userData?.let { data ->
+
                         item {
-                            Text("Full Name: ${data["fullName"] as? String ?: "N/A"}", fontFamily = FontFamily.Serif)
-                            Spacer(modifier = Modifier.height(5.dp))
-                        }
-                        item {
-                            Text("Age: ${(data["age"] as? Number)?.toString() ?: "N/A"}", fontFamily = FontFamily.Serif)
+                            Text("Age: ${(data["age"] as? Number)?.toString() ?: "N/A"}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
                         item {
-                            Text("Gender: ${data["gender"] as? String ?: "N/A"}", fontFamily = FontFamily.Serif)
+                            Text("Gender: ${data["gender"] as? String ?: "N/A"}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
                         item {
-                            Text("Height: ${(data["height"] as? Number)?.toString() ?: "N/A"}", fontFamily = FontFamily.Serif)
+                            Text("Height: ${(data["height"] as? Number)?.toString() ?: "N/A"}" , fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
                         item {
-                            Text ( "Weight: ${(data["weight"] as? Number)?.toString() ?: "N/A"}", fontFamily = FontFamily.Serif)
-                            Spacer(modifier = Modifier.height(5.dp))
-                        }
-                        item{
-                            Text("Gender: ${data["gender"] as? String ?: "N/A"}", fontFamily = FontFamily.Serif)
+                            Text ( "Weight: ${(data["weight"] as? Number)?.toString() ?: "N/A"}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
                         item {
-                            Text("Blood Pressure: ${data["bloodPressure"] as? String ?: "N/A"}", fontFamily = FontFamily.Serif)
+                            Text("Blood Pressure: ${data["bloodPressure"] as? String ?: "N/A"}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
-                        item { Text("Heart Rate: ${(data["heartRate"] as? Number)?.toString() ?: "N/A"}", fontFamily = FontFamily.Serif)
+                        item { Text("Heart Rate: ${(data["heartRate"]  )?: "N/A"}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
-                        item { Text("Blood Sugar: ${(data["bloodSugar"] as? Number)?.toString() ?: "N/A"}", fontFamily = FontFamily.Serif)
+                        item { Text("Blood Sugar: ${(data["bloodSugar"] )?: "N/A"}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
-                        item { Text("Cholesterol: ${(data["cholesterol"] as? Number)?.toString() ?: "N/A"}", fontFamily = FontFamily.Serif)
+                        item { Text("Cholesterol: ${(data["cholesterol"] ) ?: "N/A"}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
                     }
@@ -191,14 +184,15 @@ fun MedicalHistoryView(userData: Map<String, Any>?, onBack: () -> Unit) {
                         Text(
                             text = question,
                             fontWeight = FontWeight.Normal,
-                            fontFamily = FontFamily.Serif,
-                            fontSize = 18.sp
+
+                            fontSize = 20.sp
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Ans: $answer",
                             fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Serif,
-                            fontSize = 16.sp
+
+                            fontSize = 20.sp
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
@@ -243,9 +237,10 @@ fun HabitsView(userData: Map<String, Any>?, onBack: () -> Unit) {
                     items(it) { habit ->
                         Text(
                             text = formatHabitName(habit),
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(vertical = 4.dp),
-                            fontFamily = FontFamily.Serif
+                            fontSize = 20.sp,
+                            modifier = Modifier.padding( 10.dp),
+                            fontWeight = FontWeight.SemiBold
+
                         )
                     }
                 }
