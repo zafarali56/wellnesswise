@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseUser
 import com.project.wellnesswise.R
+import com.project.wellnesswise.components.ui.ButtonComponent
 import com.project.wellnesswise.components.ui.UserImage
 import com.project.wellnesswise.components.ui.formatHabitName
 
@@ -49,10 +50,9 @@ fun MainProfileView(
                 } else {
                     userData?.let { data ->
                         Text(
-                            "${data["fullName"] as? String ?: "N/A"}",
-                            fontFamily = FontFamily.Serif,
+                            data["fullName"] as? String ?: "N/A",
                             fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp,
+                            fontSize = 30.sp,
                         )
                     }
 
@@ -102,6 +102,27 @@ fun MainProfileView(
                             Text("Height: ${(data["height"] as? Number)?.toString() ?: "N/A"}", fontFamily = FontFamily.Serif)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
+                        item {
+                            Text ( "Weight: ${(data["weight"] as? Number)?.toString() ?: "N/A"}", fontFamily = FontFamily.Serif)
+                            Spacer(modifier = Modifier.height(5.dp))
+                        }
+                        item{
+                            Text("Gender: ${data["gender"] as? String ?: "N/A"}", fontFamily = FontFamily.Serif)
+                            Spacer(modifier = Modifier.height(5.dp))
+                        }
+                        item {
+                            Text("Blood Pressure: ${data["bloodPressure"] as? String ?: "N/A"}", fontFamily = FontFamily.Serif)
+                            Spacer(modifier = Modifier.height(5.dp))
+                        }
+                        item { Text("Heart Rate: ${(data["heartRate"] as? Number)?.toString() ?: "N/A"}", fontFamily = FontFamily.Serif)
+                            Spacer(modifier = Modifier.height(5.dp))
+                        }
+                        item { Text("Blood Sugar: ${(data["bloodSugar"] as? Number)?.toString() ?: "N/A"}", fontFamily = FontFamily.Serif)
+                            Spacer(modifier = Modifier.height(5.dp))
+                        }
+                        item { Text("Cholesterol: ${(data["cholesterol"] as? Number)?.toString() ?: "N/A"}", fontFamily = FontFamily.Serif)
+                            Spacer(modifier = Modifier.height(5.dp))
+                        }
                     }
                 }
             }
@@ -117,25 +138,19 @@ fun MainProfileView(
                 onClick = onHabitsClick,
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary))
             ) {
-                Text("View Habits")
+                Text("View Habits", fontWeight = FontWeight.Bold)
             }
             Button(
                 modifier = Modifier.weight(1f),
                 onClick = onMedicalHistoryClick,
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary))
             ) {
-                Text("View Medical History")
+                Text("View Medical History", fontWeight = FontWeight.Bold)
             }
         }
-
         Spacer(Modifier.height(16.dp))
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onEditClick,
-            colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary))
-        ) {
-            Text("Edit Profile")
-        }
+       ButtonComponent(value = "Edit Profile", onButtonClicked = onEditClick, isEnabled = true)
+
     }
 }
 
