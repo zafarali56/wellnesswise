@@ -1,3 +1,5 @@
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,7 +27,8 @@ fun MainProfileView(
     userData: Map<String, Any>?,
     isLoading: Boolean,
     onMedicalHistoryClick: () -> Unit,
-    onHabitsClick: () -> Unit
+    onHabitsClick: () -> Unit,
+    onEditClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -41,15 +44,23 @@ fun MainProfileView(
             Column {
                 UserImage()
                 Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = user?.displayName ?: "User Name",
-                    fontFamily = FontFamily.Serif,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
-                )
+                if (isLoading) {
+                    Text("Loading user data...")
+                } else {
+                    userData?.let { data ->
+                        Text(
+                            "${data["fullName"] as? String ?: "N/A"}",
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp,
+                        )
+                    }
 
+
+                }
             }
         }
+
         Spacer(modifier = Modifier.height(10.dp))
         Card(
             modifier = Modifier
@@ -115,6 +126,15 @@ fun MainProfileView(
             ) {
                 Text("View Medical History")
             }
+        }
+
+        Spacer(Modifier.height(16.dp))
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = onEditClick,
+            colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary))
+        ) {
+            Text("Edit Profile")
         }
     }
 }
@@ -217,4 +237,10 @@ fun HabitsView(userData: Map<String, Any>?, onBack: () -> Unit) {
             }
         }
     }
+}
+
+
+
+fun showToast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }

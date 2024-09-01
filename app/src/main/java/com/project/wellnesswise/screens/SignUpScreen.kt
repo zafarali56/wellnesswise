@@ -14,11 +14,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -246,7 +244,6 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
             item {
                 Spacer(modifier = Modifier.height(10.dp))
                 CheckBoxComponent(
-                    value = "I accept the privacy policy and terms of service",
                     checked = registrationUIState.isPolicyAccepted,
                     onCheckedChange = {
                         registrationViewModel.onEvent(UIEvent.PolicyAcceptedChanged(it))

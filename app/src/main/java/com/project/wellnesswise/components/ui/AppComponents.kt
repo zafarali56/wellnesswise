@@ -92,8 +92,8 @@ import com.project.wellnesswise.data.Habit
 import com.project.wellnesswise.data.MedicalHistoryQuestion
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.data.UIEvent
-import com.project.wellnesswise.ui.theme.componentShapes
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @Composable
 fun NormalTextComponent(value: String) {
@@ -253,7 +253,6 @@ fun MyPasswordField(
 
 @Composable
 fun ClickableTextComponent(
-    value: String,
     onTextSelected: (String) -> Unit = {},
 ) {
     val initialText = "By continuing you agree to our "
@@ -286,7 +285,6 @@ fun ClickableTextComponent(
 
 @Composable
 fun CheckBoxComponent(
-    value: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     onTextSelected: (String) -> Unit = {},
@@ -308,7 +306,7 @@ fun CheckBoxComponent(
                     checkmarkColor = Color.White, // Set the checkmark color here
                 ),
         )
-        ClickableTextComponent(value = value, onTextSelected)
+        ClickableTextComponent(onTextSelected)
     }
 }
 
@@ -520,10 +518,10 @@ fun HabitSelection(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text =
-                        habit.name
-                            .replace("_", " ")
-                            .lowercase()
-                            .capitalize(),
+                    habit.name
+                        .replace("_", " ")
+                        .lowercase()
+                        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() },
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(end = 8.dp),
                 )
@@ -536,7 +534,8 @@ fun HabitSelection(
 fun formatHabitName(name: String): String {
     return name.replace("_", " ")
         .split(" ")
-        .joinToString(" ") { it.lowercase().capitalize() }
+        .joinToString(" ") { it.lowercase()
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() } }
 }
 
 
