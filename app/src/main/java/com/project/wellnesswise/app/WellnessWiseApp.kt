@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import com.project.wellnesswise.data.AuthViewModel
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
@@ -32,7 +31,7 @@ fun WellnessWiseApp(
 ) {
     homeViewModel.checkForActiveSession()
 
-    Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
+    Surface(modifier = Modifier.fillMaxSize()) {
         if (homeViewModel.isUserLoggedIn.value) {
             WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
         }

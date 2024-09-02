@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,7 +52,8 @@ fun EditProfileScreen(
     onSave: (Map<String, Any>) -> Unit,
     onBack: () -> Unit,
     onEditMedicalHistory: () -> Unit,
-    onEditHabits: () -> Unit
+    onEditHabits: () -> Unit,
+    colorScheme: ColorScheme
 ) {
     var fullName by remember { mutableStateOf(userData?.get("fullName") as? String ?: "") }
     var age by remember { mutableStateOf(userData?.get("age")?.toString() ?: "") }
@@ -71,29 +73,29 @@ fun EditProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Edit User Profile") },
+                title = { Text(text = "Edit User Profile", color = colorScheme.onSurface) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
+                            tint = colorScheme.onSurface
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                    titleContentColor = colorScheme.onSurface,
+                    navigationIconContentColor = colorScheme.onSurface
                 )
             )
         },
-        containerColor = Color.White
+        containerColor = colorScheme.background
     ) { innerPadding ->
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            color = Color.White
+            color = colorScheme.background
         ) {
 
             LazyColumn(
@@ -240,36 +242,38 @@ fun EditProfileScreen(
 fun EditMedicalHistoryScreen(
     medicalHistory: Map<String, String>,
     onSave: (Map<String, String>) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    colorScheme: ColorScheme
 ) {
     var updatedMedicalHistory by remember { mutableStateOf(medicalHistory) }
     val context = LocalContext.current
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Edit Medical History") },
+                title = { Text(text = "Edit Medical History", color = colorScheme.onSurface) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
+                            tint = colorScheme.onSurface
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+
+                    titleContentColor = colorScheme.onSurface,
+                    navigationIconContentColor = colorScheme.onSurface
                 )
             )
         },
-        containerColor = Color.White
+        containerColor = colorScheme.background
     ) { innerPadding ->
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            color = Color.White
+            color = colorScheme.background
         ) {
 
             LazyColumn(
@@ -338,7 +342,8 @@ fun EditMedicalHistoryScreen(
 fun EditHabitsScreen(
     habits: List<Habit>,
     onSave: (List<Habit>) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    colorScheme: ColorScheme
 ) {
     var selectedHabits by remember { mutableStateOf(habits.toSet()) }
     val context = LocalContext.current
@@ -346,29 +351,29 @@ fun EditHabitsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Edit Habits") },
+                title = { Text(text = "Edit Habits", color = colorScheme.onSurface) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
+                            tint = colorScheme.onSurface
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                    titleContentColor = colorScheme.onSurface,
+                    navigationIconContentColor = colorScheme.onSurface
                 )
             )
         },
-        containerColor = Color.White
+        containerColor = colorScheme.background
     ) { innerPadding ->
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            color = Color.White
+            color = colorScheme.background
         ) {
 
             LazyColumn(

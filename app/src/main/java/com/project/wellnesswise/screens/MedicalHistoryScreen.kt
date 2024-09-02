@@ -1,5 +1,6 @@
 package com.project.wellnesswise.screens
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -7,12 +8,15 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.wellnesswise.components.ui.MedicalHistorySection
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.data.medicalHistoryQuestions
@@ -24,7 +28,24 @@ import com.project.wellnesswise.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MedicalHistoryScreen(registrationViewModel: RegistrationViewModel) {
-    Scaffold(
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = !isSystemInDarkTheme()
+    val context = LocalContext.current
+
+    // Use dynamic color scheme
+    val colorScheme = when {
+        useDarkIcons -> dynamicLightColorScheme(context)
+        else -> dynamicDarkColorScheme(context)
+    }
+
+    LaunchedEffect(colorScheme) {
+        systemUiController.setSystemBarsColor(
+            color = colorScheme.background,
+            darkIcons = useDarkIcons
+        )
+    }
+
+    MaterialTheme(colorScheme = colorScheme) {  Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(text = stringResource(id = R.string.MedicalHistory)) },
@@ -39,19 +60,18 @@ fun MedicalHistoryScreen(registrationViewModel: RegistrationViewModel) {
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                    titleContentColor = colorScheme.onSurfaceVariant,
+                    navigationIconContentColor = colorScheme.onSurfaceVariant
                 )
             )
         },
-        containerColor = Color.White
+        containerColor = colorScheme.background
     ) { innerPadding ->
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            color = Color.White
+            color = colorScheme.background
         ) {
             LazyColumn(
                 modifier = Modifier
@@ -71,7 +91,7 @@ fun MedicalHistoryScreen(registrationViewModel: RegistrationViewModel) {
     SystemBackButtonHandler {
         WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
     }
-}
+}}
 
 @Composable
 @Preview

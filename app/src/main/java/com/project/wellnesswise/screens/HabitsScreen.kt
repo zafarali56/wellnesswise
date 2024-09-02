@@ -1,5 +1,6 @@
 package com.project.wellnesswise.screens
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -7,12 +8,15 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ui.HabitSelection
 import com.project.wellnesswise.data.RegistrationViewModel
@@ -24,57 +28,75 @@ import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitsScreen(registrationViewModel: RegistrationViewModel) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = stringResource(id = R.string.Habits)) },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = !isSystemInDarkTheme()
+    val context = LocalContext.current
+
+    // Use dynamic color scheme
+    val colorScheme = when {
+        useDarkIcons -> dynamicLightColorScheme(context)
+        else -> dynamicDarkColorScheme(context)
+    }
+
+    LaunchedEffect(colorScheme) {
+        systemUiController.setSystemBarsColor(
+            color = colorScheme.background,
+            darkIcons = useDarkIcons
+        )
+    }
+
+    MaterialTheme(colorScheme = colorScheme) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(text = stringResource(id = R.string.Habits)) },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
+                        }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                    )
                 )
-            )
-        },
-        containerColor = Color.White
-    ) { innerPadding ->
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            color = Color.White
-        ) {
-            LazyColumn(
+            },
+            containerColor = colorScheme.background
+        ) { innerPadding ->
+            Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 22.dp)
+                    .padding(innerPadding),
+                color = colorScheme.background
             ) {
-                item {
-                    HabitSelection(
-                        registrationViewModel = registrationViewModel,
-                        onHabitsSelected = { habits ->
-                            registrationViewModel.onEvent(UIEvent.HabitsChanged(habits))
-                        }
-                    )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 22.dp)
+                ) {
+                    item {
+                        HabitSelection(
+                            registrationViewModel = registrationViewModel,
+                            onHabitsSelected = { habits ->
+                                registrationViewModel.onEvent(UIEvent.HabitsChanged(habits))
+                            }
+                        )
+                    }
                 }
             }
         }
-    }
 
-    SystemBackButtonHandler {
-        WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
+        SystemBackButtonHandler {
+            WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
+        }
     }
 }
-
 @Composable
 @Preview
 fun HabitsScreenPreview() {

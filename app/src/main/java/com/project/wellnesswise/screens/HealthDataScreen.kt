@@ -1,5 +1,6 @@
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
@@ -12,6 +13,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.HealthDataTypes
@@ -28,12 +30,29 @@ fun HealthDataScreen(
     healthDataViewModel: HealthDataViewModel,
     loginViewModel: LoginViewModel
 ) {
+
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = !isSystemInDarkTheme()
+    val context = LocalContext.current
+    // Use dynamic color scheme
+    val colorScheme = when {
+        useDarkIcons -> dynamicLightColorScheme(context)
+        else -> dynamicDarkColorScheme(context)
+    }
+
+    LaunchedEffect(colorScheme) {
+        systemUiController.setSystemBarsColor(
+            color = colorScheme.background,
+            darkIcons = useDarkIcons
+        )
+    }
+
     val primaryColor = colorResource(id = R.color.primary)
     val healthData by healthDataViewModel.healthData.collectAsState()
     val cholesterol by healthDataViewModel.cholesterol.collectAsState()
     val isSyncing by healthDataViewModel.isSyncing.collectAsState()
     val syncMessage by healthDataViewModel.syncMessage.collectAsState()
-    val context = LocalContext.current
+
     val coroutineScope = rememberCoroutineScope()
 
     var isManualInput by remember { mutableStateOf(healthData["dataSourcePreference"] != "GOOGLE_FIT") }
@@ -58,6 +77,12 @@ fun HealthDataScreen(
             healthDataViewModel.setSyncMessage("Failed to obtain Google Fit permissions")
         }
     }
+
+    MaterialTheme(colorScheme = colorScheme) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = colorScheme.background
+        ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -167,6 +192,8 @@ fun HealthDataScreen(
         ButtonComponent(value = "Submit", onButtonClicked = {   healthDataViewModel.sendHealthDataToFirestore()
             WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)}, isEnabled = true)
 
+            }
+        }
     }
 }
 @Composable

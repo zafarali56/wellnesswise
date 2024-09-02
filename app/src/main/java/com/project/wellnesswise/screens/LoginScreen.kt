@@ -1,6 +1,7 @@
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
@@ -14,6 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ui.ButtonComponent
 import com.project.wellnesswise.components.ui.ClickableLoginTextComponent
@@ -35,110 +37,136 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
     val context = LocalContext.current
     val validationResults = loginViewModel.validationResults.value
 
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = !isSystemInDarkTheme()
+
+    // Use dynamic color scheme
+    val colorScheme = when {
+        useDarkIcons -> dynamicLightColorScheme(context)
+        else -> dynamicDarkColorScheme(context)
+    }
+
+    LaunchedEffect(colorScheme) {
+        systemUiController.setSystemBarsColor(
+            color = colorScheme.background,
+            darkIcons = useDarkIcons
+        )
+    }
+
     LaunchedEffect(Unit) {
         loginViewModel.resetLoginUIState()
     }
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center,   ) {
-        Surface(
+    MaterialTheme(colorScheme = colorScheme) {
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Color.White)
-                .padding(28.dp)
+                .background(colorScheme.background)
+                .padding(28.dp),
+            contentAlignment = Alignment.Center
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .background(color = Color.White)
-                    .fillMaxSize()
-                    .padding(10.dp)
-                    .imePadding()
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = Color.Transparent
             ) {
-                item {
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Image(
-                            painter = painterResource(id = R.drawable.img),
-                            contentDescription = "Logo",
-                            modifier = Modifier.size(250.dp)
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .imePadding()
+                ) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.img),
+                                contentDescription = "Logo",
+                                modifier = Modifier.size(250.dp)
+                            )
+                        }
+                        HeadingTextComponent(value = stringResource(id = R.string.Login))
+                        Spacer(modifier = Modifier.height(30.dp))
+                        HorizontalDivider(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = colorResource(id = R.color.gray_100)
                         )
-                    }
-                    HeadingTextComponent(value = stringResource(id = R.string.Login))
-                    Spacer(modifier = Modifier.height(30.dp))
-                    HorizontalDivider(
-                        modifier = Modifier.fillMaxWidth(),
-                        color = colorResource(id = R.color.gray_100)
-                    )
-                    Spacer(modifier = Modifier.height(30.dp))
-                    MyTextField(
-                        labelValue = stringResource(id = R.string.Email),
-                        initialValue = loginUIState.email,
-                        onTextSelected = {
-                            loginViewModel.onEvent(LoginUIEvent.EmailChangedLogin(it))
-                        },
-                        isError = validationResults["email"] == false
-                    )
-                    MyPasswordField(
-                        labelValue = stringResource(id = R.string.Password),
-                        initialValue = loginUIState.password,
-                        onTextSelected = {
-                            loginViewModel.onEvent(LoginUIEvent.PasswordChangedLogin(it))
-                        },
-                        isError = validationResults["password"] == false
-                    )
-                    Spacer(modifier = Modifier.height(30.dp))
-                    ButtonComponent(
-                        value = stringResource(id = R.string.Login),
-                        onButtonClicked = {
-                            loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked)
-                        },
-                        isEnabled = Validator.isValidLoginUIState(loginUIState)
-                    )
-                    Spacer(modifier = Modifier.height(30.dp))
-                    UnderLinedTextComponent(value = stringResource(id = R.string.Forgot_password))
-                    DividerTextComponent(value = "OR")
+                        Spacer(modifier = Modifier.height(30.dp))
+                        MyTextField(
+                            labelValue = stringResource(id = R.string.Email),
+                            initialValue = loginUIState.email,
+                            onTextSelected = {
+                                loginViewModel.onEvent(LoginUIEvent.EmailChangedLogin(it))
+                            },
+                            isError = validationResults["email"] == false
+                        )
+                        MyPasswordField(
+                            labelValue = stringResource(id = R.string.Password),
+                            initialValue = loginUIState.password,
+                            onTextSelected = {
+                                loginViewModel.onEvent(LoginUIEvent.PasswordChangedLogin(it))
+                            },
+                            isError = validationResults["password"] == false
+                        )
+                        Spacer(modifier = Modifier.height(30.dp))
+                        ButtonComponent(
+                            value = stringResource(id = R.string.Login),
+                            onButtonClicked = {
+                                loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked)
+                            },
+                            isEnabled = Validator.isValidLoginUIState(loginUIState)
+                        )
+                        Spacer(modifier = Modifier.height(30.dp))
+                        UnderLinedTextComponent(value = stringResource(id = R.string.Forgot_password))
+                        DividerTextComponent(value = "OR")
 
-                    if (errorMessage != null) {
-                        val context = LocalContext.current
-                        LaunchedEffect(errorMessage) {
-                            Toast.makeText(context, "Invalid credentials! Please try again", Toast.LENGTH_SHORT).show()
+                        if (errorMessage != null) {
+                            val context = LocalContext.current
+                            LaunchedEffect(errorMessage) {
+                                Toast.makeText(
+                                    context,
+                                    "Invalid credentials! Please try again",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                     }
-                }
 
-                item () {
-                    Spacer(modifier = Modifier.height(50.dp))
-                    ClickableLoginTextComponent(tryingToLogin = false, onTextSelected = {
-                        WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
-                    })
-                }
+                    item() {
+                        Spacer(modifier = Modifier.height(50.dp))
+                        ClickableLoginTextComponent(tryingToLogin = false, onTextSelected = {
+                            WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
+                        })
+                    }
 
+                }
+            }
+
+            if (loginViewModel.logInProgress.value) {
+                CircularProgressIndicator(
+                    color = colorResource(id = R.color.primary)
+                )
+            }
+
+            if (loginViewModel.needsGoogleFitPermissions.value) {
+                GoogleFitPermissionRequest(
+                    onPermissionResult = { permissionGranted ->
+                        loginViewModel.onGoogleFitPermissionResult(permissionGranted)
+                    },
+                    onDismissRequest = {
+                        loginViewModel.onGoogleFitPermissionDismissed()
+                    }
+                )
             }
         }
 
-        if (loginViewModel.logInProgress.value) {
-            CircularProgressIndicator(
-                color = colorResource(id = R.color.primary)
-            )
-        }
-
-        if (loginViewModel.needsGoogleFitPermissions.value) {
-            GoogleFitPermissionRequest(
-                onPermissionResult = { permissionGranted ->
-                    loginViewModel.onGoogleFitPermissionResult(permissionGranted)
-                },
-                onDismissRequest = {
-                    loginViewModel.onGoogleFitPermissionDismissed()
-                }
-            )
-        }
-    }
-
-    LaunchedEffect(loginViewModel.isLoggedIn.value) {
-        if (loginViewModel.isLoggedIn.value) {
-            loginViewModel.checkGoogleFitPermissions(context)
+        LaunchedEffect(loginViewModel.isLoggedIn.value) {
+            if (loginViewModel.isLoggedIn.value) {
+                loginViewModel.checkGoogleFitPermissions(context)
+            }
         }
     }
 }
-
 @Preview
 @Composable
 fun LoginScreenPreview() {
