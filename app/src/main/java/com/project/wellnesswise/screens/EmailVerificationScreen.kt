@@ -44,7 +44,7 @@ fun EmailVerificationScreen(viewModel: RegistrationViewModel) {
 
     LaunchedEffect(Unit) {
         while (true) {
-            delay(5000) // Check every 5 seconds
+            delay(5000)
             viewModel.checkEmailVerification()
         }
     }

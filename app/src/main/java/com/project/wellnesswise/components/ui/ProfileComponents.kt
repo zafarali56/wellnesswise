@@ -11,13 +11,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseUser
-import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ui.ButtonComponent
 import com.project.wellnesswise.components.ui.UserImage
 import com.project.wellnesswise.components.ui.formatHabitName
@@ -78,7 +75,7 @@ fun MainProfileView(
 
                 item {
                     Spacer(Modifier.height(5.dp))
-                    Text("Email: ${user?.email ?: "N/A"}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                    Text("Email: ${user?.email ?: "N/A"}", fontSize = 18.sp)
                     Spacer(modifier = Modifier.height(5.dp))
                 }
 
@@ -88,32 +85,32 @@ fun MainProfileView(
                     userData?.let { data ->
 
                         item {
-                            Text("Age: ${(data["age"] as? Number)?.toString() ?: "N/A"}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                            Text("Age: ${(data["age"] as? Number)?.toString() ?: "N/A"}", fontSize = 18.sp)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
                         item {
-                            Text("Gender: ${data["gender"] as? String ?: "N/A"}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                            Text("Gender: ${data["gender"] as? String ?: "N/A"}", fontSize = 18.sp)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
                         item {
-                            Text("Height: ${(data["height"] as? Number)?.toString() ?: "N/A"}" , fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                            Text("Height: ${(data["height"] as? Number)?.toString() ?: "N/A"}" , fontSize = 18.sp)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
                         item {
-                            Text ( "Weight: ${(data["weight"] as? Number)?.toString() ?: "N/A"}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                            Text ( "Weight: ${(data["weight"] as? Number)?.toString() ?: "N/A"}",  fontSize = 18.sp)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
                         item {
-                            Text("Blood Pressure: ${data["bloodPressure"] as? String ?: "N/A"}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                            Text("Blood Pressure: ${data["bloodPressure"] as? String ?: "N/A"}", fontSize = 18.sp)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
-                        item { Text("Heart Rate: ${(data["heartRate"]  )?: "N/A"}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                        item { Text("Heart Rate: ${(data["heartRate"]  )?: "N/A"}",fontSize = 18.sp)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
-                        item { Text("Blood Sugar: ${(data["bloodSugar"] )?: "N/A"}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                        item { Text("Blood Sugar: ${(data["bloodSugar"] )?: "N/A"}",fontSize = 18.sp)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
-                        item { Text("Cholesterol: ${(data["cholesterol"] ) ?: "N/A"}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                        item { Text("Cholesterol: ${(data["cholesterol"] ) ?: "N/A"}",fontSize = 18.sp)
                             Spacer(modifier = Modifier.height(5.dp))
                         }
                     }
@@ -129,14 +126,14 @@ fun MainProfileView(
             Button(
                 modifier = Modifier.weight(1f),
                 onClick = onHabitsClick,
-                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary))
+                colors = ButtonDefaults.buttonColors( MaterialTheme.colorScheme.primary),
             ) {
                 Text("View Habits", fontWeight = FontWeight.Bold)
             }
             Button(
                 modifier = Modifier.weight(1f),
                 onClick = onMedicalHistoryClick,
-                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary))
+                colors = ButtonDefaults.buttonColors( MaterialTheme.colorScheme.primary),
             ) {
                 Text("View Medical History", fontWeight = FontWeight.Bold)
             }

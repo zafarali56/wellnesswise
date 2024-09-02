@@ -144,7 +144,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
 
             if (loginViewModel.logInProgress.value) {
                 CircularProgressIndicator(
-                    color = colorResource(id = R.color.primary)
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 

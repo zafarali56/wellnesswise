@@ -131,7 +131,7 @@ fun HomeScreen(
                                     elevation = 6.dp,
                                     shape = RoundedCornerShape(28.dp),
                                 ),
-                            colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+                            colors = ButtonDefaults.buttonColors( MaterialTheme.colorScheme.primary),
                             shape = RoundedCornerShape(28.dp),
                         ) {
                             Row(
@@ -142,13 +142,13 @@ fun HomeScreen(
                                     imageVector = Icons.Filled.BarChart,
                                     contentDescription = "Data Visualization",
                                     modifier = Modifier.size(24.dp),
-                                    tint = Color.White,
+
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(
                                     "Data Visualization",
                                     style = MaterialTheme.typography.titleMedium,
-                                    color = Color.White,
+                                    color = MaterialTheme.colorScheme.onPrimary,
                                     fontWeight = FontWeight.Bold,
                                 )
                             }

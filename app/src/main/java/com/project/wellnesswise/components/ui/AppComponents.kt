@@ -55,7 +55,6 @@ import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -106,7 +105,7 @@ fun NormalTextComponent(value: String) {
                 fontWeight = FontWeight.Normal,
                 fontStyle = FontStyle.Normal,
             ),
-        color = colorResource(id = R.color.black),
+        color = MaterialTheme.colorScheme.onSurface,
         textAlign = TextAlign.Center,
     )
 }
@@ -126,7 +125,7 @@ fun HeadingTextComponent(value: String) {
                 fontWeight = FontWeight.Bold,
                 fontStyle = FontStyle.Normal,
             ),
-        color = colorResource(id = R.color.black),
+        color = MaterialTheme.colorScheme.onSurface,
         textAlign = TextAlign.Center,
     )
 }
@@ -146,13 +145,12 @@ fun MyTextField(
                 .fillMaxWidth(),
         shape = shapes.small, // This line adds rounded corners
         label = { Text(text = labelValue) },
-        colors =
-            OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
-                unfocusedBorderColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.gray_100),
-                focusedLabelColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
-                cursorColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
-            ),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary,
+        ),
         keyboardActions = KeyboardActions.Default,
         value = textValue.value,
         onValueChange = {
@@ -180,13 +178,12 @@ fun MyNumberField(
 
         shape = shapes.small,
         label = { Text(text = labelValue) },
-        colors =
-            OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
-                unfocusedBorderColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.gray_100),
-                focusedLabelColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
-                cursorColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
-            ),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary,
+        ),
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         keyboardActions = KeyboardActions.Default,
         value = textValue.value,
@@ -216,13 +213,12 @@ fun MyPasswordField(
                 .fillMaxWidth(),
         shape = shapes.small,
         label = { Text(text = labelValue) },
-        colors =
-            OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
-                unfocusedBorderColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.gray_100),
-                focusedLabelColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
-                cursorColor = if (isError) MaterialTheme.colorScheme.error else colorResource(id = R.color.primary),
-            ),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary,
+        ),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         value = password.value,
         onValueChange = {
@@ -261,13 +257,20 @@ fun ClickableTextComponent(
     val termsAndConditions = "Terms of Service"
     val annotatedString =
         buildAnnotatedString {
-            append(initialText)
-            withStyle(style = SpanStyle(color = colorResource(id = R.color.primary))) {
+            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+                pushStringAnnotation(tag = termsAndConditions, annotation = termsAndConditions)
+                append(initialText)
+            }
+
+            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
                 pushStringAnnotation(tag = privacyPolicyText, annotation = privacyPolicyText)
                 append(privacyPolicyText)
             }
-            append(andText)
-            withStyle(style = SpanStyle(color = colorResource(id = R.color.primary))) {
+            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+                pushStringAnnotation(tag = termsAndConditions, annotation = termsAndConditions)
+                append(andText)
+            }
+            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
                 pushStringAnnotation(tag = termsAndConditions, annotation = termsAndConditions)
                 append(termsAndConditions)
             }
@@ -299,12 +302,11 @@ fun CheckBoxComponent(
         Checkbox(
             checked = checked,
             onCheckedChange = onCheckedChange,
-            colors =
-                CheckboxDefaults.colors(
-                    checkedColor = colorResource(id = R.color.primary), // Set the tick color here
-                    uncheckedColor = Color.Gray, // Optional: Set the unchecked color
-                    checkmarkColor = Color.White, // Set the checkmark color here
-                ),
+            colors = CheckboxDefaults.colors(
+                checkedColor = MaterialTheme.colorScheme.primary,
+                uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                checkmarkColor = MaterialTheme.colorScheme.onPrimary
+            ),
         )
         ClickableTextComponent(onTextSelected)
     }
@@ -332,12 +334,17 @@ fun ButtonComponent(
                     .fillMaxWidth()
                     .heightIn(48.dp)
                     .background(
-                        color = colorResource(id = R.color.primary),
-                        shape = RoundedCornerShape(50.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = shapes.medium
                     ),
             contentAlignment = Alignment.Center,
         ) {
-            Text(text = value, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = value,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
         }
     }
 }
@@ -353,7 +360,12 @@ fun DividerTextComponent(value: String) {
             color = colorResource(id = R.color.gray_100),
             thickness = 1.dp,
         )
-        Text(modifier = Modifier.padding(8.dp), text = value, fontSize = 18.sp, color = colorResource(id = R.color.primary))
+        Text(
+            modifier = Modifier.padding(8.dp),
+            text = value,
+            fontSize = 18.sp,
+            color = MaterialTheme.colorScheme.primary
+        )
         HorizontalDivider(
             modifier =
                 Modifier
@@ -370,34 +382,26 @@ fun ClickableLoginTextComponent(
     tryingToLogin: Boolean = true,
     onTextSelected: (String) -> Unit = {},
 ) {
-    val initialText = if (tryingToLogin) "Already have an account? " else " Don't have an account? "
-
+    val initialText = if (tryingToLogin) "Already have an account? " else "Don't have an account? "
     val loginText = if (tryingToLogin) "Login" else "Register"
 
-    val annotatedString =
-        buildAnnotatedString {
+    val annotatedString = buildAnnotatedString {
+        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
             append(initialText)
-            withStyle(style = SpanStyle(color = colorResource(id = R.color.primary))) {
-                pushStringAnnotation(tag = initialText, annotation = initialText)
-            }
-
-            withStyle(style = SpanStyle(color = colorResource(id = R.color.primary))) {
-                pushStringAnnotation(tag = loginText, annotation = loginText)
-                append(loginText)
-            }
         }
+        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+            pushStringAnnotation(tag = loginText, annotation = loginText)
+            append(loginText)
+        }
+    }
 
     ClickableText(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .heightIn(min = 40.dp),
-        style =
-            TextStyle(
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Normal,
-                fontStyle = FontStyle.Normal,
-            ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 40.dp),
+        style = MaterialTheme.typography.bodyLarge.copy(
+            textAlign = TextAlign.Center
+        ),
         text = annotatedString,
         onClick = { offset ->
             annotatedString.getStringAnnotations(offset, offset).firstOrNull()?.also { span ->
@@ -406,7 +410,7 @@ fun ClickableLoginTextComponent(
                     onTextSelected(span.item)
                 }
             }
-        },
+        }
     )
 }
 
@@ -424,7 +428,7 @@ fun UnderLinedTextComponent(value: String) {
                 fontWeight = FontWeight.Normal,
                 fontStyle = FontStyle.Normal,
             ),
-        color = colorResource(id = R.color.gray_100),
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
         textAlign = TextAlign.Center,
         textDecoration = TextDecoration.Underline,
     )
@@ -450,10 +454,10 @@ fun GenderSelection(
                 selectedGender = Gender.MALE
                 onGenderSelected(selectedGender)
             },
-            colors =
-                RadioButtonDefaults.colors(
-                    selectedColor = colorResource(id = R.color.primary),
-                    unselectedColor = Color.Gray,
+            colors = RadioButtonDefaults.colors(
+                selectedColor = MaterialTheme.colorScheme.primary,
+                unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+
                 ),
         )
         Text(text = "Male", style = MaterialTheme.typography.bodyMedium)
@@ -464,10 +468,10 @@ fun GenderSelection(
                 selectedGender = Gender.FEMALE
                 onGenderSelected(selectedGender)
             },
-            colors =
-                RadioButtonDefaults.colors(
-                    selectedColor = colorResource(id = R.color.primary),
-                    unselectedColor = Color.Gray,
+            colors = RadioButtonDefaults.colors(
+                selectedColor = MaterialTheme.colorScheme.primary,
+                unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+
                 ),
         )
         Text(text = "Female", style = MaterialTheme.typography.bodyMedium)
@@ -509,11 +513,11 @@ fun HabitSelection(
                         onHabitsSelected(selectedHabits)
                         registrationViewModel.onEvent(UIEvent.HabitsChanged(selectedHabits))
                     },
-                    colors =
-                        CheckboxDefaults.colors(
-                            checkedColor = colorResource(id = R.color.primary),
-                            uncheckedColor = Color.Gray,
-                        ),
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = MaterialTheme.colorScheme.primary,
+                        uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        checkmarkColor = MaterialTheme.colorScheme.onPrimary
+                    )
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -552,7 +556,7 @@ fun HabbitAndMedHistoryButton(
             Modifier
                 .fillMaxWidth()
                 .background(
-                    color = colorResource(id = R.color.primary),
+                    color = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(11.dp),
                 ).clickable { onClick() }
                 .padding(17.dp),
@@ -564,14 +568,14 @@ fun HabbitAndMedHistoryButton(
         ) {
             Text(
                 text = text,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.weight(1f)) // This will push the icon to the end
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = null,
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.onPrimary,
             )
         }
     }
@@ -612,11 +616,11 @@ fun MedicalHistorySection(
                                 medicalHistory[question.question] = answer
                                 registrationViewModel.onEvent(UIEvent.MedicalHistoryChanged(question.question, answer))
                             },
-                            colors =
-                                RadioButtonDefaults.colors(
-                                    selectedColor = colorResource(id = R.color.primary),
-                                    unselectedColor = Color.Gray,
-                                ),
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                                unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+
+                            ),
                         )
                         Text(text = answer, style = MaterialTheme.typography.bodyMedium)
                     }
@@ -669,12 +673,13 @@ fun NavigationDrawer(
                         text = user?.displayName ?: "User Name",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     // User email
                     Text(
                         text = user?.email ?: "user@example.com",
                         fontSize = 16.sp,
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -728,7 +733,7 @@ fun NavigationItem(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    val primaryColor = MaterialTheme.colorScheme.primary // Get the primary color from the theme
+    MaterialTheme.colorScheme.primary // Get the primary color from the theme
 
     Surface(
         modifier =
@@ -736,7 +741,10 @@ fun NavigationItem(
                 .fillMaxWidth()
                 .padding(vertical = 4.dp),
         shape = RoundedCornerShape(26.dp),
-        color = if (isPressed) primaryColor.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surface,
+        color = if (isPressed)
+            MaterialTheme.colorScheme.primaryContainer
+        else
+            MaterialTheme.colorScheme.surface,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)),
         onClick = onClick,
         interactionSource = interactionSource,
@@ -751,7 +759,7 @@ fun NavigationItem(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = colorResource(id = R.color.primary),
+                tint = MaterialTheme.colorScheme.primary,
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
@@ -776,7 +784,10 @@ fun HealthMetricCard(
     Card(
         modifier = modifier.height(if (isLargeCard) 120.dp else 100.dp),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.2f)),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+        )
     ) {
         Row(
             modifier =
@@ -852,15 +863,12 @@ fun HealthDataTextField(
             shape = shapes.small,
             label = { Text(label) },
             modifier = Modifier.fillMaxWidth(),
-            colors =
-                TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = colorResource(id = R.color.primary),
-                    focusedLabelColor = colorResource(id = R.color.primary),
-                    cursorColor = colorResource(id = R.color.primary),
-                    disabledBorderColor = colorResource(id = R.color.gray_300),
-                    disabledLabelColor = colorResource(id = R.color.gray_500),
-                    disabledTextColor = colorResource(id = R.color.gray_700),
-                ),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                cursorColor = MaterialTheme.colorScheme.primary,
+            ),
             isError = isError,
             enabled = enabled,
             readOnly = !enabled,
@@ -876,7 +884,7 @@ fun HealthDataTextField(
         if (!enabled) {
             Text(
                 text = "This field is synced with Google Fit",
-                color = colorResource(id = R.color.gray_500),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(start = 16.dp, top = 4.dp),
             )

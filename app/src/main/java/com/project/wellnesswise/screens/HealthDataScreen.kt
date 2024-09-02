@@ -1,11 +1,30 @@
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Save
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -21,10 +40,10 @@ import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ui.ButtonComponent
 import com.project.wellnesswise.components.ui.HeadingTextComponent
 import com.project.wellnesswise.components.ui.HealthDataTextField
-import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import kotlinx.coroutines.launch
+
 @Composable
 fun HealthDataScreen(
     healthDataViewModel: HealthDataViewModel,
@@ -99,7 +118,7 @@ fun HealthDataScreen(
             Button(
                 onClick = { isManualInput = true },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isManualInput) colorResource(id = R.color.primary) else colorResource(id = R.color.secondary)
+                    containerColor = if (isManualInput)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text("Manual Input", fontWeight = FontWeight.Bold)
@@ -116,7 +135,7 @@ fun HealthDataScreen(
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (!isManualInput) colorResource(id = R.color.primary) else colorResource(id = R.color.secondary)
+                    containerColor = if (!isManualInput) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text("Google Fit Sync", fontWeight = FontWeight.Bold)
@@ -158,7 +177,7 @@ fun HealthDataScreen(
             )
         } else {
             if (isSyncing) {
-                CircularProgressIndicator(color = primaryColor)
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary )
             } else {
                 Text("Data synced from Google Fit:")
                 Text("Blood Pressure: ${healthData["bloodPressure"] ?: "N/A"}")
@@ -173,7 +192,6 @@ fun HealthDataScreen(
             "Cholesterol (Manual Input Required)",
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontWeight = FontWeight.Bold,
-                color = primaryColor
             ),
             modifier = Modifier.padding(bottom = 8.dp)
         )

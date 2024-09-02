@@ -32,9 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ui.ButtonComponent
 import com.project.wellnesswise.components.ui.HealthDataTextField
 import com.project.wellnesswise.components.ui.MyNumberField
@@ -302,7 +300,7 @@ fun EditMedicalHistoryScreen(
                                     },
                                     colors =
                                     RadioButtonDefaults.colors(
-                                        selectedColor = colorResource(id = R.color.primary),
+                                        selectedColor = MaterialTheme.colorScheme.primary,
                                         unselectedColor = Color.Gray,
                                     ),
                                 )
@@ -404,7 +402,7 @@ fun EditHabitsScreen(
                                 },
                                 colors =
                                 CheckboxDefaults.colors(
-                                    checkedColor = colorResource(id = R.color.primary),
+                                    checkedColor = colorScheme.primary ,
                                     uncheckedColor = Color.Gray,
                                 ),
                             )
