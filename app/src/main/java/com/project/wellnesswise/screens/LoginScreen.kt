@@ -62,7 +62,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(colorScheme.background)
-                .padding(28.dp),
+                .padding(horizontal = 20.dp),
             contentAlignment = Alignment.Center
         ) {
             Surface(
@@ -80,9 +80,15 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                             contentAlignment = Alignment.Center
                         ) {
                             Image(
-                                painter = painterResource(id = R.drawable.img),
+                                painter = painterResource(
+                                    id = if (isSystemInDarkTheme()) {
+                                        R.drawable.blacktheme
+                                    } else {
+                                        R.drawable.whitetheme
+                                    }
+                                ),
                                 contentDescription = "Logo",
-                                modifier = Modifier.size(250.dp)
+                                modifier = Modifier.size(320.dp)
                             )
                         }
                         HeadingTextComponent(value = stringResource(id = R.string.Login))
@@ -116,7 +122,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                             },
                             isEnabled = Validator.isValidLoginUIState(loginUIState)
                         )
-                        Spacer(modifier = Modifier.height(30.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
                         UnderLinedTextComponent(value = stringResource(id = R.string.Forgot_password))
                         DividerTextComponent(value = "OR")
 

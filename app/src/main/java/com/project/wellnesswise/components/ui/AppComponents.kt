@@ -2,7 +2,6 @@ package com.project.wellnesswise.components.ui
 
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,7 +19,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
@@ -28,6 +26,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
@@ -65,11 +64,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -316,34 +313,47 @@ fun CheckBoxComponent(
 fun ButtonComponent(
     value: String,
     onButtonClicked: () -> Unit = {},
-    isEnabled: Boolean = false,
+    isEnabled: Boolean = true,
 ) {
+    val backgroundColor = if (isEnabled) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant
+    }
+
+    val contentColor = if (isEnabled) {
+        MaterialTheme.colorScheme.onPrimary
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
     Button(
         onClick = { onButtonClicked.invoke() },
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .heightIn(48.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(48.dp),
         contentPadding = PaddingValues(),
-        colors = ButtonDefaults.buttonColors(Color.Transparent),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent
+        ),
         enabled = isEnabled,
     ) {
         Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .heightIn(48.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = shapes.medium
-                    ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(48.dp)
+                .background(
+                    color = backgroundColor,
+                    shape = MaterialTheme.shapes.medium
+                ),
             contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = value,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = contentColor
             )
         }
     }
@@ -361,7 +371,6 @@ fun DividerTextComponent(value: String) {
             thickness = 1.dp,
         )
         Text(
-            modifier = Modifier.padding(8.dp),
             text = value,
             fontSize = 18.sp,
             color = MaterialTheme.colorScheme.primary
@@ -649,6 +658,7 @@ fun NavigationDrawer(
     onProfileClick: () -> Unit,
     onHomeClick: () -> Unit,
     onLogoutClick: () -> Unit,
+
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -667,7 +677,7 @@ fun NavigationDrawer(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     // Giant logo icon
-                    UserImage()
+                    UserImg()
                     // User name
                     Text(
                         text = user?.displayName ?: "User Name",
@@ -893,18 +903,12 @@ fun HealthDataTextField(
 }
 
 @Composable
-fun UserImage() {
-    Image(
-        painter = painterResource(id = R.drawable.iconfordrawer),
-        contentDescription = null,
-        modifier =
-            Modifier
-                .size(100.dp)
-                .clip(CircleShape)
-                .background(Color.Gray),
+fun UserImg(modifier: Modifier = Modifier) {
+    Icon(
+        imageVector = Icons.Filled.AccountCircle,
+        contentDescription = "User Profile",
+        modifier = modifier.size(100.dp)
     )
 }
-
-
 
 

@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseUser
 import com.project.wellnesswise.components.ui.ButtonComponent
-import com.project.wellnesswise.components.ui.UserImage
+import com.project.wellnesswise.components.ui.UserImg
 import com.project.wellnesswise.components.ui.formatHabitName
 
 @Composable
@@ -40,7 +40,7 @@ fun MainProfileView(
             contentAlignment = Alignment.Center
         ) {
             Column {
-                UserImage()
+                UserImg()
                 Spacer(modifier = Modifier.height(10.dp))
                 if (isLoading) {
                     Text("Loading user data...")
@@ -69,7 +69,8 @@ fun MainProfileView(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(20.dp)
+
             ) {
 
 
@@ -251,3 +252,5 @@ fun HabitsView(userData: Map<String, Any>?, onBack: () -> Unit) {
 fun showToast(context: Context, message: String) {
     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }
+
+

@@ -1,7 +1,15 @@
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
@@ -9,14 +17,20 @@ import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.WaterDrop
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,7 +38,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ui.HealthMetricCard
 import com.project.wellnesswise.components.ui.NavigationDrawer
 import com.project.wellnesswise.data.AuthViewModel
@@ -43,14 +56,9 @@ fun HomeScreen(
     val bloodSugar by homeViewModel.bloodSugar.collectAsStateWithLifecycle()
     val isRefreshing by homeViewModel.isRefreshing.collectAsStateWithLifecycle()
     val cholesterol by homeViewModel.cholesterol.collectAsStateWithLifecycle()
-    val primaryColor = colorResource(id = R.color.primary)
-    val secondaryColor = colorResource(id = R.color.secondary)
-    val lightRedColor = Color(0xFFE53935)
-    val lightBlueColor = Color(0xFF1E88E5)
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = !isSystemInDarkTheme()
 
-    // Use dynamic color scheme
     val colorScheme = when {
         useDarkIcons -> dynamicLightColorScheme(context)
         else -> dynamicDarkColorScheme(context)
@@ -86,7 +94,7 @@ fun HomeScreen(
                             title = "Heart Rate",
                             value = heartRate,
                             unit = "bpm",
-                            color = lightRedColor,
+                            color = MaterialTheme.colorScheme.primary,
                             icon = Icons.Filled.Favorite,
                             modifier = Modifier.fillMaxWidth(),
                             isLargeCard = true,
@@ -102,7 +110,7 @@ fun HomeScreen(
                                 title = "Blood Pressure",
                                 value = bloodPressure,
                                 unit = "mmHg",
-                                color = primaryColor,
+                                color = MaterialTheme.colorScheme.primary,
                                 icon = Icons.Filled.MonitorHeart,
                                 modifier = Modifier.weight(1f),
                                 isLargeCard = false,
@@ -112,7 +120,7 @@ fun HomeScreen(
                                 title = "Blood Sugar",
                                 value = bloodSugar,
                                 unit = "mg/dL",
-                                color = secondaryColor,
+                                color = MaterialTheme.colorScheme.primary,
                                 icon = Icons.Filled.WaterDrop,
                                 modifier = Modifier.weight(1f),
                                 isLargeCard = false,
@@ -160,7 +168,7 @@ fun HomeScreen(
                             title = "Cholesterol",
                             value = cholesterol,
                             unit = "mg/dL",
-                            color = lightBlueColor,
+                            color = MaterialTheme.colorScheme.primary,
                             icon = Icons.Filled.Analytics,
                             modifier = Modifier.fillMaxWidth(),
                             isLargeCard = false,
