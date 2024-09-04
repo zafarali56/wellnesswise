@@ -1,5 +1,6 @@
 package com.project.wellnesswise.app
 import DataVisualizationScreen
+import DataVisualizationViewModel
 import HealthDataScreen
 import HealthDataViewModel
 import HomeScreen
@@ -28,6 +29,7 @@ fun WellnessWiseApp(
     homeViewModel: HomeViewModel,
     healthDataViewModel: HealthDataViewModel,
     onRequestGoogleFitPermission: () -> Unit,
+    dataVisualizationViewModel : DataVisualizationViewModel ,
 ) {
     homeViewModel.checkForActiveSession()
 
@@ -46,8 +48,8 @@ fun WellnessWiseApp(
                 is Screen.HomeScreen -> HomeScreen(homeViewModel, authViewModel)
                 is Screen.EmailVerificationScreen -> EmailVerificationScreen(registrationViewModel)
                 is Screen.HealthDataScreen -> HealthDataScreen(healthDataViewModel, loginViewModel)
-                is Screen.DataVisualizationScreen -> DataVisualizationScreen()
                 is Screen.UserProfileScreen -> UserProfileScreen(authViewModel)
+                is Screen.DataVisualizationScreen -> DataVisualizationScreen(dataVisualizationViewModel)
             }
         }
     }

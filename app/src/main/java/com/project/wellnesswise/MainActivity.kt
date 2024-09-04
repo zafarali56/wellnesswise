@@ -1,5 +1,6 @@
 package com.project.wellnesswise
 
+import DataVisualizationViewModel
 import HealthDataSyncWorker
 import HealthDataViewModel
 import HomeViewModel
@@ -66,6 +67,7 @@ class MainActivity : ComponentActivity() {
             val loginViewModel: LoginViewModel = viewModel()
             val healthDataViewModel: HealthDataViewModel = viewModel()
             val authViewModel: AuthViewModel = viewModel { AuthViewModel(registrationViewModel, loginViewModel, healthDataViewModel) }
+            val dataVisualizationViewModel: DataVisualizationViewModel = viewModel()
 
             WellnessWiseApp(
                 homeViewModel = homeViewModel,
@@ -76,6 +78,7 @@ class MainActivity : ComponentActivity() {
                 onRequestGoogleFitPermission = {
                     requestGoogleFitPermissions()
                 },
+                dataVisualizationViewModel = DataVisualizationViewModel(),
             )
         }
     }

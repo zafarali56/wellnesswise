@@ -42,7 +42,7 @@ fun MainProfileView(
                 .wrapContentHeight(),
             contentAlignment = Alignment.Center
         ) {
-            Column {
+            Column (modifier = Modifier, horizontalAlignment = Alignment.CenterHorizontally){
                 UserImg()
                 Spacer(modifier = Modifier.height(10.dp))
                 if (isLoading) {
