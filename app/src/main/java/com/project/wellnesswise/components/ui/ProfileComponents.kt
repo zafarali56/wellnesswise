@@ -7,10 +7,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,6 +53,7 @@ fun MainProfileView(
                             data["fullName"] as? String ?: "N/A",
                             fontWeight = FontWeight.Bold,
                             fontSize = 30.sp,
+                            color = colorScheme.primary
                         )
                     }
 
@@ -64,8 +67,14 @@ fun MainProfileView(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
-        ) {
+            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+
+            colors = CardDefaults.cardColors(
+                containerColor = colorScheme.secondaryContainer,
+                contentColor = colorScheme.onSecondaryContainer
+
+
+        ) ){
 
             LazyColumn(
                 modifier = Modifier
@@ -77,12 +86,12 @@ fun MainProfileView(
 
                 item {
                     Spacer(Modifier.height(5.dp))
-                    Text("Email: ${user?.email ?: "N/A"}", fontSize = 18.sp)
+                    Text("Email: ${user?.email ?: "N/A"}", fontSize = 18.sp, )
                     Spacer(modifier = Modifier.height(5.dp))
                 }
 
                 if (isLoading) {
-                    item { Text("Loading user data...") }
+                    item { LoadingAnimation() }
                 } else {
                     userData?.let { data ->
 
@@ -123,21 +132,22 @@ fun MainProfileView(
         Spacer(Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(9.dp)
+
         ) {
             Button(
                 modifier = Modifier.weight(1f),
                 onClick = onHabitsClick,
-                colors = ButtonDefaults.buttonColors( MaterialTheme.colorScheme.primary),
+                colors = ButtonDefaults.buttonColors( colorScheme.primary),
             ) {
-                Text("View Habits", fontWeight = FontWeight.Bold)
+                Text("Habits",  fontWeight = FontWeight.SemiBold,)
             }
             Button(
                 modifier = Modifier.weight(1f),
                 onClick = onMedicalHistoryClick,
-                colors = ButtonDefaults.buttonColors( MaterialTheme.colorScheme.primary),
+                colors = ButtonDefaults.buttonColors( colorScheme.primary),
             ) {
-                Text("View Medical History", fontWeight = FontWeight.Bold)
+                Text("Medical History",  fontWeight = FontWeight.SemiBold)
             }
         }
         Spacer(Modifier.height(16.dp))
@@ -146,54 +156,67 @@ fun MainProfileView(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MedicalHistoryView(userData: Map<String, Any>?, onBack: () -> Unit) {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-            }
-            Text(
-                "Medical History",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 8.dp)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "Medical history", color = colorScheme.onSurface) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = colorScheme.onSurface
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    titleContentColor = colorScheme.onSurface,
+                    navigationIconContentColor = colorScheme.onSurface
+                )
             )
-        }
-
-        Card(
+        },
+        containerColor = colorScheme.background
+    ) { innerPadding ->
+        Surface(
             modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .clip(RoundedCornerShape(16.dp)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                .fillMaxSize()
+                .padding(innerPadding),
+            color = colorScheme.background
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(16.dp)
-            ) {
-                val medicalHistory = userData?.get("medicalHistory") as? Map<String, String>
-                medicalHistory?.forEach { (question, answer) ->
-                    item {
-                        Text(
-                            text = question,
-                            fontWeight = FontWeight.Normal,
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .clip(RoundedCornerShape(16.dp)),
+                    colors = CardDefaults.cardColors(
+                        containerColor = colorScheme.secondaryContainer,
+                        contentColor = colorScheme.onSecondaryContainer
+                    )
+                ) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(16.dp)
+                    ) {
+                        val medicalHistory = userData?.get("medicalHistory") as? Map<String, String>
+                        medicalHistory?.forEach { (question, answer) ->
+                            item {
 
-                            fontSize = 20.sp
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Ans: $answer",
-                            fontWeight = FontWeight.Bold,
-
-                            fontSize = 20.sp
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = question,
+                                    fontSize = 20.sp,
+                                )
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Text(
+                                    text = "Ans: $answer",
+                                    fontSize = 20.sp,
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                        }
                     }
                 }
             }
@@ -201,54 +224,67 @@ fun MedicalHistoryView(userData: Map<String, Any>?, onBack: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitsView(userData: Map<String, Any>?, onBack: () -> Unit) {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-            }
-            Text(
-                "Habits",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 8.dp)
-            )
-        }
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .clip(RoundedCornerShape(16.dp)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            LazyColumn(
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(text = "Habits", color = colorScheme.onSurface) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back",
+                                tint = colorScheme.onSurface
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        titleContentColor = colorScheme.onSurface,
+                        navigationIconContentColor = colorScheme.onSurface
+                    )
+                )
+            },
+            containerColor = colorScheme.background
+        ) { innerPadding ->
+            Surface(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                color = colorScheme.background
             ) {
-                val habits = userData?.get("habits") as? List<String>
-                habits?.let {
-                    items(it) { habit ->
-                        Text(
-                            text = formatHabitName(habit),
-                            fontSize = 20.sp,
-                            modifier = Modifier.padding( 10.dp),
-                            fontWeight = FontWeight.SemiBold
-
-                        )
-                    }
+Column (modifier = Modifier.padding(horizontal = 26.dp)) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .clip(RoundedCornerShape(16.dp)),
+        colors = CardDefaults.cardColors(
+            containerColor = colorScheme.secondaryContainer,
+            contentColor = colorScheme.onSecondaryContainer
+        )
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .padding(22.dp)
+        ) {
+            val habits = userData?.get("habits") as? List<String>
+            habits?.let {
+                items(it) { habit ->
+                    Text(
+                        text = formatHabitName(habit),
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(5.dp),
+                    )
                 }
             }
         }
     }
 }
-
-
+            }
+        }
+    }
 
 fun showToast(context: Context, message: String) {
     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()

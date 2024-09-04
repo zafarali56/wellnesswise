@@ -50,6 +50,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -109,7 +110,7 @@ fun NormalTextComponent(value: String) {
                 fontWeight = FontWeight.Normal,
                 fontStyle = FontStyle.Normal,
             ),
-        color = MaterialTheme.colorScheme.onSurface,
+        color = colorScheme.onSurface,
         textAlign = TextAlign.Center,
     )
 }
@@ -129,7 +130,7 @@ fun HeadingTextComponent(value: String) {
                 fontWeight = FontWeight.Bold,
                 fontStyle = FontStyle.Normal,
             ),
-        color = MaterialTheme.colorScheme.onSurface,
+        color = colorScheme.onSurface,
         textAlign = TextAlign.Center,
     )
 }
@@ -150,10 +151,10 @@ fun MyTextField(
         shape = shapes.small, // This line adds rounded corners
         label = { Text(text = labelValue) },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            focusedBorderColor = colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-            focusedLabelColor = MaterialTheme.colorScheme.primary,
-            cursorColor = MaterialTheme.colorScheme.primary,
+            focusedLabelColor = colorScheme.primary,
+            cursorColor = colorScheme.primary,
         ),
         keyboardActions = KeyboardActions.Default,
         value = textValue.value,
@@ -183,10 +184,10 @@ fun MyNumberField(
         shape = shapes.small,
         label = { Text(text = labelValue) },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            focusedBorderColor = colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-            focusedLabelColor = MaterialTheme.colorScheme.primary,
-            cursorColor = MaterialTheme.colorScheme.primary,
+            focusedLabelColor = colorScheme.primary,
+            cursorColor = colorScheme.primary,
         ),
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         keyboardActions = KeyboardActions.Default,
@@ -218,10 +219,10 @@ fun MyPasswordField(
         shape = shapes.small,
         label = { Text(text = labelValue) },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            focusedBorderColor = colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-            focusedLabelColor = MaterialTheme.colorScheme.primary,
-            cursorColor = MaterialTheme.colorScheme.primary,
+            focusedLabelColor = colorScheme.primary,
+            cursorColor = colorScheme.primary,
         ),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         value = password.value,
@@ -261,20 +262,20 @@ fun ClickableTextComponent(
     val termsAndConditions = "Terms of Service"
     val annotatedString =
         buildAnnotatedString {
-            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+            withStyle(style = SpanStyle(color = colorScheme.primary)) {
                 pushStringAnnotation(tag = termsAndConditions, annotation = termsAndConditions)
                 append(initialText)
             }
 
-            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+            withStyle(style = SpanStyle(color = colorScheme.primary)) {
                 pushStringAnnotation(tag = privacyPolicyText, annotation = privacyPolicyText)
                 append(privacyPolicyText)
             }
-            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+            withStyle(style = SpanStyle(color = colorScheme.primary)) {
                 pushStringAnnotation(tag = termsAndConditions, annotation = termsAndConditions)
                 append(andText)
             }
-            withStyle(style = SpanStyle( MaterialTheme.colorScheme.primary)) {
+            withStyle(style = SpanStyle( colorScheme.primary)) {
                 pushStringAnnotation(tag = termsAndConditions, annotation = termsAndConditions)
                 append(termsAndConditions)
             }
@@ -307,8 +308,8 @@ fun CheckBoxComponent(
             checked = checked,
             onCheckedChange = onCheckedChange,
             colors = CheckboxDefaults.colors(
-                checkedColor = MaterialTheme.colorScheme.primary,
-                uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                checkedColor = colorScheme.primary,
+                uncheckedColor = colorScheme.onSurfaceVariant,
                 checkmarkColor = MaterialTheme.colorScheme.onPrimary
             ),
         )
@@ -323,15 +324,15 @@ fun ButtonComponent(
     isEnabled: Boolean = true,
 ) {
     val backgroundColor = if (isEnabled) {
-        MaterialTheme.colorScheme.primary
+        colorScheme.primary
     } else {
-        MaterialTheme.colorScheme.surfaceVariant
+        colorScheme.surfaceVariant
     }
 
     val contentColor = if (isEnabled) {
         MaterialTheme.colorScheme.onPrimary
     } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
+        colorScheme.onSurfaceVariant
     }
 
     Button(
@@ -380,7 +381,7 @@ fun DividerTextComponent(value: String) {
         Text(
             text = value,
             fontSize = 18.sp,
-            color = MaterialTheme.colorScheme.primary
+            color = colorScheme.primary
         )
         HorizontalDivider(
             modifier =
@@ -405,7 +406,7 @@ fun ClickableLoginTextComponent(
         withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
             append(initialText)
         }
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+        withStyle(style = SpanStyle(color = colorScheme.primary)) {
             pushStringAnnotation(tag = loginText, annotation = loginText)
             append(loginText)
         }
@@ -444,7 +445,7 @@ fun UnderLinedTextComponent(value: String) {
                 fontWeight = FontWeight.Normal,
                 fontStyle = FontStyle.Normal,
             ),
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        color = colorScheme.onSurface.copy(alpha = 0.6f),
         textAlign = TextAlign.Center,
         textDecoration = TextDecoration.Underline,
     )
@@ -471,8 +472,8 @@ fun GenderSelection(
                 onGenderSelected(selectedGender)
             },
             colors = RadioButtonDefaults.colors(
-                selectedColor = MaterialTheme.colorScheme.primary,
-                unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                selectedColor = colorScheme.primary,
+                unselectedColor = colorScheme.onSurfaceVariant,
 
                 ),
         )
@@ -485,8 +486,8 @@ fun GenderSelection(
                 onGenderSelected(selectedGender)
             },
             colors = RadioButtonDefaults.colors(
-                selectedColor = MaterialTheme.colorScheme.primary,
-                unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                selectedColor = colorScheme.primary,
+                unselectedColor = colorScheme.onSurfaceVariant,
 
                 ),
         )
@@ -530,8 +531,8 @@ fun HabitSelection(
                         registrationViewModel.onEvent(UIEvent.HabitsChanged(selectedHabits))
                     },
                     colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colorScheme.primary,
-                        uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        checkedColor = colorScheme.primary,
+                        uncheckedColor = colorScheme.onSurfaceVariant,
                         checkmarkColor = MaterialTheme.colorScheme.onPrimary
                     )
                 )
@@ -572,7 +573,7 @@ fun HabbitAndMedHistoryButton(
             Modifier
                 .fillMaxWidth()
                 .background(
-                    color = MaterialTheme.colorScheme.primary,
+                    color = colorScheme.primary,
                     shape = RoundedCornerShape(11.dp),
                 ).clickable { onClick() }
                 .padding(17.dp),
@@ -633,8 +634,8 @@ fun MedicalHistorySection(
                                 registrationViewModel.onEvent(UIEvent.MedicalHistoryChanged(question.question, answer))
                             },
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = MaterialTheme.colorScheme.primary,
-                                unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                selectedColor = colorScheme.primary,
+                                unselectedColor = colorScheme.onSurfaceVariant,
 
                             ),
                         )
@@ -650,7 +651,7 @@ fun MedicalHistorySection(
 @Composable
 fun AppToolbar(onNavigationIconClick: () -> Unit) {
     TopAppBar(
-        title = { Text("WellnessWise") },
+        title = { Text("Wellness Wise") },
         navigationIcon = {
             IconButton(onClick = onNavigationIconClick) {
                 Icon(Icons.Filled.Menu, contentDescription = "Menu")
@@ -690,13 +691,13 @@ fun NavigationDrawer(
                         text = user?.displayName ?: "User Name",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = colorScheme.primary
                     )
                     // User email
                     Text(
                         text = user?.email ?: "user@example.com",
                         fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = colorScheme.primary
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -750,7 +751,7 @@ fun NavigationItem(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    MaterialTheme.colorScheme.primary // Get the primary color from the theme
+    colorScheme.primary // Get the primary color from the theme
 
     Surface(
         modifier =
@@ -759,10 +760,10 @@ fun NavigationItem(
                 .padding(vertical = 4.dp),
         shape = RoundedCornerShape(26.dp),
         color = if (isPressed)
-            MaterialTheme.colorScheme.primaryContainer
+            colorScheme.primaryContainer
         else
-            MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)),
+            colorScheme.surface,
+        border = BorderStroke(1.dp, colorScheme.outline.copy(alpha = 0.12f)),
         onClick = onClick,
         interactionSource = interactionSource,
     ) {
@@ -776,13 +777,13 @@ fun NavigationItem(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = colorScheme.primary,
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = colorScheme.onSurface,
             )
         }
     }
@@ -829,7 +830,7 @@ fun HealthMetricCard(
                         } else {
                             MaterialTheme.typography.titleSmall
                         },
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -881,10 +882,10 @@ fun HealthDataTextField(
             label = { Text(label) },
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedBorderColor = colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = colorScheme.primary,
+                cursorColor = colorScheme.primary,
             ),
             isError = isError,
             enabled = enabled,
@@ -901,7 +902,7 @@ fun HealthDataTextField(
         if (!enabled) {
             Text(
                 text = "This field is synced with Google Fit",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(start = 16.dp, top = 4.dp),
             )
@@ -915,7 +916,7 @@ fun UserImg(modifier: Modifier = Modifier) {
         imageVector = Icons.Filled.AccountCircle,
         contentDescription = "User Profile",
         modifier = modifier.size(100.dp),
-        tint = MaterialTheme.colorScheme.primary
+        tint = colorScheme.primary
     )
 }
 
@@ -933,7 +934,7 @@ fun LoadingAnimation() {
             .size(24.dp)
             .scale(scale)
             .background(
-                color = MaterialTheme.colorScheme.primary,
+                color = colorScheme.primary,
                 shape = CircleShape
             )
             .fillMaxWidth()
