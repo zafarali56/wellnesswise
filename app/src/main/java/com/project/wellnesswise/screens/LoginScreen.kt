@@ -13,8 +13,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ui.ButtonComponent
@@ -40,7 +43,6 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = !isSystemInDarkTheme()
 
-    // Use dynamic color scheme
     val colorScheme = when {
         useDarkIcons -> dynamicLightColorScheme(context)
         else -> dynamicDarkColorScheme(context)
@@ -62,7 +64,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(colorScheme.background)
-                .padding(horizontal = 20.dp),
+                .padding(horizontal = 26.dp),
             contentAlignment = Alignment.Center
         ) {
             Surface(
@@ -88,10 +90,16 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                                     }
                                 ),
                                 contentDescription = "Logo",
-                                modifier = Modifier.size(320.dp)
+                                modifier = Modifier.size(width = 400.dp, height = 300.dp)
                             )
                         }
-                        HeadingTextComponent(value = stringResource(id = R.string.Login))
+                        Text(text = "Login to your account",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                            )
                         Spacer(modifier = Modifier.height(30.dp))
                         HorizontalDivider(
                             modifier = Modifier.fillMaxWidth(),
@@ -131,7 +139,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                             LaunchedEffect(errorMessage) {
                                 Toast.makeText(
                                     context,
-                                    "Invalid credentials! Please try again",
+                                    "ERROR:${errorMessage}",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
@@ -139,7 +147,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                     }
 
                     item() {
-                        Spacer(modifier = Modifier.height(50.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
                         ClickableLoginTextComponent(tryingToLogin = false, onTextSelected = {
                             WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
                         })

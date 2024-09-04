@@ -91,7 +91,6 @@ class RegistrationViewModel : ViewModel() {
                         medicalHistory = registrationUIState.value.medicalHistory,
                     )
                 } else {
-                    // Show validation errors
                     Log.d(TAG, "Validation failed")
                 }
             }

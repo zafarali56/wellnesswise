@@ -111,7 +111,6 @@ class LoginViewModel : ViewModel() {
                     isLoggedIn.value = true
                     Log.d(TAG, "Login successful")
                     if (_dataSourcePreference.value == RegistrationViewModel.DataSourcePreference.GOOGLE_FIT) {
-                        // Note: We can't call checkGoogleFitPermissions here as it requires a Context
                         needsGoogleFitPermissions.value = true
                     } else {
                         WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
