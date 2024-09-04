@@ -40,6 +40,7 @@ import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ui.ButtonComponent
 import com.project.wellnesswise.components.ui.HeadingTextComponent
 import com.project.wellnesswise.components.ui.HealthDataTextField
+import com.project.wellnesswise.components.ui.LoadingAnimation
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import kotlinx.coroutines.launch
@@ -177,7 +178,7 @@ fun HealthDataScreen(
             )
         } else {
             if (isSyncing) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary )
+                LoadingAnimation()
             } else {
                 Text("Data synced from Google Fit:")
                 Text("Blood Pressure: ${healthData["bloodPressure"] ?: "N/A"}")

@@ -2,10 +2,23 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,7 +37,7 @@ import com.project.wellnesswise.components.ui.ButtonComponent
 import com.project.wellnesswise.components.ui.ClickableLoginTextComponent
 import com.project.wellnesswise.components.ui.DividerTextComponent
 import com.project.wellnesswise.components.ui.GoogleFitPermissionRequest
-import com.project.wellnesswise.components.ui.HeadingTextComponent
+import com.project.wellnesswise.components.ui.LoadingAnimation
 import com.project.wellnesswise.components.ui.MyPasswordField
 import com.project.wellnesswise.components.ui.MyTextField
 import com.project.wellnesswise.components.ui.UnderLinedTextComponent
@@ -32,6 +45,7 @@ import com.project.wellnesswise.data.LoginUIEvent
 import com.project.wellnesswise.data.rules.Validator
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @Composable
 fun LoginScreen(loginViewModel: LoginViewModel) {
@@ -123,6 +137,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                             isError = validationResults["password"] == false
                         )
                         Spacer(modifier = Modifier.height(30.dp))
+
                         ButtonComponent(
                             value = stringResource(id = R.string.Login),
                             onButtonClicked = {
@@ -130,6 +145,11 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                             },
                             isEnabled = Validator.isValidLoginUIState(loginUIState)
                         )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        if (loginViewModel.logInProgress.value) {
+
+                            Box (modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){LoadingAnimation()}
+                        }
                         Spacer(modifier = Modifier.height(10.dp))
                         UnderLinedTextComponent(value = stringResource(id = R.string.Forgot_password))
                         DividerTextComponent(value = "OR")
@@ -156,11 +176,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                 }
             }
 
-            if (loginViewModel.logInProgress.value) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+
 
             if (loginViewModel.needsGoogleFitPermissions.value) {
                 GoogleFitPermissionRequest(
@@ -186,3 +202,5 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
 fun LoginScreenPreview() {
     LoginScreen(LoginViewModel())
 }
+
+

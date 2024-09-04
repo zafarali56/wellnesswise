@@ -5,6 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,6 +35,7 @@ import com.project.wellnesswise.components.ui.DividerTextComponent
 import com.project.wellnesswise.components.ui.GenderSelection
 import com.project.wellnesswise.components.ui.HabbitAndMedHistoryButton
 import com.project.wellnesswise.components.ui.HeadingTextComponent
+import com.project.wellnesswise.components.ui.LoadingAnimation
 import com.project.wellnesswise.components.ui.MyNumberField
 import com.project.wellnesswise.components.ui.MyPasswordField
 import com.project.wellnesswise.components.ui.MyTextField
@@ -280,6 +282,12 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                             },
                             isEnabled = Validator.isValidRegistrationUIState(registrationViewModel.registrationUIState.value)
                         )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        if (registrationViewModel.signUpInProgress.value) {
+
+                            Box (modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){ LoadingAnimation() }
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
                         DividerTextComponent(value = "OR")
                     }
                     item {
@@ -293,11 +301,7 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                     }
                 }
             }
-            if (registrationViewModel.signUpInProgress.value) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+
 
         }
 

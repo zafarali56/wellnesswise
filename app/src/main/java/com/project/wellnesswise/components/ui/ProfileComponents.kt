@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseUser
 import com.project.wellnesswise.components.ui.ButtonComponent
+import com.project.wellnesswise.components.ui.LoadingAnimation
 import com.project.wellnesswise.components.ui.UserImg
 import com.project.wellnesswise.components.ui.formatHabitName
 
@@ -43,7 +44,7 @@ fun MainProfileView(
                 UserImg()
                 Spacer(modifier = Modifier.height(10.dp))
                 if (isLoading) {
-                    Text("Loading user data...")
+                    LoadingAnimation()
                 } else {
                     userData?.let { data ->
                         Text(

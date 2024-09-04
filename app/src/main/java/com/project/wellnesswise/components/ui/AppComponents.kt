@@ -1,6 +1,11 @@
 package com.project.wellnesswise.components.ui
 
 import android.util.Log
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +24,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
@@ -64,6 +70,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
@@ -267,7 +274,7 @@ fun ClickableTextComponent(
                 pushStringAnnotation(tag = termsAndConditions, annotation = termsAndConditions)
                 append(andText)
             }
-            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+            withStyle(style = SpanStyle( MaterialTheme.colorScheme.primary)) {
                 pushStringAnnotation(tag = termsAndConditions, annotation = termsAndConditions)
                 append(termsAndConditions)
             }
@@ -907,8 +914,57 @@ fun UserImg(modifier: Modifier = Modifier) {
     Icon(
         imageVector = Icons.Filled.AccountCircle,
         contentDescription = "User Profile",
-        modifier = modifier.size(100.dp)
+        modifier = modifier.size(100.dp),
+        tint = MaterialTheme.colorScheme.primary
     )
 }
 
 
+@Composable
+fun LoadingAnimation() {
+    val dots = 3
+    val delayUnit = 300
+
+    @Composable
+    fun Dot(
+        scale: Float
+    ) = Spacer(
+        Modifier
+            .size(24.dp)
+            .scale(scale)
+            .background(
+                color = MaterialTheme.colorScheme.primary,
+                shape = CircleShape
+            )
+            .fillMaxWidth()
+    )
+
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+
+    @Composable
+    fun animateScaleWithDelay(delay: Int) = infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = delayUnit * 4
+                0f at delay using LinearEasing
+                1f at delay + delayUnit using LinearEasing
+                0f at delay + delayUnit * 2
+            }
+        ),
+        label = ""
+    )
+
+    val scales = (0 until dots).map { animateScaleWithDelay(it * delayUnit) }
+
+    Row(
+        modifier = Modifier
+            .padding(top = 16.dp, bottom = 8.dp)
+    ) {
+        scales.forEach { scale ->
+            Dot(scale.value)
+            Spacer(Modifier.width(12.dp))
+        }
+    }
+}
