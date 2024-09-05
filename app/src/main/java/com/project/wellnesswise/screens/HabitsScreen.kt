@@ -46,14 +46,12 @@ fun HabitsScreen(registrationViewModel: RegistrationViewModel) {
         useDarkIcons -> dynamicLightColorScheme(context)
         else -> dynamicDarkColorScheme(context)
     }
-
     LaunchedEffect(colorScheme) {
         systemUiController.setSystemBarsColor(
             color = colorScheme.background,
             darkIcons = useDarkIcons
         )
     }
-
     MaterialTheme(colorScheme = colorScheme) {
         Scaffold(
             topBar = {
@@ -100,7 +98,6 @@ fun HabitsScreen(registrationViewModel: RegistrationViewModel) {
                 }
             }
         }
-
         SystemBackButtonHandler {
             WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
         }
