@@ -17,21 +17,26 @@ object HealthDataUtils {
     ): Map<String, Any> {
         val healthData = mutableMapOf<String, Any>()
 
-        // Read heart rate
-        val heartRateResult =
-            Fitness
-                .getHistoryClient(context, account)
-                .readDailyTotal(DataType.TYPE_HEART_RATE_BPM)
-                .await()
-        if (!heartRateResult.isEmpty) {
-            healthData["heartRate"] = heartRateResult.dataPoints
-                .firstOrNull()
-                ?.getValue(Field.FIELD_AVERAGE)
-                ?.asFloat() ?: 0f
-        }
 
         val endTime = System.currentTimeMillis()
-        val startTime = endTime - 24 * 60 * 60 * 1000 // 24 hours ago
+        val startTime = endTime - 24 * 60 * 60 * 1000
+
+        val heartRateRequest = com.google.android.gms.fitness.request.DataReadRequest.Builder()
+            .read(DataType.TYPE_HEART_RATE_BPM)
+            .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+            .setLimit(1)
+            .build()
+
+        val heartRateResponse = Fitness.getHistoryClient(context, account)
+            .readData(heartRateRequest)
+            .await()
+
+        if (heartRateResponse.dataSets.isNotEmpty() && heartRateResponse.dataSets[0].dataPoints.isNotEmpty()) {
+            val latestHeartRate = heartRateResponse.dataSets[0].dataPoints[0]
+            healthData["heartRate"] = latestHeartRate.getValue(Field.FIELD_BPM).asFloat()
+        }
+
+
         val readRequest =
             com.google.android.gms.fitness.request.DataReadRequest
                 .Builder()
