@@ -1,5 +1,6 @@
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -63,7 +64,7 @@ fun HomeScreen(
                             title = "Heart Rate",
                             value = heartRate,
                             unit = "bpm",
-                            color = MaterialTheme.colorScheme.primary,
+                            color = MaterialTheme.colorScheme.onSurface,
                             icon = Icons.Filled.Favorite,
                             modifier = Modifier.fillMaxWidth(),
                             isLargeCard = true,
@@ -79,7 +80,7 @@ fun HomeScreen(
                                 title = "Blood Pressure",
                                 value = bloodPressure,
                                 unit = "mmHg",
-                                color = MaterialTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 icon = Icons.Filled.MonitorHeart,
                                 modifier = Modifier.weight(1f),
                                 isLargeCard = false,
@@ -89,7 +90,7 @@ fun HomeScreen(
                                 title = "Blood Sugar",
                                 value = bloodSugar,
                                 unit = "mg/dL",
-                                color = MaterialTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 icon = Icons.Filled.WaterDrop,
                                 modifier = Modifier.weight(1f),
                                 isLargeCard = false,
@@ -111,19 +112,34 @@ fun HomeScreen(
                             title = "Cholesterol",
                             value = cholesterol,
                             unit = "mg/dL",
-                            color = MaterialTheme.colorScheme.primary,
+                            color = MaterialTheme.colorScheme.onSurface,
                             icon = Icons.Filled.Analytics,
                             modifier = Modifier.fillMaxWidth(),
                             isLargeCard = false,
                         )
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        ActionButton(
-                            text = "Predictions & Analysis",
-                            icon = Icons.Filled.TrendingUp,
-                            onClick = { /* TODO: Implement predictions and analysis navigation */ },
-                            color = MaterialTheme.colorScheme.secondary
-                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            CustomShapeButton(
+                                text = "Prediction",
+                                onClick = { /* TODO: Handle click */ },
+
+                                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 6.dp, bottomStart = 8.dp, bottomEnd = 24.dp),
+                                icon = Icons.Filled.Analytics, containerColor = MaterialTheme.colorScheme.inversePrimary, contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+
+                            CustomShapeButton(
+                                text = "Recommendation",
+                                onClick = { /* TODO: Handle click */ },
+
+                                shape = RoundedCornerShape(topStart = 8.dp, topEnd = 24.dp, bottomStart = 24.dp, bottomEnd = 8.dp) ,
+                                icon = Icons.Filled.HealthAndSafety, containerColor = MaterialTheme.colorScheme.tertiaryContainer, contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                        }
                     }
                 }
             },
@@ -133,3 +149,4 @@ fun HomeScreen(
         )
     }
 }
+

@@ -691,13 +691,13 @@ fun NavigationDrawer(
                         text = user?.displayName ?: "User Name",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = colorScheme.primary
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     // User email
                     Text(
                         text = user?.email ?: "user@example.com",
                         fontSize = 16.sp,
-                        color = colorScheme.primary
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
