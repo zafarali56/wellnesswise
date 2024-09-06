@@ -22,6 +22,7 @@ fun HomeScreen(
     homeViewModel: HomeViewModel,
     authViewModel: AuthViewModel,
 ) {
+    var userData by remember { mutableStateOf<Map<String, Any>?>(null) }
     val context = LocalContext.current
     val bloodPressure by homeViewModel.bloodPressure.collectAsStateWithLifecycle()
     val heartRate by homeViewModel.heartRate.collectAsStateWithLifecycle()
@@ -45,6 +46,9 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         homeViewModel.checkForActiveSession()
+        homeViewModel.getUserData { fetchedUserData ->
+            userData = fetchedUserData
+        }
     }
 
     MaterialTheme(colorScheme = colorScheme) {
@@ -146,6 +150,7 @@ fun HomeScreen(
             onLogoutClick = { authViewModel.logOut() },
             onProfileClick = { WellnessWiseAppRouter.navigateTo(Screen.UserProfileScreen) },
             onHomeClick = { WellnessWiseAppRouter.navigateTo(Screen.HomeScreen) },
+            userData = userData
         )
     }
 }

@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlin.math.roundToInt
 
 class HomeViewModel : ViewModel() {
     private val TAG = "HomeViewModel"
@@ -34,11 +33,29 @@ class HomeViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var firestoreListener: ListenerRegistration? = null
-
     init {
         checkForActiveSession()
     }
-
+    fun getUserData(callback: (Map<String, Any>?) -> Unit) {
+        viewModelScope.launch {
+            val currentUser = auth.currentUser
+            if (currentUser != null) {
+                try {
+                    val snapshot = firestore.collection("users").document(currentUser.uid).get().await()
+                    if (snapshot.exists()) {
+                        callback(snapshot.data)
+                    } else {
+                        callback(null)
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error fetching user data", e)
+                    callback(null)
+                }
+            } else {
+                callback(null)
+            }
+        }
+    }
     fun checkForActiveSession() {
         val currentUser = auth.currentUser
         if (currentUser != null) {
@@ -127,7 +144,7 @@ class HomeViewModel : ViewModel() {
         _bloodPressure.value = data["bloodPressure"]?.toString() ?: "N/A"
         _heartRate.value =
             when (val hrData = data["heartRate"]) {
-                is Number -> hrData.toFloat().roundToInt().toString()
+                is Number -> hrData.toString()
                 is String -> hrData.toIntOrNull()?.toString() ?: "N/A"
                 else -> "N/A"
             }

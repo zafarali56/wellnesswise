@@ -141,7 +141,6 @@ class RegistrationViewModel : ViewModel() {
                         val profileUpdates =
                             UserProfileChangeRequest
                                 .Builder()
-                                .setDisplayName(fullName)
                                 .build()
                         user
                             .updateProfile(profileUpdates)

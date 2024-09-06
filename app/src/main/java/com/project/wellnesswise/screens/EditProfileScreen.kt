@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.project.wellnesswise.components.ui.ButtonComponent
+import com.project.wellnesswise.components.ui.CustomBloodPressureInput
 import com.project.wellnesswise.components.ui.HealthDataTextField
 import com.project.wellnesswise.components.ui.MyNumberField
 import com.project.wellnesswise.components.ui.MyTextField
@@ -57,16 +58,19 @@ fun EditProfileScreen(
     var age by remember { mutableStateOf(userData?.get("age")?.toString() ?: "") }
     var weight by remember { mutableStateOf(userData?.get("weight")?.toString() ?: "") }
     var height by remember { mutableStateOf(userData?.get("height")?.toString() ?: "") }
-    var bloodPressure by remember {
-        mutableStateOf(
-            userData?.get("bloodPressure") as? String ?: ""
-        )
-    }
+
     var heartRate by remember { mutableStateOf(userData?.get("heartRate")?.toString() ?: "") }
     var bloodSugar by remember { mutableStateOf(userData?.get("bloodSugar")?.toString() ?: "") }
     var cholesterol by remember { mutableStateOf(userData?.get("cholesterol")?.toString() ?: "") }
     val context = LocalContext.current
     val dataSourcePreference = userData?.get("dataSourcePreference") as? String ?: "MANUAL"
+
+
+    var bloodPressure by remember {
+        mutableStateOf(userData?.get("bloodPressure") as? String ?: "")
+    }
+    var systolic by remember { mutableStateOf(bloodPressure.split("/").firstOrNull() ?: "") }
+    var diastolic by remember { mutableStateOf(bloodPressure.split("/").lastOrNull() ?: "") }
 
     Scaffold(
         topBar = {
@@ -154,13 +158,17 @@ fun EditProfileScreen(
 
                 item {
                     if (dataSourcePreference == "MANUAL") {
-                        HealthDataTextField(
-                            value = bloodPressure,
-                            onValueChange = { bloodPressure = it },
-                            label = "Blood Pressure (e.g. 120/80)",
-                            isError = false,
-                            errorMessage = "Invalid blood pressure format",
-                            enabled = true
+                        CustomBloodPressureInput(
+                            systolic = systolic,
+                            diastolic = diastolic,
+                            onSystolicChange = { newSystolic ->
+                                systolic = newSystolic
+                                bloodPressure = "$newSystolic/$diastolic"
+                            },
+                            onDiastolicChange = { newDiastolic ->
+                                diastolic = newDiastolic
+                                bloodPressure = "$systolic/$newDiastolic"
+                            }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
 

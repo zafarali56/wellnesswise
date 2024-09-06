@@ -159,7 +159,7 @@ fun UserProfileScreen(authViewModel: AuthViewModel) {
                     content = content,
                     onProfileClick = { WellnessWiseAppRouter.navigateTo(Screen.UserProfileScreen) },
                     onHomeClick = { WellnessWiseAppRouter.navigateTo(Screen.HomeScreen) },
-                    onLogoutClick = { authViewModel.logOut() }
+                    onLogoutClick = { authViewModel.logOut() }, userData = userData
                 )
             } else {
                 content()

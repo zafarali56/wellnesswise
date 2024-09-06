@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -38,6 +37,7 @@ import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.HealthDataTypes
 import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ui.ButtonComponent
+import com.project.wellnesswise.components.ui.CustomBloodPressureInput
 import com.project.wellnesswise.components.ui.HeadingTextComponent
 import com.project.wellnesswise.components.ui.HealthDataTextField
 import com.project.wellnesswise.components.ui.LoadingAnimation
@@ -50,7 +50,8 @@ fun HealthDataScreen(
     healthDataViewModel: HealthDataViewModel,
     loginViewModel: LoginViewModel
 ) {
-
+    var systolic by remember { mutableStateOf("") }
+    var diastolic by remember { mutableStateOf("") }
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = !isSystemInDarkTheme()
     val context = LocalContext.current
@@ -67,11 +68,10 @@ fun HealthDataScreen(
         )
     }
 
-    val primaryColor = colorResource(id = R.color.primary)
+    colorResource(id = R.color.primary)
     val healthData by healthDataViewModel.healthData.collectAsState()
     val cholesterol by healthDataViewModel.cholesterol.collectAsState()
     val isSyncing by healthDataViewModel.isSyncing.collectAsState()
-    val syncMessage by healthDataViewModel.syncMessage.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -146,13 +146,17 @@ fun HealthDataScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         if (isManualInput) {
-            HealthDataTextField(
-                value = healthData["bloodPressure"] as? String ?: "",
-                onValueChange = { healthDataViewModel.updateManualHealthData(bloodPressure = it) },
-                label = "Blood Pressure (e.g. 120/80)",
-                isError = false, // Add validation logic if needed
-                errorMessage = "Invalid blood pressure format",
-                enabled = true
+            CustomBloodPressureInput(
+                systolic = systolic,
+                diastolic = diastolic,
+                onSystolicChange = { newSystolic ->
+                    systolic = newSystolic
+                    updateBloodPressure(newSystolic, diastolic, healthDataViewModel)
+                },
+                onDiastolicChange = { newDiastolic ->
+                    diastolic = newDiastolic
+                    updateBloodPressure(systolic, newDiastolic, healthDataViewModel)
+                }
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -160,8 +164,8 @@ fun HealthDataScreen(
             HealthDataTextField(
                 value = healthData["heartRate"] as? String ?: "",
                 onValueChange = { healthDataViewModel.updateManualHealthData(heartRate = it) },
-                label = "Heart Rate (e.g. 70)",
-                isError = false, // Add validation logic if needed
+                label = "Heart Rate (bpm)",
+                isError = false,
                 errorMessage = "Invalid heart rate",
                 enabled = true
             )
@@ -171,8 +175,8 @@ fun HealthDataScreen(
             HealthDataTextField(
                 value = healthData["bloodSugar"] as? String ?: "",
                 onValueChange = { healthDataViewModel.updateManualHealthData(bloodSugar = it) },
-                label = "Blood Sugar (e.g. 100)",
-                isError = false, // Add validation logic if needed
+                label = "Blood Sugar (mg/dL)",
+                isError = false,
                 errorMessage = "Invalid blood sugar value",
                 enabled = true
             )
@@ -219,4 +223,9 @@ fun HealthDataScreen(
 @Preview
 fun HealthDataScreenPreview() {
     HealthDataScreen(HealthDataViewModel(), LoginViewModel())
+}
+private fun updateBloodPressure(systolic: String, diastolic: String, viewModel: HealthDataViewModel) {
+    if (systolic.isNotEmpty() && diastolic.isNotEmpty()) {
+        viewModel.updateManualHealthData(bloodPressure = "$systolic/$diastolic")
+    }
 }

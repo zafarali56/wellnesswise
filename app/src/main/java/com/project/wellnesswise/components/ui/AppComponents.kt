@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -40,8 +39,6 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DrawerValue
@@ -152,7 +149,7 @@ fun MyTextField(
         label = { Text(text = labelValue) },
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            unfocusedBorderColor = colorScheme.outline,
             focusedLabelColor = colorScheme.primary,
             cursorColor = colorScheme.primary,
         ),
@@ -163,6 +160,7 @@ fun MyTextField(
             onTextSelected(it)
         },
         isError = isError,
+        singleLine = true,
     )
 }
 
@@ -185,7 +183,7 @@ fun MyNumberField(
         label = { Text(text = labelValue) },
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            unfocusedBorderColor = colorScheme.outline,
             focusedLabelColor = colorScheme.primary,
             cursorColor = colorScheme.primary,
         ),
@@ -199,6 +197,7 @@ fun MyNumberField(
             }
         },
         isError = isError,
+        singleLine = true,
     )
 }
 
@@ -220,7 +219,7 @@ fun MyPasswordField(
         label = { Text(text = labelValue) },
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            unfocusedBorderColor = colorScheme.outline,
             focusedLabelColor = colorScheme.primary,
             cursorColor = colorScheme.primary,
         ),
@@ -249,6 +248,7 @@ fun MyPasswordField(
         },
         visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
         isError = isError,
+        singleLine = true,
     )
 }
 
@@ -310,7 +310,7 @@ fun CheckBoxComponent(
             colors = CheckboxDefaults.colors(
                 checkedColor = colorScheme.primary,
                 uncheckedColor = colorScheme.onSurfaceVariant,
-                checkmarkColor = MaterialTheme.colorScheme.onPrimary
+                checkmarkColor = colorScheme.onPrimary
             ),
         )
         ClickableTextComponent(onTextSelected)
@@ -330,7 +330,7 @@ fun ButtonComponent(
     }
 
     val contentColor = if (isEnabled) {
-        MaterialTheme.colorScheme.onPrimary
+        colorScheme.onPrimary
     } else {
         colorScheme.onSurfaceVariant
     }
@@ -353,7 +353,7 @@ fun ButtonComponent(
                 .heightIn(48.dp)
                 .background(
                     color = backgroundColor,
-                    shape = MaterialTheme.shapes.medium
+                    shape = shapes.medium
                 ),
             contentAlignment = Alignment.Center,
         ) {
@@ -403,7 +403,7 @@ fun ClickableLoginTextComponent(
     val loginText = if (tryingToLogin) "Login" else "Register"
 
     val annotatedString = buildAnnotatedString {
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+        withStyle(style = SpanStyle(color = colorScheme.onBackground)) {
             append(initialText)
         }
         withStyle(style = SpanStyle(color = colorScheme.primary)) {
@@ -533,7 +533,7 @@ fun HabitSelection(
                     colors = CheckboxDefaults.colors(
                         checkedColor = colorScheme.primary,
                         uncheckedColor = colorScheme.onSurfaceVariant,
-                        checkmarkColor = MaterialTheme.colorScheme.onPrimary
+                        checkmarkColor = colorScheme.onPrimary
                     )
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -585,14 +585,14 @@ fun HabbitAndMedHistoryButton(
         ) {
             Text(
                 text = text,
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = colorScheme.onPrimary,
                 fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.weight(1f)) // This will push the icon to the end
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
+                tint = colorScheme.onPrimary,
             )
         }
     }
@@ -666,6 +666,7 @@ fun NavigationDrawer(
     onProfileClick: () -> Unit,
     onHomeClick: () -> Unit,
     onLogoutClick: () -> Unit,
+    userData: Map<String, Any>?
 
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -688,16 +689,16 @@ fun NavigationDrawer(
                     UserImg()
                     // User name
                     Text(
-                        text = user?.displayName ?: "User Name",
+                        text = userData?.get("fullName") as? String ?: "User Name",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = colorScheme.onSurface,
                     )
                     // User email
                     Text(
                         text = user?.email ?: "user@example.com",
                         fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = colorScheme.onSurface,
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -810,18 +811,20 @@ fun HealthDataTextField(
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                unfocusedBorderColor = colorScheme.outline,
                 focusedLabelColor = colorScheme.primary,
                 cursorColor = colorScheme.primary,
             ),
             isError = isError,
             enabled = enabled,
             readOnly = !enabled,
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         )
         if (isError && enabled) {
             Text(
                 text = errorMessage,
-                color = MaterialTheme.colorScheme.error,
+                color = colorScheme.error,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(start = 16.dp, top = 4.dp),
             )
@@ -893,6 +896,81 @@ fun LoadingAnimation() {
         scales.forEach { scale ->
             Dot(scale.value)
             Spacer(Modifier.width(12.dp))
+        }
+    }
+}
+
+
+
+@Composable
+fun CustomBloodPressureInput(
+    systolic: String,
+    diastolic: String,
+    onSystolicChange: (String) -> Unit,
+    onDiastolicChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(1.dp)
+    ) {
+        BPTextField(
+            value = systolic,
+            onValueChange = onSystolicChange,
+            label = "Systolic",
+            modifier = Modifier.weight(1f)
+        )
+        BPTextField(
+            value = diastolic,
+            onValueChange = onDiastolicChange,
+            label = "Diastolic",
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+fun BPTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier
+) {
+    var isError by remember { mutableStateOf(false) }
+
+    Column(modifier = modifier) {
+
+        Spacer(modifier = Modifier.height(2.dp))
+        OutlinedTextField(
+            value = value,
+            onValueChange = {
+                if (it.length <= 3 && it.all { char -> char.isDigit() }) {
+                    onValueChange(it)
+                    isError = it.isNotEmpty() && it.toIntOrNull() !in 40..250
+                }
+            },
+            label = { Text(label) },
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = MaterialTheme.typography.bodyLarge,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            singleLine = true,
+            isError = isError,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = colorScheme.primary,
+                unfocusedBorderColor = colorScheme.outline,
+                focusedLabelColor = colorScheme.primary,
+                cursorColor = colorScheme.primary,
+                errorBorderColor = colorScheme.error
+            ),
+            shape = RoundedCornerShape(10.dp)
+        )
+        if (isError) {
+            Text(
+                text = "Invalid input",
+                color = colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 4.dp)
+            )
         }
     }
 }

@@ -53,7 +53,7 @@ fun MainProfileView(
                             data["fullName"] as? String ?: "N/A",
                             fontWeight = FontWeight.Bold,
                             fontSize = 30.sp,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = colorScheme.onSurface,
                         )
                     }
 
