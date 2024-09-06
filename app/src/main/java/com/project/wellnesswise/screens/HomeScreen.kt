@@ -107,7 +107,7 @@ fun HomeScreen(
                             text = "Data Visualization",
                             icon = Icons.Filled.BarChart,
                             onClick = { WellnessWiseAppRouter.navigateTo(Screen.DataVisualizationScreen) },
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primaryContainer,
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -131,17 +131,20 @@ fun HomeScreen(
                             CustomShapeButton(
                                 text = "Prediction",
                                 onClick = { /* TODO: Handle click */ },
-
                                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 6.dp, bottomStart = 8.dp, bottomEnd = 24.dp),
-                                icon = Icons.Filled.Analytics, containerColor = MaterialTheme.colorScheme.inversePrimary, contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                icon = Icons.Filled.Analytics,
+                                containerColor = MaterialTheme.colorScheme.inversePrimary,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+
                             )
 
                             CustomShapeButton(
                                 text = "Recommendation",
                                 onClick = { /* TODO: Handle click */ },
-
-                                shape = RoundedCornerShape(topStart = 8.dp, topEnd = 24.dp, bottomStart = 24.dp, bottomEnd = 8.dp) ,
-                                icon = Icons.Filled.HealthAndSafety, containerColor = MaterialTheme.colorScheme.tertiaryContainer, contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 6.dp, bottomStart = 8.dp, bottomEnd = 24.dp),
+                                icon = Icons.Filled.HealthAndSafety,
+                                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                             )
                         }
                     }

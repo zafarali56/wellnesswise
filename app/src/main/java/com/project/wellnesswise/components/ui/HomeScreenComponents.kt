@@ -14,6 +14,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults.contentColor
+import androidx.compose.material3.ListItemDefaults.shape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
@@ -34,7 +36,8 @@ fun ActionButton(
     text: String,
     icon: ImageVector,
     onClick: () -> Unit,
-    color: androidx.compose.ui.graphics.Color
+    color: Color,
+
 ) {
     val configuration = LocalConfiguration.current
     val buttonText = if (configuration.screenWidthDp < 360) "" else text
@@ -44,12 +47,11 @@ fun ActionButton(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
-            .shadow(
-                elevation = 6.dp,
-                shape = RoundedCornerShape(28.dp),
-            ),
+
+        ,
+
         colors = ButtonDefaults.buttonColors(containerColor = color),
-        shape = RoundedCornerShape(28.dp),
+        shape =  RoundedCornerShape(26.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -59,13 +61,14 @@ fun ActionButton(
                 imageVector = icon,
                 contentDescription = text,
                 modifier = Modifier.size(30.dp),
+                tint = contentColor
             )
             if (buttonText.isNotEmpty()) {
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     buttonText,
                     style = MaterialTheme.typography.titleMedium,
-                    color = colorScheme.onPrimary,
+                    color = colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                 )
             }
@@ -85,11 +88,12 @@ fun HealthMetricCard(
     isLargeCard: Boolean = true,
 ) {
     Card(
-        modifier = modifier.height(if (isLargeCard) 120.dp else 100.dp),
+        modifier = modifier.height(if (isLargeCard) 120.dp else 100.dp)
+            .clip(shape),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+            containerColor = colorScheme.secondaryContainer,
+            contentColor = colorScheme.onSecondaryContainer
         )
     ) {
         Row(
@@ -157,7 +161,7 @@ fun CustomShapeButton(
     shape: RoundedCornerShape,
     icon: ImageVector,
     containerColor: Color,
-    contentColor: Color
+    contentColor: Color,
 ) {
     val configuration = LocalConfiguration.current
     val buttonText = if (configuration.screenWidthDp < 360) "" else text
