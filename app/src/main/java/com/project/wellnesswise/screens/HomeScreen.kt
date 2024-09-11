@@ -78,7 +78,7 @@ fun HomeScreen(
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
                             HealthMetricCard(
                                 title = "Blood Pressure",
@@ -107,7 +107,7 @@ fun HomeScreen(
                             text = "Data Visualization",
                             icon = Icons.Filled.BarChart,
                             onClick = { WellnessWiseAppRouter.navigateTo(Screen.DataVisualizationScreen) },
-                            color = MaterialTheme.colorScheme.inversePrimary,
+                            color = MaterialTheme.colorScheme.primary,
                         )
 
                         Spacer(modifier = Modifier.height(10.dp))
@@ -126,14 +126,14 @@ fun HomeScreen(
                             text = "Health Risk Predictions",
                             icon = Icons.Filled.BubbleChart,
                             onClick = { WellnessWiseAppRouter.navigateTo(Screen.PredictionsScreen) },
-                            color = MaterialTheme.colorScheme.inversePrimary,
+                            color = MaterialTheme.colorScheme.primary,
                         )
                         Spacer(modifier = Modifier.height(10.dp))
                         ActionButton(
                             text = "Personalized Recommendations",
                             icon = Icons.Filled.Spa,
                             onClick = { WellnessWiseAppRouter.navigateTo(Screen.PersonalizedRecommendationsScreen) },
-                            color = MaterialTheme.colorScheme.inversePrimary,
+                            color = MaterialTheme.colorScheme.primary,
                         )
 
                     }

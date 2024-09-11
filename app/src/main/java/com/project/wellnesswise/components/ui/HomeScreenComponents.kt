@@ -50,7 +50,7 @@ fun ActionButton(
             .height(56.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = color,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            contentColor = MaterialTheme.colorScheme.onPrimary
         ),
         shape = RoundedCornerShape(26.dp)
     ) {
