@@ -14,6 +14,8 @@ sealed class Screen {
     object HealthDataScreen : Screen()
     object DataVisualizationScreen : Screen()
     object UserProfileScreen: Screen()
+    object PredictionsScreen: Screen()
+    object PersonalizedRecommendationsScreen: Screen()
 }
 object WellnessWiseAppRouter {
     var currentScreen: MutableState<Screen> = mutableStateOf(Screen.SignUpScreen)

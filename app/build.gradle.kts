@@ -85,5 +85,5 @@ dependencies {
     implementation(libs.accompanist.swiperefresh)
     implementation(libs.compose)
     implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
-    implementation ("com.airbnb.android:lottie-compose:6.0.0")
+
     }

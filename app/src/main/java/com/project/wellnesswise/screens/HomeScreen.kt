@@ -74,7 +74,7 @@ fun HomeScreen(
                             isLargeCard = true,
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -101,16 +101,16 @@ fun HomeScreen(
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
                         ActionButton(
                             text = "Data Visualization",
                             icon = Icons.Filled.BarChart,
                             onClick = { WellnessWiseAppRouter.navigateTo(Screen.DataVisualizationScreen) },
-                            color = MaterialTheme.colorScheme.primaryContainer,
+                            color = MaterialTheme.colorScheme.inversePrimary,
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
                         HealthMetricCard(
                             title = "Cholesterol",
@@ -121,32 +121,21 @@ fun HomeScreen(
                             modifier = Modifier.fillMaxWidth(),
                             isLargeCard = false,
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
+                        ActionButton(
+                            text = "Health Risk Predictions",
+                            icon = Icons.Filled.BubbleChart,
+                            onClick = { WellnessWiseAppRouter.navigateTo(Screen.PredictionsScreen) },
+                            color = MaterialTheme.colorScheme.inversePrimary,
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        ActionButton(
+                            text = "Personalized Recommendations",
+                            icon = Icons.Filled.Spa,
+                            onClick = { WellnessWiseAppRouter.navigateTo(Screen.PersonalizedRecommendationsScreen) },
+                            color = MaterialTheme.colorScheme.inversePrimary,
+                        )
 
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            CustomShapeButton(
-                                text = "Prediction",
-                                onClick = { /* TODO: Handle click */ },
-                                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 6.dp, bottomStart = 8.dp, bottomEnd = 24.dp),
-                                icon = Icons.Filled.Analytics,
-                                containerColor = MaterialTheme.colorScheme.inversePrimary,
-                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-
-                            )
-
-                            CustomShapeButton(
-                                text = "Recommendation",
-                                onClick = { /* TODO: Handle click */ },
-                                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 6.dp, bottomStart = 8.dp, bottomEnd = 24.dp),
-                                icon = Icons.Filled.HealthAndSafety,
-                                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                            )
-                        }
                     }
                 }
             },

@@ -9,13 +9,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItemDefaults.contentColor
 import androidx.compose.material3.ListItemDefaults.shape
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
@@ -23,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
@@ -36,8 +38,7 @@ fun ActionButton(
     text: String,
     icon: ImageVector,
     onClick: () -> Unit,
-    color: Color,
-
+    color: Color = colorScheme.primaryContainer,
 ) {
     val configuration = LocalConfiguration.current
     val buttonText = if (configuration.screenWidthDp < 360) "" else text
@@ -46,36 +47,38 @@ fun ActionButton(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp)
-
-        ,
-
-        colors = ButtonDefaults.buttonColors(containerColor = color),
-        shape =  RoundedCornerShape(26.dp)
+            .height(56.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = color,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        ),
+        shape = RoundedCornerShape(26.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
+            modifier = Modifier.fillMaxWidth()
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = text,
-                modifier = Modifier.size(30.dp),
-                tint = contentColor
+                modifier = Modifier.size(30.dp)
             )
             if (buttonText.isNotEmpty()) {
-                Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     buttonText,
                     style = MaterialTheme.typography.titleMedium,
-                    color = colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                 )
             }
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = "Forward",
+                modifier = Modifier.size(24.dp)
+            )
         }
     }
 }
-
 
 @Composable
 fun HealthMetricCard(
@@ -148,53 +151,6 @@ fun HealthMetricCard(
                         modifier = Modifier.alignByBaseline(),
                     )
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun CustomShapeButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    shape: RoundedCornerShape,
-    icon: ImageVector,
-    containerColor: Color,
-    contentColor: Color,
-) {
-    val configuration = LocalConfiguration.current
-    val buttonText = if (configuration.screenWidthDp < 360) "" else text
-
-    Button(
-        onClick = onClick,
-        modifier = modifier
-            .height(60.dp)
-            .clip(shape),
-        shape = shape,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = containerColor,
-            contentColor = contentColor
-        )
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = text,
-                modifier = Modifier.size(24.dp),
-                tint = contentColor
-            )
-            if (buttonText.isNotEmpty()) {
-                Spacer(modifier = Modifier.width(5.dp))
-                Text(
-                    buttonText,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = contentColor,
-                    fontWeight = FontWeight.SemiBold,
-                )
             }
         }
     }

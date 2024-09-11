@@ -50,6 +50,8 @@ fun WellnessWiseApp(
                 is Screen.HealthDataScreen -> HealthDataScreen(healthDataViewModel, loginViewModel)
                 is Screen.UserProfileScreen -> UserProfileScreen(authViewModel)
                 is Screen.DataVisualizationScreen -> DataVisualizationScreen(dataVisualizationViewModel)
+                is Screen.PredictionsScreen -> PredictionsScreen()
+                is Screen.PersonalizedRecommendationsScreen -> PersonalizedRecommendationsScreen()
             }
         }
     }
