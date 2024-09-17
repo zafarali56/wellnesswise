@@ -29,9 +29,15 @@ class HealthDataViewModel : ViewModel() {
     private val _cholesterol = MutableStateFlow<String>("")
     val cholesterol: StateFlow<String> = _cholesterol
 
+
+    private val _triglycerides = MutableStateFlow<String>("")
+    val triglycerides: StateFlow<String> = _triglycerides
+
+    private val _waistCircumference = MutableStateFlow<String>("")
+    val waistCircumference: StateFlow<String> = _waistCircumference
+
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-
 
     init {
         loadUserHealthData()
@@ -44,18 +50,19 @@ class HealthDataViewModel : ViewModel() {
                     val document = firestore.collection("users").document(user.uid).get().await()
                     if (document.exists()) {
                         val data = document.data ?: emptyMap()
-                        _healthData.value = data.filter { it.key != "cholesterol" }
+                        _healthData.value = data.filter { it.key !in listOf("cholesterol", "triglycerides", "waistCircumference") }
                         _cholesterol.value = data["cholesterol"] as? String ?: ""
+                        _triglycerides.value = data["triglycerides"] as? String ?: ""
+                        _waistCircumference.value = data["waistCircumference"] as? String ?: ""
+
                     } else {
-                        _healthData.value = emptyMap()
-                        _cholesterol.value = ""
+                        resetHealthData()
                     }
                 } catch (e: Exception) {
                     Log.e("HealthDataViewModel", "Error loading user health data", e)
                 }
             } else {
-                _healthData.value = emptyMap()
-                _cholesterol.value = ""
+                resetHealthData()
             }
         }
     }
@@ -115,6 +122,16 @@ class HealthDataViewModel : ViewModel() {
     fun updateCholesterol(cholesterol: String) {
         _cholesterol.value = cholesterol
     }
+    // New update methods for ML model fields
+    fun updateTriglycerides(triglycerides: String) {
+        _triglycerides.value = triglycerides
+    }
+
+    fun updateWaistCircumference(waistCircumference: String) {
+        _waistCircumference.value = waistCircumference
+    }
+
+
 
     suspend fun syncWithGoogleFit(
         context: Context,
@@ -154,6 +171,8 @@ class HealthDataViewModel : ViewModel() {
                 setSyncMessage("Updating health data...")
                 val combinedData = _healthData.value.toMutableMap()
                 combinedData["cholesterol"] = _cholesterol.value
+                combinedData["triglycerides"] = _triglycerides.value
+                combinedData["waistCircumference"] = _waistCircumference.value
                 updateFirestore(combinedData)
                 setSyncMessage("Health data updated successfully")
             } catch (e: Exception) {
@@ -185,5 +204,9 @@ class HealthDataViewModel : ViewModel() {
         _syncMessage.value = null
         _isSyncing.value = false
         _cholesterol.value = ""
+        _triglycerides.value = ""
+        _waistCircumference.value = ""
+
+
     }
 }

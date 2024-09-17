@@ -89,7 +89,6 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.project.wellnesswise.R
 import com.project.wellnesswise.data.Gender
-import com.project.wellnesswise.data.Habit
 import com.project.wellnesswise.data.MedicalHistoryQuestion
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.data.UIEvent
@@ -495,76 +494,9 @@ fun GenderSelection(
     }
 }
 
-@Composable
-fun HabitSelection(
-    registrationViewModel: RegistrationViewModel,
-    onHabitsSelected: (List<Habit>) -> Unit,
-) {
-    val habits = Habit.entries
-    var selectedHabits by remember { mutableStateOf(registrationViewModel.registrationUIState.value.habits) }
-
-    Column(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        habits.forEach { habit ->
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Checkbox(
-                    checked = selectedHabits.contains(habit),
-                    onCheckedChange = { isChecked ->
-                        selectedHabits =
-                            if (isChecked) {
-                                selectedHabits + habit
-                            } else {
-                                selectedHabits - habit
-                            }
-                        onHabitsSelected(selectedHabits)
-                        registrationViewModel.onEvent(UIEvent.HabitsChanged(selectedHabits))
-                    },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = colorScheme.primary,
-                        uncheckedColor = colorScheme.onSurfaceVariant,
-                        checkmarkColor = colorScheme.onPrimary
-                    )
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text =
-                    habit.name
-                        .replace("_", " ")
-                        .lowercase()
-                        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() },
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(end = 8.dp),
-                )
-            }
-        }
-    }
-}
-
-
-fun formatHabitName(name: String): String {
-    return name.replace("_", " ")
-        .split(" ")
-        .joinToString(" ") { it.lowercase()
-            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() } }
-}
-
-
-
-
 
 @Composable
-fun HabbitAndMedHistoryButton(
+fun HealthAssessmentButton(
     text: String,
     onClick: () -> Unit,
 ) {
@@ -598,54 +530,7 @@ fun HabbitAndMedHistoryButton(
     }
 }
 
-@Composable
-fun MedicalHistorySection(
-    registrationViewModel: RegistrationViewModel,
-    questions: List<MedicalHistoryQuestion>,
-) {
-    val medicalHistory =
-        registrationViewModel.registrationUIState.value.medicalHistory
-            .toMutableMap()
 
-    Column(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        questions.forEach { question ->
-            Column(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-            ) {
-                Text(text = question.question, style = MaterialTheme.typography.bodyMedium)
-                question.suggestedAnswers.forEach { answer ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        RadioButton(
-                            selected = medicalHistory[question.question] == answer,
-                            onClick = {
-                                medicalHistory[question.question] = answer
-                                registrationViewModel.onEvent(UIEvent.MedicalHistoryChanged(question.question, answer))
-                            },
-                            colors = RadioButtonDefaults.colors(
-                                selectedColor = colorScheme.primary,
-                                unselectedColor = colorScheme.onSurfaceVariant,
-
-                            ),
-                        )
-                        Text(text = answer, style = MaterialTheme.typography.bodyMedium)
-                    }
-                }
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -974,3 +859,7 @@ fun BPTextField(
         }
     }
 }
+
+
+
+

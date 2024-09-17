@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.project.wellnesswise.data.rules.Validator
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
+import com.project.wellnesswise.screens.HealthAssessmentMode
 
 class RegistrationViewModel : ViewModel() {
     var registrationUIState = mutableStateOf(RegistrationUIState())
@@ -27,9 +28,15 @@ class RegistrationViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 
+    var currentMode = mutableStateOf(HealthAssessmentMode.SIGNUP)
 
+    private val _healthAssessmentValidated = mutableStateOf(false)
+    val healthAssessmentValidated: State<Boolean> = _healthAssessmentValidated
 
-
+    fun setMode(mode: HealthAssessmentMode) {
+        currentMode.value = mode
+        _healthAssessmentValidated.value = false
+    }
 
     fun onEvent(event: UIEvent) {
         when (event) {
@@ -58,16 +65,7 @@ class RegistrationViewModel : ViewModel() {
                 registrationUIState.value = registrationUIState.value.copy(weight = event.weight)
                 validateField("weight")
             }
-            is UIEvent.HabitsChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(habits = event.habits)
-                validateField("habits")
-            }
-            is UIEvent.MedicalHistoryChanged -> {
-                val updatedMedicalHistory = registrationUIState.value.medicalHistory.toMutableMap()
-                updatedMedicalHistory[event.question] = event.answer
-                registrationUIState.value = registrationUIState.value.copy(medicalHistory = updatedMedicalHistory)
-                validateField("medicalHistory")
-            }
+
             is UIEvent.PasswordChanged -> {
                 registrationUIState.value = registrationUIState.value.copy(password = event.password)
                 validateField("password")
@@ -76,6 +74,75 @@ class RegistrationViewModel : ViewModel() {
                 registrationUIState.value = registrationUIState.value.copy(isPolicyAccepted = event.isPolicyAccepted)
                 validateField("policyAccepted")
             }
+
+            is UIEvent.FamilyDiabetesChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(familyDiabetes = event.value)
+                validateField("familyDiabetes")
+            }
+            is UIEvent.FamilyHeartChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(familyHeart = event.value)
+                validateField("familyHeart")
+            }
+            is UIEvent.FamilyCancerChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(familyCancer = event.value)
+                validateField("familyCancer")
+            }
+            is UIEvent.PreviousSurgeriesChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(previousSurgeries = event.value)
+                validateField("previousSurgeries")
+            }
+            is UIEvent.ChronicConditionsChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(chronicConditions = event.value)
+                validateField("chronicConditions")
+            }
+            is UIEvent.SmokingChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(smoking = event.value)
+                validateField("smoking")
+            }
+            is UIEvent.AlcoholConsumptionChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(alcoholConsumption = event.value)
+                validateField("alcoholConsumption")
+            }
+            is UIEvent.PhysicalActivityChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(physicalActivity = event.value)
+                validateField("physicalActivity")
+            }
+            is UIEvent.DietQualityChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(dietQuality = event.value)
+                validateField("dietQuality")
+            }
+            is UIEvent.SleepHoursChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(sleepHours = event.value)
+                validateField("sleepHours")
+            }
+            is UIEvent.AirQualityIndexChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(airQualityIndex = event.value)
+                validateField("airQualityIndex")
+            }
+            is UIEvent.ExposureToPollutantsChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(exposureToPollutants = event.value)
+                validateField("exposureToPollutants")
+            }
+            is UIEvent.StressLevelChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(stressLevel = event.value)
+                validateField("stressLevel")
+            }
+            is UIEvent.AccessToHealthcareChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(accessToHealthcare = event.value)
+                validateField("accessToHealthcare")
+            }
+            is UIEvent.SaveHealthAssessmentClicked -> {
+                val isValid = validateHealthAssessment()
+                if (isValid) {
+                    _healthAssessmentValidated.value = true
+                } else {
+                    // Handle validation failure (e.g., show an error message)
+                    Log.d(TAG, "Health assessment validation failed")
+                }
+            }
+
+
+
             is UIEvent.RegisterButtonClicked -> {
                 updateValidationResults()
                 if (Validator.isValidRegistrationUIState(registrationUIState.value)) {
@@ -87,14 +154,26 @@ class RegistrationViewModel : ViewModel() {
                         gender = registrationUIState.value.gender,
                         height = registrationUIState.value.height,
                         weight = registrationUIState.value.weight,
-                        habits = registrationUIState.value.habits,
-                        medicalHistory = registrationUIState.value.medicalHistory,
+
                     )
                 } else {
                     Log.d(TAG, "Validation failed")
                 }
             }
         }
+    }
+
+    fun resetHealthAssessmentValidation() {
+        _healthAssessmentValidated.value = false
+    }
+    private fun validateHealthAssessment(): Boolean {
+        val validationResults = Validator.validateRegistrationUIState(registrationUIState.value)
+        return validationResults.filterKeys {
+            it in listOf("familyDiabetes", "familyHeart", "familyCancer", "previousSurgeries",
+                "chronicConditions", "smoking", "alcoholConsumption", "physicalActivity",
+                "dietQuality", "sleepHours", "airQualityIndex", "exposureToPollutants",
+                "stressLevel", "accessToHealthcare")
+        }.all { it.value }
     }
 
     private fun validateField(fieldName: String) {
@@ -107,10 +186,22 @@ class RegistrationViewModel : ViewModel() {
                 "gender" -> Validator.validateGender(registrationUIState.value.gender)
                 "height" -> Validator.validateHeight(registrationUIState.value.height)
                 "weight" -> Validator.validateWeight(registrationUIState.value.weight)
-                "habits" -> Validator.validateHabits(registrationUIState.value.habits)
-                "medicalHistory" -> Validator.validateMedicalHistory(registrationUIState.value.medicalHistory)
                 "password" -> Validator.validatePassword(registrationUIState.value.password)
                 "policyAccepted" -> Validator.validatePolicyAccepted(registrationUIState.value.isPolicyAccepted)
+                "familyDiabetes" -> Validator.validateYesNoAnswer(registrationUIState.value.familyDiabetes)
+                "familyHeart" -> Validator.validateYesNoAnswer(registrationUIState.value.familyHeart)
+                "familyCancer" -> Validator.validateYesNoAnswer(registrationUIState.value.familyCancer)
+                "previousSurgeries" -> Validator.validateYesNoAnswer(registrationUIState.value.previousSurgeries)
+                "chronicConditions" -> Validator.validateYesNoAnswer(registrationUIState.value.chronicConditions)
+                "smoking" -> Validator.validateSmoking(registrationUIState.value.smoking)
+                "alcoholConsumption" -> Validator.validateNumericScale(registrationUIState.value.alcoholConsumption, 1, 5)
+                "physicalActivity" -> Validator.validateNumericScale(registrationUIState.value.physicalActivity, 1, 5)
+                "dietQuality" -> Validator.validateNumericScale(registrationUIState.value.dietQuality, 1, 5)
+                "sleepHours" -> Validator.validateNumericScale(registrationUIState.value.sleepHours, 0, 24)
+                "airQualityIndex" -> Validator.validateNumericScale(registrationUIState.value.airQualityIndex, 0, 500)
+                "exposureToPollutants" -> Validator.validateNumericScale(registrationUIState.value.exposureToPollutants, 1, 5)
+                "stressLevel" -> Validator.validateNumericScale(registrationUIState.value.stressLevel, 1, 5)
+                "accessToHealthcare" -> Validator.validateNumericScale(registrationUIState.value.accessToHealthcare, 1, 5)
                 else -> true
             }
         validationResults.value = currentValidationResults
@@ -128,8 +219,6 @@ class RegistrationViewModel : ViewModel() {
         gender: Gender,
         height: Number,
         weight: Number,
-        habits: List<Habit>,
-        medicalHistory: Map<String, String>,
     ) {
         signUpInProgress.value = true
         auth
@@ -182,32 +271,87 @@ class RegistrationViewModel : ViewModel() {
     fun checkEmailVerification() {
         val user = auth.currentUser
         user?.reload()?.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                if (user.isEmailVerified) {
-                    val userData =
-                        mapOf(
-                            "fullName" to registrationUIState.value.fullName,
-                            "age" to registrationUIState.value.age,
-                            "gender" to registrationUIState.value.gender.name,
-                            "height" to registrationUIState.value.height,
-                            "weight" to registrationUIState.value.weight,
-                            "habits" to registrationUIState.value.habits.map { it.name },
-                            "medicalHistory" to registrationUIState.value.medicalHistory,
-                        )
-                    firestore
-                        .collection("users")
-                        .document(user.uid)
-                        .set(userData)
-                        .addOnSuccessListener {
-                            Log.d(TAG, "User data stored successfully")
-                            WellnessWiseAppRouter.navigateTo(Screen.HealthDataScreen)
-                        }.addOnFailureListener { e ->
-                            Log.w(TAG, "Error storing user data", e)
-                        }
-                }
+            if (task.isSuccessful && user.isEmailVerified) {
+                firestore
+                    .collection("users")
+                    .document(user.uid)
+                    .set(getUserData())
+                    .addOnSuccessListener {
+                        Log.d(TAG, "User data stored successfully")
+                        WellnessWiseAppRouter.navigateTo(Screen.HealthDataScreen)
+                    }.addOnFailureListener { e ->
+                        Log.w(TAG, "Error storing user data", e)
+                    }
             } else {
-                Log.w(TAG, "Error reloading user", task.exception)
+                Log.w(TAG, "Error reloading user or email not verified", task.exception)
             }
+        }
+    }
+
+    fun getUserData(): Map<String, Any> {
+        return mapOf(
+            "fullName" to registrationUIState.value.fullName,
+            "age" to registrationUIState.value.age,
+            "gender" to registrationUIState.value.gender.name,
+            "height" to registrationUIState.value.height,
+            "weight" to registrationUIState.value.weight,
+            "familyDiabetes" to registrationUIState.value.familyDiabetes,
+            "familyHeart" to registrationUIState.value.familyHeart,
+            "familyCancer" to registrationUIState.value.familyCancer,
+            "previousSurgeries" to registrationUIState.value.previousSurgeries,
+            "chronicConditions" to registrationUIState.value.chronicConditions,
+            "smoking" to registrationUIState.value.smoking,
+            "alcoholConsumption" to registrationUIState.value.alcoholConsumption,
+            "physicalActivity" to registrationUIState.value.physicalActivity,
+            "dietQuality" to registrationUIState.value.dietQuality,
+            "sleepHours" to registrationUIState.value.sleepHours,
+            "airQualityIndex" to registrationUIState.value.airQualityIndex,
+            "exposureToPollutants" to registrationUIState.value.exposureToPollutants,
+            "stressLevel" to registrationUIState.value.stressLevel,
+            "accessToHealthcare" to registrationUIState.value.accessToHealthcare,
+            "bloodPressure" to registrationUIState.value.bloodPressure,
+            "heartRate" to registrationUIState.value.heartRate,
+            "bloodSugar" to registrationUIState.value.bloodSugar,
+            "cholesterol" to registrationUIState.value.cholesterol
+        )
+    }
+
+    fun getHealthAssessmentData(): Map<String, Any> {
+        return mapOf(
+            "familyDiabetes" to registrationUIState.value.familyDiabetes,
+            "familyHeart" to registrationUIState.value.familyHeart,
+            "familyCancer" to registrationUIState.value.familyCancer,
+            "previousSurgeries" to registrationUIState.value.previousSurgeries,
+            "chronicConditions" to registrationUIState.value.chronicConditions,
+            "smoking" to registrationUIState.value.smoking,
+            "alcoholConsumption" to registrationUIState.value.alcoholConsumption,
+            "physicalActivity" to registrationUIState.value.physicalActivity,
+            "dietQuality" to registrationUIState.value.dietQuality,
+            "sleepHours" to registrationUIState.value.sleepHours,
+            "airQualityIndex" to registrationUIState.value.airQualityIndex,
+            "exposureToPollutants" to registrationUIState.value.exposureToPollutants,
+            "stressLevel" to registrationUIState.value.stressLevel,
+            "accessToHealthcare" to registrationUIState.value.accessToHealthcare
+        )
+    }
+    fun loadExistingHealthAssessmentData(userData: Map<String, Any>?) {
+        userData?.let { data ->
+            registrationUIState.value = registrationUIState.value.copy(
+                familyDiabetes = data["familyDiabetes"] as? String ?: registrationUIState.value.familyDiabetes,
+                familyHeart = data["familyHeart"] as? String ?: registrationUIState.value.familyHeart,
+                familyCancer = data["familyCancer"] as? String ?: registrationUIState.value.familyCancer,
+                previousSurgeries = data["previousSurgeries"] as? String ?: registrationUIState.value.previousSurgeries,
+                chronicConditions = data["chronicConditions"] as? String ?: registrationUIState.value.chronicConditions,
+                smoking = data["smoking"] as? Boolean ?: registrationUIState.value.smoking,
+                alcoholConsumption = (data["alcoholConsumption"] as? Number)?.toInt() ?: registrationUIState.value.alcoholConsumption,
+                physicalActivity = (data["physicalActivity"] as? Number)?.toInt() ?: registrationUIState.value.physicalActivity,
+                dietQuality = (data["dietQuality"] as? Number)?.toInt() ?: registrationUIState.value.dietQuality,
+                sleepHours = (data["sleepHours"] as? Number)?.toInt() ?: registrationUIState.value.sleepHours,
+                airQualityIndex = (data["airQualityIndex"] as? Number)?.toInt() ?: registrationUIState.value.airQualityIndex,
+                exposureToPollutants = (data["exposureToPollutants"] as? Number)?.toInt() ?: registrationUIState.value.exposureToPollutants,
+                stressLevel = (data["stressLevel"] as? Number)?.toInt() ?: registrationUIState.value.stressLevel,
+                accessToHealthcare = (data["accessToHealthcare"] as? Number)?.toInt() ?: registrationUIState.value.accessToHealthcare
+            )
         }
     }
 

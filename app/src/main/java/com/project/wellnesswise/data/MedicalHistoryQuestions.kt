@@ -2,56 +2,54 @@ package com.project.wellnesswise.data
 
 data class MedicalHistoryQuestion(
     val question: String,
-    val suggestedAnswers: List<String>
+    val suggestedAnswers: List<String>,
+    val mlModelField: String
 )
 
 val medicalHistoryQuestions = listOf(
     MedicalHistoryQuestion(
-        question = "Do you have any allergies?",
-        suggestedAnswers = listOf("Yes", "No", "Don't know" )
+        question = "Do you smoke?",
+        suggestedAnswers = listOf("No", "Yes"),
+        mlModelField = "smoking"
     ),
     MedicalHistoryQuestion(
-        question = "Have you had any surgeries?",
-        suggestedAnswers = listOf("Yes", "No")
+        question = "How many alcoholic drinks do you consume per week on average?",
+        suggestedAnswers = listOf("0", "1-3", "4-7", "8-14", "15+"),
+        mlModelField = "alcohol"
     ),
     MedicalHistoryQuestion(
-        question = "Do you have any chronic diseases?",
-        suggestedAnswers = listOf("Yes", "No")
+        question = "How would you rate your physical activity level?",
+        suggestedAnswers = listOf("1 (Very Low)", "2 (Low)", "3 (Moderate)", "4 (High)", "5 (Very High)"),
+        mlModelField = "physical_activity"
     ),
     MedicalHistoryQuestion(
-        question = "Do you have diabetes?",
-        suggestedAnswers = listOf("Yes", "No")
+        question = "Do you have a family history of diabetes (parents or siblings)?",
+        suggestedAnswers = listOf("No", "Yes"),
+        mlModelField = "family_diabetes"
     ),
     MedicalHistoryQuestion(
-        question = "Do you have high blood pressure?",
-        suggestedAnswers = listOf("Yes", "No")
+        question = "Do you have a family history of heart disease (parents or siblings)?",
+        suggestedAnswers = listOf("No", "Yes"),
+        mlModelField = "family_heart"
     ),
     MedicalHistoryQuestion(
-        question = "Do you have asthma?",
-        suggestedAnswers = listOf("Yes", "No")
+        question = "Do you have a family history of cancer (parents or siblings)?",
+        suggestedAnswers = listOf("No", "Yes"),
+        mlModelField = "family_cancer"
     ),
     MedicalHistoryQuestion(
-        question = "Do you have heart disease?",
-        suggestedAnswers = listOf("Yes", "No")
+        question = "How would you rate your overall diet quality?",
+        suggestedAnswers = listOf("1 (Poor)", "2 (Fair)", "3 (Average)", "4 (Good)", "5 (Excellent)"),
+        mlModelField = "diet_quality"
     ),
     MedicalHistoryQuestion(
-        question = "Do you have arthritis?",
-        suggestedAnswers = listOf("Yes", "No")
+        question = "On average, how many hours of sleep do you get per night?",
+        suggestedAnswers = listOf("<6", "6-7", "7-8", "8-9", ">9"),
+        mlModelField = "sleep_hours"
     ),
     MedicalHistoryQuestion(
-        question = "Do you have kidney disease?",
-        suggestedAnswers = listOf("Yes", "No")
-    ),
-    MedicalHistoryQuestion(
-        question = "Do you have a thyroid condition?",
-        suggestedAnswers = listOf("Yes", "No")
-    ),
-    MedicalHistoryQuestion(
-        question = "Do you have chronic pain?",
-        suggestedAnswers = listOf("Yes", "No")
-    ),
-    MedicalHistoryQuestion(
-        question = "Do you have any mental health conditions?",
-        suggestedAnswers = listOf("Yes", "No")
+        question = "How would you rate your overall stress level in the past month?",
+        suggestedAnswers = listOf("1 (Very Low)", "2 (Low)", "3 (Moderate)", "4 (High)", "5 (Very High)"),
+        mlModelField = "stress_level"
     )
 )

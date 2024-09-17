@@ -43,15 +43,43 @@ fun WellnessWiseApp(
                 is Screen.SignUpScreen -> SignUpScreen(registrationViewModel)
                 is Screen.TermsAndConditionsScreen -> TermsAndConditionsScreen()
                 is Screen.LoginScreen -> LoginScreen(loginViewModel)
-                is Screen.HabitsScreen -> HabitsScreen(registrationViewModel)
-                is Screen.MedicalHistoryScreen -> MedicalHistoryScreen(registrationViewModel)
                 is Screen.HomeScreen -> HomeScreen(homeViewModel, authViewModel)
                 is Screen.EmailVerificationScreen -> EmailVerificationScreen(registrationViewModel)
                 is Screen.HealthDataScreen -> HealthDataScreen(healthDataViewModel, loginViewModel)
-                is Screen.UserProfileScreen -> UserProfileScreen(authViewModel)
-                is Screen.DataVisualizationScreen -> DataVisualizationScreen(dataVisualizationViewModel)
+                is Screen.UserProfileScreen -> UserProfileScreen(
+                    authViewModel,
+                    registrationViewModel
+                )
+
+                is Screen.DataVisualizationScreen -> DataVisualizationScreen(
+                    dataVisualizationViewModel
+                )
+
                 is Screen.PredictionsScreen -> PredictionsScreen()
                 is Screen.PersonalizedRecommendationsScreen -> PersonalizedRecommendationsScreen()
+                is Screen.HealthAssessmentScreen -> {
+                    val mode = registrationViewModel.currentMode.value
+                    HealthAssessmentScreen(
+                        registrationViewModel = registrationViewModel,
+                        mode = mode,
+                        onSave = {
+                            when (mode) {
+                                HealthAssessmentMode.SIGNUP -> {
+                                    WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
+                                }
+                                HealthAssessmentMode.EDIT -> {
+                                    WellnessWiseAppRouter.navigateTo(Screen.UserProfileScreen)
+                                }
+                            }
+                        },
+                        onBack = {
+                            when (mode) {
+                                HealthAssessmentMode.SIGNUP -> WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
+                                HealthAssessmentMode.EDIT -> WellnessWiseAppRouter.navigateTo(Screen.UserProfileScreen)
+                            }
+                        }
+                    )
+                }
             }
         }
     }

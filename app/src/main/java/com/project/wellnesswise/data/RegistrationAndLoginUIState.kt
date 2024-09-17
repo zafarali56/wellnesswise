@@ -9,10 +9,23 @@ data class RegistrationUIState(
     var gender: Gender = Gender.MALE,
     var height: Number = 0,
     var weight: Number = 0,
-    var habits: List<Habit> = emptyList(),
-    var medicalHistory: Map<String, String> = emptyMap(),
     var password: String = "",
     var isPolicyAccepted: Boolean = false,
+
+    var familyDiabetes: String = "",
+    var familyHeart: String = "",
+    var familyCancer: String = "",
+    var previousSurgeries: String = "",
+    var chronicConditions: String = "",
+    var smoking: Boolean = false,
+    var alcoholConsumption: Int = 0,
+    var physicalActivity: Int = 0,
+    var dietQuality: Int = 0,
+    var sleepHours: Int = 0,
+    var airQualityIndex: Int = 0,
+    var exposureToPollutants: Int = 0,
+    var stressLevel: Int = 0,
+    var accessToHealthcare: Int = 0,
 
     // Health parameters
     var bloodPressure: String = "",
@@ -40,23 +53,3 @@ enum class Gender {
     FEMALE,
 
 }
-
-enum class Habit {
-    Smoking,
-    Drinking,
-    Exercise,
-    Healthy_Eating,
-    Sleep_Patterns,
-    Stress_Management,
-    Meditation,
-    Alcohol_Consumption,
-    Drug_Use,
-    Screen_Time,
-    Social_Interaction,
-    Physical_Activity,
-    Mental_Health_Practices,
-    Hygiene_Practices,
-
-}
-
-

@@ -104,22 +104,23 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                                     }
                                 ),
                                 contentDescription = "Logo",
-                                modifier = Modifier.size(width = 400.dp, height = 300.dp)
+                                modifier = Modifier.size(width = 400.dp, height = 400.dp)
                             )
                         }
+
+                        HorizontalDivider(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = colorResource(id = R.color.gray_100)
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
                         Text(text = "Login to your account",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
-                            )
-                        Spacer(modifier = Modifier.height(30.dp))
-                        HorizontalDivider(
-                            modifier = Modifier.fillMaxWidth(),
-                            color = colorResource(id = R.color.gray_100)
                         )
-                        Spacer(modifier = Modifier.height(30.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
                         MyTextField(
                             labelValue = stringResource(id = R.string.Email),
                             initialValue = loginUIState.email,

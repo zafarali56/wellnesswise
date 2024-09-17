@@ -1,5 +1,6 @@
 package com.project.wellnesswise.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,8 +32,8 @@ import com.project.wellnesswise.components.ui.CheckBoxComponent
 import com.project.wellnesswise.components.ui.ClickableLoginTextComponent
 import com.project.wellnesswise.components.ui.DividerTextComponent
 import com.project.wellnesswise.components.ui.GenderSelection
-import com.project.wellnesswise.components.ui.HabbitAndMedHistoryButton
 import com.project.wellnesswise.components.ui.HeadingTextComponent
+import com.project.wellnesswise.components.ui.HealthAssessmentButton
 import com.project.wellnesswise.components.ui.LoadingAnimation
 import com.project.wellnesswise.components.ui.MyNumberField
 import com.project.wellnesswise.components.ui.MyPasswordField
@@ -46,6 +45,7 @@ import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
     val systemUiController = rememberSystemUiController()
@@ -207,18 +207,6 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
 
                     }
                     item {
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Text(
-                            text = "Select at least one habit",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        HabbitAndMedHistoryButton(
-                            text = stringResource(id = R.string.Habits),
-                            onClick = { WellnessWiseAppRouter.navigateTo(Screen.HabitsScreen) }
-                        )
-
 
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
@@ -226,19 +214,20 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        HabbitAndMedHistoryButton(
-                            text = stringResource(id = R.string.MedicalHistory),
-                            onClick = { WellnessWiseAppRouter.navigateTo(Screen.MedicalHistoryScreen) }
+                            Spacer(modifier = Modifier.height(10.dp))
+                        HealthAssessmentButton(
+                            text = "Complete Health Assessment",
+                            onClick = {
+                                registrationViewModel.setMode(HealthAssessmentMode.SIGNUP)
+                                WellnessWiseAppRouter.navigateTo(Screen.HealthAssessmentScreen)
+                            }
                         )
-
-
-                        if (validationResults["habits"] == false) {
-                            Text(text = "Select at least one habit", color = Color.Red)
-                        }
+                        Spacer(modifier = Modifier.height(4.dp))
                         if (validationResults["medicalHistory"] == false) {
-                            Text(text = "Provide medical history", color = Color.Red)
+                            Text(text = "Please provide all the answers", color = Color.Red)
                         }
+
+
                     }
                     item {
                         Spacer(modifier = Modifier.height(10.dp))
@@ -280,7 +269,9 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                             onButtonClicked = {
                                 registrationViewModel.onEvent(UIEvent.RegisterButtonClicked)
                             },
-                            isEnabled = Validator.isValidRegistrationUIState(registrationViewModel.registrationUIState.value)
+                            isEnabled = Validator.isValidRegistrationUIState(
+                                registrationViewModel.registrationUIState.value,
+                            )
                         )
                         Spacer(modifier = Modifier.height(10.dp))
                         if (registrationViewModel.signUpInProgress.value) {

@@ -24,6 +24,8 @@
     <string name="menu">Menu</string>
     <string name="Profile">Profile</string>
     <string name="HealthData">Health Data</string>
+    <string name="HealthAssessment">Health Assessment</string>
+    <string name="SaveAndContinue">Save</string>
 
 
 </resources>

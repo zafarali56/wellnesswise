@@ -1,6 +1,5 @@
 package com.project.wellnesswise.screens
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,15 +8,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,9 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.project.wellnesswise.components.ui.ButtonComponent
@@ -38,9 +30,6 @@ import com.project.wellnesswise.components.ui.CustomBloodPressureInput
 import com.project.wellnesswise.components.ui.HealthDataTextField
 import com.project.wellnesswise.components.ui.MyNumberField
 import com.project.wellnesswise.components.ui.MyTextField
-import com.project.wellnesswise.components.ui.formatHabitName
-import com.project.wellnesswise.data.Habit
-import com.project.wellnesswise.data.medicalHistoryQuestions
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import showToast
 
@@ -50,8 +39,7 @@ fun EditProfileScreen(
     userData: Map<String, Any>?,
     onSave: (Map<String, Any>) -> Unit,
     onBack: () -> Unit,
-    onEditMedicalHistory: () -> Unit,
-    onEditHabits: () -> Unit,
+    onEditHealthAssessment: () -> Unit,
     colorScheme: ColorScheme
 ) {
     var fullName by remember { mutableStateOf(userData?.get("fullName") as? String ?: "") }
@@ -65,12 +53,31 @@ fun EditProfileScreen(
     val context = LocalContext.current
     val dataSourcePreference = userData?.get("dataSourcePreference") as? String ?: "MANUAL"
 
-
     var bloodPressure by remember {
         mutableStateOf(userData?.get("bloodPressure") as? String ?: "")
     }
     var systolic by remember { mutableStateOf(bloodPressure.split("/").firstOrNull() ?: "") }
     var diastolic by remember { mutableStateOf(bloodPressure.split("/").lastOrNull() ?: "") }
+
+    fun getAllUserData(): Map<String, Any> {
+        val updatedData = userData?.toMutableMap() ?: mutableMapOf()
+
+        // Update only the fields that can be edited in this screen
+        updatedData["fullName"] = fullName
+        updatedData["age"] = age.toIntOrNull() ?: updatedData["age"] ?: 0
+        updatedData["weight"] = weight.toDoubleOrNull() ?: updatedData["weight"] ?: 0.0
+        updatedData["height"] = height.toDoubleOrNull() ?: updatedData["height"] ?: 0.0
+        updatedData["cholesterol"] = cholesterol.toDoubleOrNull() ?: updatedData["cholesterol"] ?: 0.0
+
+        // Only update these fields if the data source is MANUAL
+        if (dataSourcePreference == "MANUAL") {
+            updatedData["bloodPressure"] = bloodPressure
+            updatedData["heartRate"] = heartRate.toIntOrNull() ?: updatedData["heartRate"] ?: 0
+            updatedData["bloodSugar"] = bloodSugar.toDoubleOrNull() ?: updatedData["bloodSugar"] ?: 0.0
+        }
+
+        return updatedData
+    }
 
     Scaffold(
         topBar = {
@@ -99,14 +106,11 @@ fun EditProfileScreen(
                 .padding(innerPadding),
             color = colorScheme.background
         ) {
-
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 22.dp)
             ) {
-
-
                 item {
                     MyTextField(
                         labelValue = "Full Name",
@@ -142,7 +146,6 @@ fun EditProfileScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
-
 
                 item {
                     HealthDataTextField(
@@ -191,248 +194,35 @@ fun EditProfileScreen(
                             enabled = true
                         )
                     } else {
+                        // Display read-only fields for Google Fit data
+                        Text("Blood Pressure: ${userData?.get("bloodPressure") ?: "N/A"}")
+                        Text("Heart Rate: ${userData?.get("heartRate") ?: "N/A"}")
+                        Text("Blood Sugar: ${userData?.get("bloodSugar") ?: "N/A"}")
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
                 item {
-                    ButtonComponent(
-                        value = "Edit Medical History",
-                        onButtonClicked = onEditMedicalHistory,
-                        isEnabled = true
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-
-                item {
-                    ButtonComponent(
-                        value = "Edit Habits",
-                        onButtonClicked = onEditHabits,
-                        isEnabled = true
-                    )
                     Spacer(modifier = Modifier.height(16.dp))
+                    ButtonComponent(
+                        value = "Edit Health Assessment",
+                        onButtonClicked = onEditHealthAssessment,
+                        isEnabled = true
+                    )
                 }
 
                 item {
+                    Spacer(modifier = Modifier.height(16.dp))
                     ButtonComponent(
                         value = "Save Changes",
                         onButtonClicked = {
-                            val updatedData = mutableMapOf<String, Any>(
-                                "fullName" to fullName,
-                                "age" to (age.toIntOrNull() ?: 0),
-                                "weight" to (weight.toDoubleOrNull() ?: 0.0),
-                                "height" to (height.toDoubleOrNull() ?: 0.0),
-                                "cholesterol" to (cholesterol.toDoubleOrNull() ?: 0.0)
-                            )
-                            if (dataSourcePreference == "MANUAL") {
-                                updatedData["bloodPressure"] = bloodPressure
-                                updatedData["heartRate"] = (heartRate.toIntOrNull() ?: 0)
-                                updatedData["bloodSugar"] = (bloodSugar.toDoubleOrNull() ?: 0.0)
-                            }
+                            val updatedData = getAllUserData()
                             onSave(updatedData)
                             showToast(context, "Profile updated successfully")
                         },
                         isEnabled = true
                     )
                 }
-            }
-        }
-    }
-    SystemBackButtonHandler {
-        onBack()
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EditMedicalHistoryScreen(
-    medicalHistory: Map<String, String>,
-    onSave: (Map<String, String>) -> Unit,
-    onBack: () -> Unit,
-    colorScheme: ColorScheme
-) {
-    var updatedMedicalHistory by remember { mutableStateOf(medicalHistory) }
-    val context = LocalContext.current
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "Edit Medical History", color = colorScheme.onSurface) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = colorScheme.onSurface
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-
-                    titleContentColor = colorScheme.onSurface,
-                    navigationIconContentColor = colorScheme.onSurface
-                )
-            )
-        },
-        containerColor = colorScheme.background
-    ) { innerPadding ->
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            color = colorScheme.background
-        ) {
-
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 22.dp)
-            ) {
-
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    medicalHistoryQuestions.forEach { question ->
-
-                        Text(text = question.question, style = MaterialTheme.typography.bodyLarge)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        question.suggestedAnswers.forEach { answer ->
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                RadioButton(
-                                    selected = updatedMedicalHistory[question.question] == answer,
-                                    onClick = {
-                                        updatedMedicalHistory =
-                                            updatedMedicalHistory.toMutableMap().apply {
-                                                put(question.question, answer)
-                                            }
-                                    },
-                                    colors =
-                                    RadioButtonDefaults.colors(
-                                        selectedColor = MaterialTheme.colorScheme.primary,
-                                        unselectedColor = Color.Gray,
-                                    ),
-                                )
-                                Text(text = answer)
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ButtonComponent(
-                        value = "Save Medical History",
-                        onButtonClicked = {
-                            onSave(updatedMedicalHistory)
-                            showToast(context, "Medical history updated successfully")
-                        },
-                        isEnabled = true
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
-
-            }
-        }
-    }
-    SystemBackButtonHandler {
-        onBack()
-    }
-}
-
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EditHabitsScreen(
-    habits: List<Habit>,
-    onSave: (List<Habit>) -> Unit,
-    onBack: () -> Unit,
-    colorScheme: ColorScheme
-) {
-    var selectedHabits by remember { mutableStateOf(habits.toSet()) }
-    val context = LocalContext.current
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "Edit Habits", color = colorScheme.onSurface) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = colorScheme.onSurface
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    titleContentColor = colorScheme.onSurface,
-                    navigationIconContentColor = colorScheme.onSurface
-                )
-            )
-        },
-        containerColor = colorScheme.background
-    ) { innerPadding ->
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            color = colorScheme.background
-        ) {
-
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 22.dp)
-
-            ) {
-
-
-                item {
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-
-                    Habit.entries.forEach { habit ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Checkbox(
-                                checked = selectedHabits.contains(habit),
-                                onCheckedChange = { isChecked ->
-                                    selectedHabits = if (isChecked) {
-                                        selectedHabits + habit
-                                    } else {
-                                        selectedHabits - habit
-                                    }
-                                },
-                                colors =
-                                CheckboxDefaults.colors(
-                                    checkedColor = colorScheme.primary ,
-                                    uncheckedColor = Color.Gray,
-                                ),
-                            )
-                            Text(text = formatHabitName(habit.name))
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ButtonComponent(
-                        value = "Save Habits",
-                        onButtonClicked = {
-                            onSave(selectedHabits.toList())
-                            showToast(context, "Habits updated successfully")
-                        },
-                        isEnabled = true
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
             }
         }
     }

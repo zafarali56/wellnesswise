@@ -1,18 +1,25 @@
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.runtime.*
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,16 +27,14 @@ import com.google.firebase.auth.FirebaseUser
 import com.project.wellnesswise.components.ui.ButtonComponent
 import com.project.wellnesswise.components.ui.LoadingAnimation
 import com.project.wellnesswise.components.ui.UserImg
-import com.project.wellnesswise.components.ui.formatHabitName
 
 @Composable
 fun MainProfileView(
     user: FirebaseUser?,
     userData: Map<String, Any>?,
     isLoading: Boolean,
-    onMedicalHistoryClick: () -> Unit,
-    onHabitsClick: () -> Unit,
-    onEditClick: () -> Unit
+    onEditClick: () -> Unit,
+    onDeleteAccountClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -130,161 +135,22 @@ fun MainProfileView(
         }
 
         Spacer(Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(9.dp)
 
-        ) {
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = onHabitsClick,
-                colors = ButtonDefaults.buttonColors( colorScheme.primary),
-            ) {
-                Text("Habits",  fontWeight = FontWeight.SemiBold,)
-            }
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = onMedicalHistoryClick,
-                colors = ButtonDefaults.buttonColors( colorScheme.primary),
-            ) {
-                Text("Medical History",  fontWeight = FontWeight.SemiBold)
-            }
-        }
-        Spacer(Modifier.height(16.dp))
        ButtonComponent(value = "Edit Profile", onButtonClicked = onEditClick, isEnabled = true)
 
-    }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MedicalHistoryView(userData: Map<String, Any>?, onBack: () -> Unit) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "Medical history", color = colorScheme.onSurface) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = colorScheme.onSurface
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    titleContentColor = colorScheme.onSurface,
-                    navigationIconContentColor = colorScheme.onSurface
-                )
-            )
-        },
-        containerColor = colorScheme.background
-    ) { innerPadding ->
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            color = colorScheme.background
+        Spacer(Modifier.height(16.dp))
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = onDeleteAccountClick,
+            colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error),
         ) {
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .clip(RoundedCornerShape(16.dp)),
-                    colors = CardDefaults.cardColors(
-                        containerColor = colorScheme.secondaryContainer,
-                        contentColor = colorScheme.onSecondaryContainer
-                    )
-                ) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .padding(16.dp)
-                    ) {
-                        val medicalHistory = userData?.get("medicalHistory") as? Map<String, String>
-                        medicalHistory?.forEach { (question, answer) ->
-                            item {
-
-                                Text(
-                                    text = question,
-                                    fontSize = 20.sp,
-                                )
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Text(
-                                    text = "Ans: $answer",
-                                    fontSize = 20.sp,
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                            }
-                        }
-                    }
-                }
-            }
+            Text("Delete Account")
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HabitsView(userData: Map<String, Any>?, onBack: () -> Unit) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(text = "Habits", color = colorScheme.onSurface) },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
-                                tint = colorScheme.onSurface
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        titleContentColor = colorScheme.onSurface,
-                        navigationIconContentColor = colorScheme.onSurface
-                    )
-                )
-            },
-            containerColor = colorScheme.background
-        ) { innerPadding ->
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                color = colorScheme.background
-            ) {
-Column (modifier = Modifier.padding(horizontal = 26.dp)) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .clip(RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(
-            containerColor = colorScheme.secondaryContainer,
-            contentColor = colorScheme.onSecondaryContainer
-        )
-    ) {
-        LazyColumn(
-            modifier = Modifier
-                .padding(22.dp)
-        ) {
-            val habits = userData?.get("habits") as? List<String>
-            habits?.let {
-                items(it) { habit ->
-                    Text(
-                        text = formatHabitName(habit),
-                        fontSize = 20.sp,
-                        modifier = Modifier.padding(5.dp),
-                    )
-                }
-            }
-        }
-    }
-}
-            }
-        }
-    }
+
 
 fun showToast(context: Context, message: String) {
     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()

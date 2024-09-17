@@ -1,7 +1,6 @@
 package com.project.wellnesswise.data.rules
 
 import com.project.wellnesswise.data.Gender
-import com.project.wellnesswise.data.Habit
 import com.project.wellnesswise.data.RegistrationUIState
 import com.project.wellnesswise.data.LoginUIState
 
@@ -38,15 +37,6 @@ object Validator {
         return weight is Int && weight in 30..500
     }
 
-    // Habits validation
-    fun validateHabits(habits: List<Habit>): Boolean {
-        return habits.isNotEmpty()
-    }
-
-    // Medical history validation
-    fun validateMedicalHistory(medicalHistory: Map<String, String>): Boolean {
-        return medicalHistory.isNotEmpty()
-    }
 
     // Password validation
     fun validatePassword(password: String): Boolean {
@@ -58,6 +48,12 @@ object Validator {
         return isPolicyAccepted
     }
 
+
+    // New validation methods for health assessment fields
+    fun validateYesNoAnswer(answer: String): Boolean {
+        return answer == "Yes" || answer == "No"
+    }
+
     // Validate registration UI state
     fun validateRegistrationUIState(uiState: RegistrationUIState): Map<String, Boolean> {
         return mapOf(
@@ -67,11 +63,22 @@ object Validator {
             "gender" to validateGender(uiState.gender),
             "height" to validateHeight(uiState.height),
             "weight" to validateWeight(uiState.weight),
-            "habits" to validateHabits(uiState.habits),
-            "medicalHistory" to validateMedicalHistory(uiState.medicalHistory),
             "password" to validatePassword(uiState.password),
-            "policyAccepted" to validatePolicyAccepted(uiState.isPolicyAccepted)
-
+            "policyAccepted" to validatePolicyAccepted(uiState.isPolicyAccepted),
+            "familyDiabetes" to validateYesNoAnswer(uiState.familyDiabetes),
+            "familyHeart" to validateYesNoAnswer(uiState.familyHeart),
+            "familyCancer" to validateYesNoAnswer(uiState.familyCancer),
+            "previousSurgeries" to validateYesNoAnswer(uiState.previousSurgeries),
+            "chronicConditions" to validateYesNoAnswer(uiState.chronicConditions),
+            "smoking" to validateSmoking(uiState.smoking),
+            "alcoholConsumption" to validateNumericScale(uiState.alcoholConsumption, 1, 5),
+            "physicalActivity" to validateNumericScale(uiState.physicalActivity, 1, 5),
+            "dietQuality" to validateNumericScale(uiState.dietQuality, 1, 5),
+            "sleepHours" to validateNumericScale(uiState.sleepHours, 0, 24),
+            "airQualityIndex" to validateNumericScale(uiState.airQualityIndex, 0, 500),
+            "exposureToPollutants" to validateNumericScale(uiState.exposureToPollutants, 1, 5),
+            "stressLevel" to validateNumericScale(uiState.stressLevel, 1, 5),
+            "accessToHealthcare" to validateNumericScale(uiState.accessToHealthcare, 1, 5)
         )
     }
 
@@ -79,6 +86,15 @@ object Validator {
     fun isValidRegistrationUIState(uiState: RegistrationUIState): Boolean {
         val validationResults = validateRegistrationUIState(uiState)
         return validationResults.all { it.value }
+    }
+    // Update this method to handle Boolean
+    fun validateSmoking(smoking: Boolean): Boolean {
+        return true  // Always valid as it's a Boolean
+    }
+
+    // Update this method to handle Int
+    fun validateNumericScale(value: Int, min: Int, max: Int): Boolean {
+        return value in min..max
     }
 
     // Validate login UI state

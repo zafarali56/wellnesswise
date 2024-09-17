@@ -1,32 +1,47 @@
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.project.wellnesswise.components.ui.LoadingAnimation
+import com.project.wellnesswise.components.ui.MyPasswordField
 import com.project.wellnesswise.components.ui.NavigationDrawer
 import com.project.wellnesswise.data.AuthViewModel
-import com.project.wellnesswise.data.Habit
+import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
-import com.project.wellnesswise.screens.EditHabitsScreen
-import com.project.wellnesswise.screens.EditMedicalHistoryScreen
 import com.project.wellnesswise.screens.EditProfileScreen
+import com.project.wellnesswise.screens.HealthAssessmentMode
+import com.project.wellnesswise.screens.HealthAssessmentScreen
+import kotlinx.coroutines.launch
 
 @Composable
-fun UserProfileScreen(authViewModel: AuthViewModel) {
+fun UserProfileScreen(authViewModel: AuthViewModel, registrationViewModel: RegistrationViewModel) {
     val user = FirebaseAuth.getInstance().currentUser
     val firestore = FirebaseFirestore.getInstance()
     var userData by remember { mutableStateOf<Map<String, Any>?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var currentView by remember { mutableStateOf("main") }
+
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
+    var showDeleteError by remember { mutableStateOf<String?>(null) }
+    var deletePassword by remember { mutableStateOf("") }
+    var isDeleting by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
 
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = !isSystemInDarkTheme()
@@ -60,8 +75,9 @@ fun UserProfileScreen(authViewModel: AuthViewModel) {
     val navigateBack: () -> Unit = {
         when (currentView) {
             "main" -> WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
-            "medical", "habits", "edit" -> currentView = "main"
-            "editMedical", "editHabits" -> currentView = "edit"
+            "edit" -> currentView = "main"
+            "healthAssessment" -> currentView = "edit"
+            else -> currentView = "main"
         }
     }
     MaterialTheme(colorScheme = colorScheme) {
@@ -76,21 +92,9 @@ fun UserProfileScreen(authViewModel: AuthViewModel) {
                             user = user,
                             userData = userData,
                             isLoading = isLoading,
-                            onMedicalHistoryClick = { currentView = "medical" },
-                            onHabitsClick = { currentView = "habits" },
-                            onEditClick = { currentView = "edit" }
+                            onEditClick = { currentView = "edit" },
+                            onDeleteAccountClick = { showDeleteConfirmation = true }
                         )
-
-                        "medical" -> MedicalHistoryView(
-                            userData = userData,
-                            onBack = navigateBack
-                        )
-
-                        "habits" -> HabitsView(
-                            userData = userData,
-                            onBack = navigateBack
-                        )
-
                         "edit" -> EditProfileScreen(
                             userData = userData,
                             onSave = { updatedData ->
@@ -105,54 +109,104 @@ fun UserProfileScreen(authViewModel: AuthViewModel) {
                                 }
                             },
                             onBack = navigateBack,
-                            onEditMedicalHistory = { currentView = "editMedical" },
-                            onEditHabits = { currentView = "editHabits" },
+                            onEditHealthAssessment = {
+                                currentView = "healthAssessment"
+                                registrationViewModel.loadExistingHealthAssessmentData(userData)
+                                registrationViewModel.currentMode.value = HealthAssessmentMode.EDIT
+                            },
                             colorScheme = colorScheme
                         )
-
-                        "editMedical" -> EditMedicalHistoryScreen(
-                            medicalHistory = userData?.get("medicalHistory") as? Map<String, String>
-                                ?: emptyMap(),
-                            onSave = { updatedMedicalHistory ->
+                        "healthAssessment" -> HealthAssessmentScreen(
+                            registrationViewModel = registrationViewModel,
+                            mode = HealthAssessmentMode.EDIT,
+                            onSave = {
+                                val updatedHealthData = registrationViewModel.getHealthAssessmentData()
                                 user?.let { currentUser ->
                                     firestore.collection("users").document(currentUser.uid)
-                                        .update("medicalHistory", updatedMedicalHistory)
+                                        .update(updatedHealthData)
                                         .addOnSuccessListener {
-                                            userData = userData?.toMutableMap()?.apply {
-                                                put("medicalHistory", updatedMedicalHistory)
-                                            }
+                                            userData = userData?.toMutableMap()
+                                                ?.apply { putAll(updatedHealthData) }
                                             currentView = "edit"
                                         }
                                 }
                             },
-                            onBack = navigateBack,
-                            colorScheme = colorScheme
-                        )
-
-                        "editHabits" -> EditHabitsScreen(
-                            habits = (userData?.get("habits") as? List<String>)?.map {
-                                Habit.valueOf(
-                                    it
-                                )
-                            } ?: emptyList(),
-                            onSave = { updatedHabits ->
-                                user?.let { currentUser ->
-                                    val habitStrings = updatedHabits.map { it.name }
-                                    firestore.collection("users").document(currentUser.uid)
-                                        .update("habits", habitStrings)
-                                        .addOnSuccessListener {
-                                            userData = userData?.toMutableMap()?.apply {
-                                                put("habits", habitStrings)
-                                            }
-                                            currentView = "edit"
-                                        }
-                                }
-                            },
-                            onBack = navigateBack, colorScheme = colorScheme
+                            onBack = {
+                                registrationViewModel.setMode(HealthAssessmentMode.SIGNUP)
+                                currentView = "edit"
+                            }
                         )
                     }
                 }
             }
+
+
+            if (showDeleteConfirmation) {
+                AlertDialog(
+                    onDismissRequest = {
+                        if (!isDeleting) {
+                            showDeleteConfirmation = false
+                            deletePassword = ""
+                        }
+                    },
+                    title = { Text("Delete Account") },
+                    text = {
+                        Column {
+                            Text("Are you sure you want to delete your account? This action cannot be undone. Please enter your password to confirm.")
+                            Spacer(modifier = Modifier.height(16.dp))
+                            MyPasswordField(
+                                labelValue = "Password",
+                                initialValue = deletePassword,
+                                onTextSelected = { deletePassword = it },
+                                isError = false
+                            )
+                            if (isDeleting) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                LoadingAnimation()
+                                Text("Deleting account... Please wait.",
+                                    modifier = Modifier.padding(top = 8.dp))
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                if (!isDeleting) {
+                                    isDeleting = true
+                                    coroutineScope.launch {
+                                        val result = authViewModel.deleteAccount(deletePassword)
+                                        isDeleting = false
+                                        if (result.isSuccess) {
+                                            showDeleteConfirmation = false
+                                            WellnessWiseAppRouter.navigateTo(Screen.LoginScreen)
+                                        } else {
+                                            showDeleteError = result.exceptionOrNull()?.message ?: "An error occurred"
+                                        }
+                                    }
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                            enabled = !isDeleting
+                        ) {
+                            Text("Delete")
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            onClick = {
+                                if (!isDeleting) {
+                                    showDeleteConfirmation = false
+                                    deletePassword = ""
+                                }
+                            },
+                            enabled = !isDeleting
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
+
 
             if (currentView == "main") {
                 NavigationDrawer(

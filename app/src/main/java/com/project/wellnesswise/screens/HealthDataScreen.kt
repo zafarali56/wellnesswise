@@ -2,13 +2,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -103,118 +103,149 @@ fun HealthDataScreen(
             modifier = Modifier.fillMaxSize(),
             color = colorScheme.background
         ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(20.dp))
-        HeadingTextComponent(value = "Health Data")
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Button(
-                onClick = { isManualInput = true },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isManualInput)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary
-                )
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Manual Input", fontWeight = FontWeight.Bold)
-            }
-            Button(
-                onClick = {
-                    isManualInput = false
-                    coroutineScope.launch {
-                        healthDataViewModel.handleGoogleFitSync(
-                            context,
-                            fitnessOptions,
-                            googleSignInLauncher
+             item {
+                 Spacer(modifier = Modifier.height(20.dp))
+                 HeadingTextComponent(value = "Health Data")
+                 Spacer(modifier = Modifier.height(16.dp))
+
+                 Row(
+                     modifier = Modifier.fillMaxWidth(),
+                     horizontalArrangement = Arrangement.SpaceBetween
+                 ) {
+                     Button(
+                         onClick = { isManualInput = true },
+                         colors = ButtonDefaults.buttonColors(
+                             containerColor = if (isManualInput) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary
+                         )
+                     ) {
+                         Text("Manual Input", fontWeight = FontWeight.Bold)
+                     }
+                     Button(
+                         onClick = {
+                             isManualInput = false
+                             coroutineScope.launch {
+                                 healthDataViewModel.handleGoogleFitSync(
+                                     context,
+                                     fitnessOptions,
+                                     googleSignInLauncher
+                                 )
+                             }
+                         },
+                         colors = ButtonDefaults.buttonColors(
+                             containerColor = if (!isManualInput) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary
+                         )
+                     ) {
+                         Text("Google Fit Sync", fontWeight = FontWeight.Bold)
+                     }
+                 }
+
+                 Spacer(modifier = Modifier.height(16.dp))
+             }
+                if (isManualInput) {
+                    item {
+                        CustomBloodPressureInput(
+                            systolic = systolic,
+                            diastolic = diastolic,
+                            onSystolicChange = { newSystolic ->
+                                systolic = newSystolic
+                                updateBloodPressure(newSystolic, diastolic, healthDataViewModel)
+                            },
+                            onDiastolicChange = { newDiastolic ->
+                                diastolic = newDiastolic
+                                updateBloodPressure(systolic, newDiastolic, healthDataViewModel)
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        HealthDataTextField(
+                            value = healthData["heartRate"] as? String ?: "",
+                            onValueChange = { healthDataViewModel.updateManualHealthData(heartRate = it) },
+                            label = "Heart Rate (bpm)",
+                            isError = false,
+                            errorMessage = "Invalid heart rate",
+                            enabled = true
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        HealthDataTextField(
+                            value = healthData["bloodSugar"] as? String ?: "",
+                            onValueChange = { healthDataViewModel.updateManualHealthData(bloodSugar = it) },
+                            label = "Blood Sugar (mg/dL)",
+                            isError = false,
+                            errorMessage = "Invalid blood sugar value",
+                            enabled = true
                         )
                     }
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (!isManualInput) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Text("Google Fit Sync", fontWeight = FontWeight.Bold)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (isManualInput) {
-            CustomBloodPressureInput(
-                systolic = systolic,
-                diastolic = diastolic,
-                onSystolicChange = { newSystolic ->
-                    systolic = newSystolic
-                    updateBloodPressure(newSystolic, diastolic, healthDataViewModel)
-                },
-                onDiastolicChange = { newDiastolic ->
-                    diastolic = newDiastolic
-                    updateBloodPressure(systolic, newDiastolic, healthDataViewModel)
+                } else {
+                    if (isSyncing) {
+                    item{    LoadingAnimation()}
+                    } else {
+                        item {
+                            Text("Data synced from Google Fit:")
+                            Text("Blood Pressure: ${healthData["bloodPressure"] ?: "N/A"}")
+                            Text("Heart Rate: ${healthData["heartRate"] ?: "N/A"}")
+                            Text("Blood Sugar: ${healthData["bloodSugar"] ?: "N/A"}")
+                        }
+                    }
                 }
-            )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
 
-            HealthDataTextField(
-                value = healthData["heartRate"] as? String ?: "",
-                onValueChange = { healthDataViewModel.updateManualHealthData(heartRate = it) },
-                label = "Heart Rate (bpm)",
-                isError = false,
-                errorMessage = "Invalid heart rate",
-                enabled = true
-            )
+                    Text(
+                        "Additional Health Information",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                    HealthDataTextField(
+                        value = healthDataViewModel.cholesterol.collectAsState().value,
+                        onValueChange = { healthDataViewModel.updateCholesterol(it) },
+                        label = "Cholesterol (mg/dL)",
+                        isError = false,
+                        errorMessage = "Invalid cholesterol value",
+                        enabled = true
+                    )
 
-            HealthDataTextField(
-                value = healthData["bloodSugar"] as? String ?: "",
-                onValueChange = { healthDataViewModel.updateManualHealthData(bloodSugar = it) },
-                label = "Blood Sugar (mg/dL)",
-                isError = false,
-                errorMessage = "Invalid blood sugar value",
-                enabled = true
-            )
-        } else {
-            if (isSyncing) {
-                LoadingAnimation()
-            } else {
-                Text("Data synced from Google Fit:")
-                Text("Blood Pressure: ${healthData["bloodPressure"] ?: "N/A"}")
-                Text("Heart Rate: ${healthData["heartRate"] ?: "N/A"}")
-                Text("Blood Sugar: ${healthData["bloodSugar"] ?: "N/A"}")
-            }
-        }
+                    Spacer(modifier = Modifier.height(8.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+                    HealthDataTextField(
+                        value = healthDataViewModel.triglycerides.collectAsState().value,
+                        onValueChange = { healthDataViewModel.updateTriglycerides(it) },
+                        label = "Triglycerides (mg/dL)",
+                        isError = false,
+                        errorMessage = "Invalid triglycerides value",
+                        enabled = true
+                    )
 
-        Text(
-            "Cholesterol (Manual Input Required)",
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = FontWeight.Bold,
-            ),
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+                    Spacer(modifier = Modifier.height(8.dp))
 
-        HealthDataTextField(
-            value = cholesterol,
-            onValueChange = { healthDataViewModel.updateCholesterol(it) },
-            label = "Cholesterol (e.g. 200)",
-            isError = false,
-            errorMessage = "Invalid cholesterol value",
-            enabled = true
-        )
+                    HealthDataTextField(
+                        value = healthDataViewModel.waistCircumference.collectAsState().value,
+                        onValueChange = { healthDataViewModel.updateWaistCircumference(it) },
+                        label = "Waist Circumference (cm)",
+                        isError = false,
+                        errorMessage = "Invalid waist circumference",
+                        enabled = true
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
 
-
-        Spacer(modifier = Modifier.height(16.dp))
-        ButtonComponent(value = "Submit", onButtonClicked = {   healthDataViewModel.sendHealthDataToFirestore()
-            WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)}, isEnabled = true)
-
+                    ButtonComponent(
+                        value = "Submit",
+                        onButtonClicked = {
+                            healthDataViewModel.sendHealthDataToFirestore()
+                            WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
+                        },
+                        isEnabled = true
+                    )
+                }
             }
         }
     }
