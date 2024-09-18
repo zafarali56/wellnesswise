@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.project.wellnesswise.components.ui.HealthAssessmentMode
 import com.project.wellnesswise.components.ui.LoadingAnimation
 import com.project.wellnesswise.components.ui.MyPasswordField
 import com.project.wellnesswise.components.ui.NavigationDrawer
@@ -24,7 +25,6 @@ import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import com.project.wellnesswise.screens.EditProfileScreen
-import com.project.wellnesswise.screens.HealthAssessmentMode
 import com.project.wellnesswise.screens.HealthAssessmentScreen
 import kotlinx.coroutines.launch
 

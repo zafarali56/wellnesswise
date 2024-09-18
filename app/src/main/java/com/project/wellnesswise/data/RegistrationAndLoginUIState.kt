@@ -33,18 +33,12 @@ data class RegistrationUIState(
     var bloodSugar: String = "",
     var cholesterol: String = "",
 
-    // Error states for health parameters
-    var bloodPressureError: Boolean = false,
-    var heartRateError: Boolean = false,
-    var bloodSugarError: Boolean = false,
-    var cholesterolError: Boolean = false
 )
 data class LoginUIState(
     var email: String = "",
     var password: String = "",
 
-    var emailError: Boolean = false,
-    var passwordError: Boolean = false,
+
 )
 
 

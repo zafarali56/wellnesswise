@@ -9,10 +9,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
+import com.project.wellnesswise.components.ui.HealthAssessmentMode
 import com.project.wellnesswise.data.rules.Validator
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
-import com.project.wellnesswise.screens.HealthAssessmentMode
 
 class RegistrationViewModel : ViewModel() {
     var registrationUIState = mutableStateOf(RegistrationUIState())

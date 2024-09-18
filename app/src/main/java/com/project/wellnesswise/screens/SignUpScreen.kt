@@ -1,7 +1,6 @@
 package com.project.wellnesswise.screens
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -10,9 +9,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
@@ -20,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,8 +36,8 @@ import com.project.wellnesswise.components.ui.CheckBoxComponent
 import com.project.wellnesswise.components.ui.ClickableLoginTextComponent
 import com.project.wellnesswise.components.ui.DividerTextComponent
 import com.project.wellnesswise.components.ui.GenderSelection
-import com.project.wellnesswise.components.ui.HeadingTextComponent
 import com.project.wellnesswise.components.ui.HealthAssessmentButton
+import com.project.wellnesswise.components.ui.HealthAssessmentMode
 import com.project.wellnesswise.components.ui.LoadingAnimation
 import com.project.wellnesswise.components.ui.MyNumberField
 import com.project.wellnesswise.components.ui.MyPasswordField
@@ -45,12 +49,14 @@ import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = !isSystemInDarkTheme()
-
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val scrollState = rememberLazyListState()
     // Use dynamic color scheme
     val colorScheme = when {
         useDarkIcons -> dynamicLightColorScheme(LocalContext.current)
@@ -68,27 +74,26 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
     val registrationUIState = registrationViewModel.registrationUIState.value
 
     MaterialTheme(colorScheme = colorScheme) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(colorScheme.background)
-                .padding(horizontal = 12.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            containerColor = colorScheme.background,
+            topBar = {
+                LargeTopAppBar(
+                    title = { Text(stringResource(id = R.string.Create_an_account)) },
+                    scrollBehavior = scrollBehavior,
+                    colors = TopAppBarDefaults.largeTopAppBarColors(
+                        containerColor = colorScheme.background,
+                        scrolledContainerColor = colorScheme.background
+                    )
+                )
+            }
+        ) { innerPadding ->
+            LazyColumn(
+                state = scrollState,
+                contentPadding = innerPadding,
+                modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
+            )  {
 
-                ) {
-                    item {
-                        Spacer(modifier = Modifier.height(40.dp))
-                        HeadingTextComponent(value = stringResource(id = R.string.Create_an_account))
-                        Spacer(modifier = Modifier.height(40.dp))
-                    }
                     item {
 
                         Text(
@@ -216,7 +221,7 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                         )
                             Spacer(modifier = Modifier.height(10.dp))
                         HealthAssessmentButton(
-                            text = "Complete Health Assessment",
+                            text = "Health Assessment",
                             onClick = {
                                 registrationViewModel.setMode(HealthAssessmentMode.SIGNUP)
                                 WellnessWiseAppRouter.navigateTo(Screen.HealthAssessmentScreen)
@@ -298,7 +303,7 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
 
 
     }
-}
+
 @Composable
 @Preview
 fun SignUpScreenPreview() {
