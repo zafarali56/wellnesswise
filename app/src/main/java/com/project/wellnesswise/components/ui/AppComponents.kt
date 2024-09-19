@@ -91,6 +91,7 @@ import com.project.wellnesswise.R
 import com.project.wellnesswise.data.Gender
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.data.UIEvent
+import com.project.wellnesswise.navigations.Screen
 import kotlinx.coroutines.launch
 
 
@@ -517,9 +518,12 @@ fun HealthAssessmentButton(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppToolbar(onNavigationIconClick: () -> Unit) {
+fun AppToolbar(
+    title: String,
+    onNavigationIconClick: () -> Unit
+) {
     TopAppBar(
-        title = { Text("Wellness Wise") },
+        title = { Text(title) },
         navigationIcon = {
             IconButton(onClick = onNavigationIconClick) {
                 Icon(Icons.Filled.Menu, contentDescription = "Menu")
@@ -534,8 +538,8 @@ fun NavigationDrawer(
     onProfileClick: () -> Unit,
     onHomeClick: () -> Unit,
     onLogoutClick: () -> Unit,
-    userData: Map<String, Any>?
-
+    userData: Map<String, Any>?,
+    currentScreen: Screen // Add this parameter
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -546,32 +550,27 @@ fun NavigationDrawer(
         drawerContent = {
             ModalDrawerSheet {
                 Column(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    // Giant logo icon
                     UserImg()
-                    // User name
                     Text(
                         text = userData?.get("fullName") as? String ?: "User Name",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = colorScheme.onSurface,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
-                    // User email
                     Text(
                         text = user?.email ?: "user@example.com",
                         fontSize = 16.sp,
-                        color = colorScheme.onSurface,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Navigation items
                     listOf(
                         Triple(stringResource(id = R.string.Home), Icons.Default.Home, onHomeClick),
                         Triple(stringResource(id = R.string.Profile), Icons.Default.Person, onProfileClick),
@@ -596,11 +595,14 @@ fun NavigationDrawer(
         content = {
             Scaffold(
                 topBar = {
-                    AppToolbar(onNavigationIconClick = {
-                        scope.launch {
-                            drawerState.open()
+                    AppToolbar(
+                        title = getScreenTitle(currentScreen),
+                        onNavigationIconClick = {
+                            scope.launch {
+                                drawerState.open()
+                            }
                         }
-                    })
+                    )
                 },
             ) { innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)) {
@@ -620,45 +622,52 @@ fun NavigationItem(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    colorScheme.primary // Get the primary color from the theme
-
     Surface(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         shape = RoundedCornerShape(26.dp),
         color = if (isPressed)
-            colorScheme.primaryContainer
+            MaterialTheme.colorScheme.primaryContainer
         else
-            colorScheme.surface,
-        border = BorderStroke(1.dp, colorScheme.outline.copy(alpha = 0.12f)),
+            MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)),
         onClick = onClick,
         interactionSource = interactionSource,
     ) {
         Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 12.dp, horizontal = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp, horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = colorScheme.primary,
+                tint = MaterialTheme.colorScheme.primary,
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyLarge,
-                color = colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.onSurface,
             )
         }
     }
 }
 
-
+// Add this function to get the appropriate title for each screen
+fun getScreenTitle(screen: Screen): String {
+    return when (screen) {
+        Screen.HomeScreen -> "Wellness Wise"
+        Screen.UserProfileScreen -> "User Profile"
+        Screen.DataVisualizationScreen -> "Data Visualization"
+        Screen.PredictionsScreen -> "Health Risk Predictions"
+        Screen.PersonalizedRecommendationsScreen -> "Recommendations"
+        // Add other screens as needed
+        else -> "Wellness Wise" // Default title
+    }
+}
 
 @Composable
 fun HealthDataTextField(

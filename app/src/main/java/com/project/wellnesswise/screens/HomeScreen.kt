@@ -142,7 +142,8 @@ fun HomeScreen(
             onLogoutClick = { authViewModel.logOut() },
             onProfileClick = { WellnessWiseAppRouter.navigateTo(Screen.UserProfileScreen) },
             onHomeClick = { WellnessWiseAppRouter.navigateTo(Screen.HomeScreen) },
-            userData = userData
+            userData = userData,
+            currentScreen = Screen.HomeScreen // Specify the current screen
         )
     }
 }

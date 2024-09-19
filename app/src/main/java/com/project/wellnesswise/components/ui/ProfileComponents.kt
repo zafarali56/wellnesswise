@@ -1,33 +1,30 @@
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseUser
+import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ui.ButtonComponent
 import com.project.wellnesswise.components.ui.LoadingAnimation
 import com.project.wellnesswise.components.ui.UserImg
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainProfileView(
     user: FirebaseUser?,
@@ -36,124 +33,186 @@ fun MainProfileView(
     onEditClick: () -> Unit,
     onDeleteAccountClick: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp)
-    ) {
-        Box(
+
+        LazyColumn(
             modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            contentAlignment = Alignment.Center
+                .fillMaxSize()
         ) {
-            Column (modifier = Modifier, horizontalAlignment = Alignment.CenterHorizontally){
-                UserImg()
-                Spacer(modifier = Modifier.height(10.dp))
-                if (isLoading) {
-                    LoadingAnimation()
-                } else {
-                    userData?.let { data ->
-                        Text(
-                            data["fullName"] as? String ?: "N/A",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 30.sp,
-                            color = colorScheme.onSurface,
-                        )
-                    }
-
-
-                }
+            item {
+                ProfileHeader(userData, isLoading)
             }
-        }
 
-        Spacer(modifier = Modifier.height(10.dp))
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
-
-            colors = CardDefaults.cardColors(
-                containerColor = colorScheme.secondaryContainer,
-                contentColor = colorScheme.onSecondaryContainer
-
-
-        ) ){
-
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp)
-
-            ) {
-
-
-                item {
-                    Spacer(Modifier.height(5.dp))
-                    Text("Email: ${user?.email ?: "N/A"}", fontSize = 18.sp, )
-                    Spacer(modifier = Modifier.height(5.dp))
-                }
-
-                if (isLoading) {
-                    item { LoadingAnimation() }
-                } else {
-                    userData?.let { data ->
-
+            if (isLoading) {
+                item { LoadingAnimation() }
+            } else {
+                userData?.let { data ->
+                    val groupedData = groupProfileData(data)
+                    groupedData.forEach { (groupTitle, items) ->
                         item {
-                            Text("Age: ${(data["age"] as? Number)?.toString() ?: "N/A"}", fontSize = 18.sp)
-                            Spacer(modifier = Modifier.height(5.dp))
-                        }
-                        item {
-                            Text("Gender: ${data["gender"] as? String ?: "N/A"}", fontSize = 18.sp)
-                            Spacer(modifier = Modifier.height(5.dp))
-                        }
-                        item {
-                            Text("Height: ${(data["height"] as? Number)?.toString() ?: "N/A"}" , fontSize = 18.sp)
-                            Spacer(modifier = Modifier.height(5.dp))
-                        }
-                        item {
-                            Text ( "Weight: ${(data["weight"] as? Number)?.toString() ?: "N/A"}",  fontSize = 18.sp)
-                            Spacer(modifier = Modifier.height(5.dp))
-                        }
-                        item {
-                            Text("Blood Pressure: ${data["bloodPressure"] as? String ?: "N/A"}", fontSize = 18.sp)
-                            Spacer(modifier = Modifier.height(5.dp))
-                        }
-                        item { Text("Heart Rate: ${(data["heartRate"]  )?: "N/A"}",fontSize = 18.sp)
-                            Spacer(modifier = Modifier.height(5.dp))
-                        }
-                        item { Text("Blood Sugar: ${(data["bloodSugar"] )?: "N/A"}",fontSize = 18.sp)
-                            Spacer(modifier = Modifier.height(5.dp))
-                        }
-                        item { Text("Cholesterol: ${(data["cholesterol"] ) ?: "N/A"}",fontSize = 18.sp)
-                            Spacer(modifier = Modifier.height(5.dp))
+                            ProfileSection(groupTitle, items)
                         }
                     }
                 }
             }
-        }
 
-        Spacer(Modifier.height(16.dp))
-
-       ButtonComponent(value = "Edit Profile", onButtonClicked = onEditClick, isEnabled = true)
-
-
-        Spacer(Modifier.height(16.dp))
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onDeleteAccountClick,
-            colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error),
-        ) {
-            Text("Delete Account")
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    ButtonComponent(value = "Edit Profile", onButtonClicked = onEditClick, isEnabled = true)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = onDeleteAccountClick,
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text("Delete Account")
+                    }
+                }
         }
     }
 }
 
+@Composable
+fun ProfileHeader(userData: Map<String, Any>?, isLoading: Boolean) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        UserImg()
+        Spacer(modifier = Modifier.height(16.dp))
+        if (isLoading) {
+            LoadingAnimation()
+        } else {
+            userData?.let { data ->
+                Text(
+                    text = data["fullName"] as? String ?: "N/A",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
 
+@Composable
+fun ProfileSection(title: String, items: List<Pair<String, Any?>>) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            items.forEach { (label, value) ->
+                ProfileItem(label, value)
+            }
+        }
+    }
+}
+
+@Composable
+fun ProfileItem(label: String, value: Any?) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        val icon = getIconForLabel(label)
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Column {
+            Text(text = label, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = value?.toString() ?: "N/A",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+fun groupProfileData(data: Map<String, Any>): List<Pair<String, List<Pair<String, Any?>>>> {
+    return listOf(
+        "Personal Information" to listOf(
+            "Age" to data["age"],
+            "Gender" to data["gender"],
+            "Height" to data["height"],
+            "Weight" to data["weight"],
+            "Waist Circumference" to data["waistCircumference"]
+        ),
+        "Health Metrics" to listOf(
+            "Blood Pressure" to data["bloodPressure"],
+            "Heart Rate" to data["heartRate"],
+            "Blood Sugar" to data["bloodSugar"],
+            "Cholesterol" to data["cholesterol"],
+            "Triglycerides" to data["triglycerides"]
+        ),
+        "Lifestyle" to listOf(
+            "Physical Activity" to data["physicalActivity"],
+            "Sleep Hours" to data["sleepHours"],
+            "Diet Quality" to data["dietQuality"],
+            "Alcohol Consumption" to data["alcoholConsumption"],
+            "Smoking" to data["smoking"],
+            "Stress Level" to data["stressLevel"]
+        ),
+        "Medical History" to listOf(
+            "Chronic Conditions" to data["chronicConditions"],
+            "Previous Surgeries" to data["previousSurgeries"],
+            "Family Cancer History" to data["familyCancer"],
+            "Family Diabetes History" to data["familyDiabetes"],
+            "Family Heart Disease History" to data["familyHeart"]
+        ),
+        "Environmental Factors" to listOf(
+            "Air Quality Index" to data["airQualityIndex"],
+            "Exposure To Pollutants" to data["exposureToPollutants"],
+            "Access to Healthcare" to data["accessToHealthcare"]
+        ),
+        "Data Sources" to listOf(
+            "Data Source Preference" to data["dataSourcePreference"],
+            "Blood Pressure Source" to data["bloodPressureSource"],
+            "Blood Sugar Source" to data["bloodSugarSource"],
+            "Heart Rate Source" to data["heartRateSource"],
+            "Last Updated" to (data["lastUpdated"] as? com.google.firebase.Timestamp)?.toDate(),
+            "Last Updated Source" to data["lastUpdatedSource"]
+        )
+    )
+}
+
+fun getIconForLabel(label: String): ImageVector {
+    return when (label.toLowerCase()) {
+        "age" -> Icons.Default.Cake
+        "gender" -> Icons.Default.Person
+        "height", "weight" -> Icons.Default.FitnessCenter
+        "blood pressure", "heart rate", "blood sugar", "cholesterol" -> Icons.Default.Attribution
+        "physical activity" -> Icons.Default.DirectionsRun
+        "sleep hours" -> Icons.Default.Bedtime
+        "diet quality" -> Icons.Default.Restaurant
+        "alcohol consumption" -> Icons.Default.LocalBar
+        "smoking" -> Icons.Default.SmokingRooms
+        "stress level" -> Icons.Default.Psychology
+        "air quality index"-> Icons.Default.Air
+        "exposure to pollutants" -> Icons.Default.WbSunny
+        else -> Icons.Default.Info
+    }
+}
 
 fun showToast(context: Context, message: String) {
     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }
-
-
