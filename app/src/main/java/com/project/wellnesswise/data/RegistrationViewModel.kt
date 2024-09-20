@@ -149,11 +149,6 @@ class RegistrationViewModel : ViewModel() {
                     createUserInFirebase(
                         email = registrationUIState.value.email,
                         password = registrationUIState.value.password,
-                        fullName = registrationUIState.value.fullName,
-                        age = registrationUIState.value.age,
-                        gender = registrationUIState.value.gender,
-                        height = registrationUIState.value.height,
-                        weight = registrationUIState.value.weight,
 
                     )
                 } else {
@@ -214,11 +209,6 @@ class RegistrationViewModel : ViewModel() {
     private fun createUserInFirebase(
         email: String,
         password: String,
-        fullName: String,
-        age: Number,
-        gender: Gender,
-        height: Number,
-        weight: Number,
     ) {
         signUpInProgress.value = true
         auth

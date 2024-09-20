@@ -194,7 +194,6 @@ class HealthDataViewModel : ViewModel() {
             throw Exception("User not authenticated")
         }
     }
-
     fun setSyncMessage(message: String?) {
         _syncMessage.value = message
     }
