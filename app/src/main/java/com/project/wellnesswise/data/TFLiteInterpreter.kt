@@ -35,10 +35,6 @@ class TFLiteInterpreter(context: Context, modelName: String) {
         Log.d("TFLiteInterpreter", "Output shape: ${outputShape.contentToString()}")
         Log.d("TFLiteInterpreter", "Input values: $input")
 
-        if (input.size != inputShape[1]) {
-            throw IllegalArgumentException("Input size (${input.size}) does not match model input shape (${inputShape[1]})")
-        }
-
         val inputBuffer = ByteBuffer.allocateDirect(4 * inputShape[1])
             .order(ByteOrder.nativeOrder())
         inputBuffer.rewind()
@@ -56,7 +52,6 @@ class TFLiteInterpreter(context: Context, modelName: String) {
         Log.d("TFLiteInterpreter", "Output values: $output")
         return output
     }
-
     fun close() {
         interpreter.close()
     }

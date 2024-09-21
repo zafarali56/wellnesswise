@@ -922,24 +922,27 @@ fun LifestyleHabitsSection(viewModel: RegistrationViewModel, validationResults: 
         ScaleInput(
             value = viewModel.registrationUIState.value.alcoholConsumption.toString(),
             onValueChange = { viewModel.onEvent(UIEvent.AlcoholConsumptionChanged(it.toIntOrNull() ?: 0)) },
-            label = "Alcohol consumption level (1 being best) (5 being worst)",
-            range = 1..5,
+            label = "Alcohol consumption level",
+            range = 0..4,
+            descriptions = listOf("None", "Light", "Moderate", "Heavy", "Very Heavy"),
             isError = validationResults["alcoholConsumption"] == false
         )
         Spacer(modifier = Modifier.height(10.dp))
         ScaleInput(
             value = viewModel.registrationUIState.value.physicalActivity.toString(),
             onValueChange = { viewModel.onEvent(UIEvent.PhysicalActivityChanged(it.toIntOrNull() ?: 0)) },
-            label = "Physical Activity Level (1 being worst) (5 being best)",
-            range = 1..5,
+            label = "Physical Activity Level",
+            range = 0..4,
+            descriptions = listOf("Sedentary", "Light", "Moderate", "Active", "Very Active"),
             isError = validationResults["physicalActivity"] == false
         )
         Spacer(modifier = Modifier.height(10.dp))
         ScaleInput(
             value = viewModel.registrationUIState.value.dietQuality.toString(),
             onValueChange = { viewModel.onEvent(UIEvent.DietQualityChanged(it.toIntOrNull() ?: 0)) },
-            label = "Diet Quality  (1 being worst) (5 being best)",
-            range = 1..5,
+            label = "Diet Quality",
+            range = 0..4,
+            descriptions = listOf("Poor", "Fair", "Good", "Very Good", "Excellent"),
             isError = validationResults["dietQuality"] == false
         )
         Spacer(modifier = Modifier.height(10.dp))
@@ -947,7 +950,8 @@ fun LifestyleHabitsSection(viewModel: RegistrationViewModel, validationResults: 
             labelValue = "Sleep Hours (per night)",
             initialValue = viewModel.registrationUIState.value.sleepHours.toString(),
             onTextSelected = { viewModel.onEvent(UIEvent.SleepHoursChanged(it.toIntOrNull() ?: 0)) },
-            isError = validationResults["sleepHours"] == false
+            isError = validationResults["sleepHours"] == false,
+            range = 4..12
         )
     }
 }
@@ -963,17 +967,19 @@ fun EnvironmentalFactorsSection(viewModel: RegistrationViewModel, validationResu
         )
         Spacer(modifier = Modifier.height(10.dp))
         NumberField(
-            labelValue = "Air Quality Index",
+            labelValue = "Air Quality Index (0-500)",
             initialValue = viewModel.registrationUIState.value.airQualityIndex.toString(),
             onTextSelected = { viewModel.onEvent(UIEvent.AirQualityIndexChanged(it?.toIntOrNull() ?: 0)) },
-            isError = validationResults["airQualityIndex"] == false
+            isError = validationResults["airQualityIndex"] == false,
+            range = 0..500
         )
         Spacer(modifier = Modifier.height(10.dp))
         ScaleInput(
             value = viewModel.registrationUIState.value.exposureToPollutants.toString(),
             onValueChange = { viewModel.onEvent(UIEvent.ExposureToPollutantsChanged(it.toIntOrNull() ?: 0)) },
-            label = "Exposure to Pollutants  (1 being best) (5 being worst)",
-            range = 1..5,
+            label = "Exposure to Pollutants",
+            range = 0..3,
+            descriptions = listOf("Low", "Moderate", "High", "Very High"),
             isError = validationResults["exposureToPollutants"] == false
         )
     }
@@ -992,20 +998,23 @@ fun AdditionalDataSection(viewModel: RegistrationViewModel, validationResults: M
         ScaleInput(
             value = viewModel.registrationUIState.value.stressLevel.toString(),
             onValueChange = { viewModel.onEvent(UIEvent.StressLevelChanged(it.toIntOrNull() ?: 0)) },
-            label = "Stress Level (1 being best) (5 being worst)",
-            range = 1..5,
+            label = "Stress Level",
+            range = 0..4,
+            descriptions = listOf("Low", "Mild", "Moderate", "High", "Severe"),
             isError = validationResults["stressLevel"] == false
         )
         Spacer(modifier = Modifier.height(10.dp))
         ScaleInput(
             value = viewModel.registrationUIState.value.accessToHealthcare.toString(),
             onValueChange = { viewModel.onEvent(UIEvent.AccessToHealthcareChanged(it.toIntOrNull() ?: 0)) },
-            label = "Access to Healthcare  (1 being worst) (5 being best)",
-            range = 1..5,
+            label = "Access to Healthcare",
+            range = 0..4,
+            descriptions = listOf("Poor", "Limited", "Moderate", "Good", "Excellent"),
             isError = validationResults["accessToHealthcare"] == false
         )
     }
 }
+
 @Composable
 fun YesNoQuestion(
     question: String,
@@ -1079,6 +1088,7 @@ fun NumberField(
     keyboardType: KeyboardType = KeyboardType.Number,
     onTextSelected: (String) -> Unit,
     isError: Boolean = false,
+    range: IntRange
 ) {
     var textValue by remember { mutableStateOf(initialValue) }
 
@@ -1096,22 +1106,25 @@ fun NumberField(
         keyboardActions = KeyboardActions.Default,
         value = textValue,
         onValueChange = {
-            if (it.isEmpty() || it.all { char -> char.isDigit() }) {
+            if (it.isEmpty() || (it.all { char -> char.isDigit() } && it.toIntOrNull() in range)) {
                 textValue = it
                 onTextSelected(it)
             }
         },
         isError = isError,
         singleLine = true,
+        supportingText = {
+            Text("Valid range: ${range.first} - ${range.last}")
+        }
     )
 }
-
 @Composable
 fun ScaleInput(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
     range: IntRange,
+    descriptions: List<String>,
     modifier: Modifier = Modifier,
     isError: Boolean = false
 ) {
@@ -1129,7 +1142,7 @@ fun ScaleInput(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            range.forEach { number ->
+            range.forEachIndexed { index, number ->
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     RadioButton(
                         selected = value == number.toString(),
@@ -1140,9 +1153,10 @@ fun ScaleInput(
                         )
                     )
                     Text(
-                        text = number.toString(),
+                        text = descriptions[index],
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (value == number.toString()) colorScheme.primary else colorScheme.onSurfaceVariant
+                        color = if (value == number.toString()) colorScheme.primary else colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
                     )
                 }
             }

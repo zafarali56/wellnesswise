@@ -3,6 +3,7 @@ package com.project.wellnesswise.data
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.tasks.await
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -11,9 +12,10 @@ data class ModelInput(
     val values: List<Number>,
     val labels: List<String>
 )
-class HealthDataProcessor {
+class HealthDataProcessor(private val onDataChanged: () -> Unit) {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+    private var firestoreListener: ListenerRegistration? = null
 
     companion object {
         private val listeners = mutableSetOf<() -> Unit>()
@@ -37,6 +39,21 @@ class HealthDataProcessor {
             "Family_History_Heart_Disease", "Family_History_Cancer", "Previous_Surgeries",
             "Chronic_Conditions", "Gender_Female", "Gender_Male"
         )
+    }
+
+    fun startListeningForChanges() {
+        val userId = auth.currentUser?.uid ?: return
+        firestoreListener = firestore.collection("users").document(userId)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w("HealthDataProcessor", "Listen failed.", e)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    notifyDataChanged()
+                }
+            }
     }
     suspend fun getUserHealthData(): ModelInput? {
         val userId = auth.currentUser?.uid ?: return null
@@ -79,10 +96,9 @@ class HealthDataProcessor {
     }
 
     private fun normalizeInput(input: List<Float>): List<Float> {
-        return input.mapIndexed { index, value ->
-            val (min, max) = featureRanges[inputLabels[index]] ?: Pair(0f, 1f)
-            (value - min) / (max - min)
-        }
+        val mean = input.average().toFloat()
+        val std = sqrt(input.map { (it - mean).pow(2) }.average()).toFloat()
+        return input.map { (it - mean) / (std + 1e-8f) }
     }
 
     val featureRanges = mapOf(
@@ -112,6 +128,13 @@ class HealthDataProcessor {
         "Gender_Female" to Pair(0f, 1f),
         "Gender_Male" to Pair(0f, 1f)
     )
+
+
+
+    fun stopListeningForChanges() {
+        firestoreListener?.remove()
+    }
+
     private fun calculateBMI(height: Number?, weight: Number?): Float {
         if (height == null || weight == null) return 0f
         val heightInMeters = height.toFloat() / 100

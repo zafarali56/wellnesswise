@@ -188,15 +188,14 @@ class RegistrationViewModel : ViewModel() {
                 "familyCancer" -> Validator.validateYesNoAnswer(registrationUIState.value.familyCancer)
                 "previousSurgeries" -> Validator.validateYesNoAnswer(registrationUIState.value.previousSurgeries)
                 "chronicConditions" -> Validator.validateYesNoAnswer(registrationUIState.value.chronicConditions)
-                "smoking" -> Validator.validateSmoking(registrationUIState.value.smoking)
-                "alcoholConsumption" -> Validator.validateNumericScale(registrationUIState.value.alcoholConsumption, 1, 5)
-                "physicalActivity" -> Validator.validateNumericScale(registrationUIState.value.physicalActivity, 1, 5)
-                "dietQuality" -> Validator.validateNumericScale(registrationUIState.value.dietQuality, 1, 5)
-                "sleepHours" -> Validator.validateNumericScale(registrationUIState.value.sleepHours, 0, 24)
+                "alcoholConsumption" -> Validator.validateNumericScale(registrationUIState.value.alcoholConsumption, 0, 4)
+                "physicalActivity" -> Validator.validateNumericScale(registrationUIState.value.physicalActivity, 0, 4)
+                "dietQuality" -> Validator.validateNumericScale(registrationUIState.value.dietQuality, 0, 4)
+                "sleepHours" -> Validator.validateNumericScale(registrationUIState.value.sleepHours, 4, 12)
                 "airQualityIndex" -> Validator.validateNumericScale(registrationUIState.value.airQualityIndex, 0, 500)
-                "exposureToPollutants" -> Validator.validateNumericScale(registrationUIState.value.exposureToPollutants, 1, 5)
-                "stressLevel" -> Validator.validateNumericScale(registrationUIState.value.stressLevel, 1, 5)
-                "accessToHealthcare" -> Validator.validateNumericScale(registrationUIState.value.accessToHealthcare, 1, 5)
+                "exposureToPollutants" -> Validator.validateNumericScale(registrationUIState.value.exposureToPollutants, 0, 3)
+                "stressLevel" -> Validator.validateNumericScale(registrationUIState.value.stressLevel, 0, 4)
+                "accessToHealthcare" -> Validator.validateNumericScale(registrationUIState.value.accessToHealthcare, 0, 4)
                 else -> true
             }
         validationResults.value = currentValidationResults

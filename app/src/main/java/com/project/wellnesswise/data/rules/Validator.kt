@@ -71,14 +71,14 @@ object Validator {
             "previousSurgeries" to validateYesNoAnswer(uiState.previousSurgeries),
             "chronicConditions" to validateYesNoAnswer(uiState.chronicConditions),
             "smoking" to validateSmoking(uiState.smoking),
-            "alcoholConsumption" to validateNumericScale(uiState.alcoholConsumption, 1, 5),
-            "physicalActivity" to validateNumericScale(uiState.physicalActivity, 1, 5),
-            "dietQuality" to validateNumericScale(uiState.dietQuality, 1, 5),
-            "sleepHours" to validateNumericScale(uiState.sleepHours, 0, 24),
+            "alcoholConsumption" to validateNumericScale(uiState.alcoholConsumption, 0, 4),
+            "physicalActivity" to validateNumericScale(uiState.physicalActivity, 0, 4),
+            "dietQuality" to validateNumericScale(uiState.dietQuality, 0, 4),
+            "sleepHours" to validateNumericScale(uiState.sleepHours, 4, 12),
             "airQualityIndex" to validateNumericScale(uiState.airQualityIndex, 0, 500),
-            "exposureToPollutants" to validateNumericScale(uiState.exposureToPollutants, 1, 5),
-            "stressLevel" to validateNumericScale(uiState.stressLevel, 1, 5),
-            "accessToHealthcare" to validateNumericScale(uiState.accessToHealthcare, 1, 5)
+            "exposureToPollutants" to validateNumericScale(uiState.exposureToPollutants, 0, 3),
+            "stressLevel" to validateNumericScale(uiState.stressLevel, 0, 4),
+            "accessToHealthcare" to validateNumericScale(uiState.accessToHealthcare, 0, 4)
         )
     }
 
