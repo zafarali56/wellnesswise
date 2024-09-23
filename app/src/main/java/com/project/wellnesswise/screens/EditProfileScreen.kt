@@ -50,6 +50,8 @@ fun EditProfileScreen(
     var heartRate by remember { mutableStateOf(userData?.get("heartRate")?.toString() ?: "") }
     var bloodSugar by remember { mutableStateOf(userData?.get("bloodSugar")?.toString() ?: "") }
     var cholesterol by remember { mutableStateOf(userData?.get("cholesterol")?.toString() ?: "") }
+    var triglycerides by remember { mutableStateOf(userData?.get("triglycerides")?.toString() ?: "") }
+    var waistCircumference by remember { mutableStateOf(userData?.get("waistCircumference")?.toString() ?: "") }
     val context = LocalContext.current
     val dataSourcePreference = userData?.get("dataSourcePreference") as? String ?: "MANUAL"
 
@@ -68,7 +70,8 @@ fun EditProfileScreen(
         updatedData["weight"] = weight.toDoubleOrNull() ?: updatedData["weight"] ?: 0.0
         updatedData["height"] = height.toDoubleOrNull() ?: updatedData["height"] ?: 0.0
         updatedData["cholesterol"] = cholesterol.toDoubleOrNull() ?: updatedData["cholesterol"] ?: 0.0
-
+        updatedData["triglycerides"] = triglycerides.toDoubleOrNull() ?: updatedData["triglycerides"] ?: 0.0
+        updatedData["waistCircumference"] = waistCircumference.toDoubleOrNull() ?: updatedData["waistCircumference"] ?: 0.0
         // Only update these fields if the data source is MANUAL
         if (dataSourcePreference == "MANUAL") {
             updatedData["bloodPressure"] = bloodPressure
@@ -154,6 +157,29 @@ fun EditProfileScreen(
                         label = "Cholesterol (mg/dL)",
                         isError = false,
                         errorMessage = "Invalid cholesterol value",
+                        enabled = true
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                item {
+                    HealthDataTextField(
+                        value = triglycerides,
+                        onValueChange = { triglycerides = it },
+                        label = "Triglycerides (mg/dL)",
+                        isError = false,
+                        errorMessage = "Invalid triglycerides value",
+                        enabled = true
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                item {
+                    HealthDataTextField(
+                        value = waistCircumference,
+                        onValueChange = { waistCircumference = it },
+                        label = "Waist Circumference (cm)",
+                        isError = false,
+                        errorMessage = "Invalid waist circumference value",
                         enabled = true
                     )
                     Spacer(modifier = Modifier.height(8.dp))
