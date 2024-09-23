@@ -1,6 +1,5 @@
 package com.project.wellnesswise.screens
 
-import PredictionsViewModel
 import PredictionsViewModelFactory
 import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -17,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.wellnesswise.data.HealthDataProcessor
+import com.project.wellnesswise.data.PredictionsViewModel
 import com.project.wellnesswise.ml.TFLiteInterpreter
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
@@ -24,6 +24,7 @@ import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,11 +98,24 @@ fun PredictionsScreen(viewModel: PredictionsViewModel = viewModel(factory = Pred
                         LazyColumn(modifier = Modifier.padding(16.dp)) {
                             item {
                                 Text(
-                                    text = "Your Health Risk Predictions:",
+                                    text = "Your Health Data (Model Input):",
                                     style = MaterialTheme.typography.headlineSmall,
                                     modifier = Modifier.padding(bottom = 16.dp)
                                 )
                             }
+                            items(HealthDataProcessor.inputLabels.zip(viewModel.modelInput ?: emptyList())) { (label, value) ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(text = label, style = MaterialTheme.typography.bodyMedium)
+                                    Text(text = value.toString(), style = MaterialTheme.typography.bodyMedium)
+                                    Log.d("PredictionsScreen", "Label: $label, Value: $value")
+                                }
+                            }
+
                             viewModel.predictions?.let { preds ->
                                 items(preds) { (category, risk, context) ->
                                     Column(
@@ -116,7 +130,7 @@ fun PredictionsScreen(viewModel: PredictionsViewModel = viewModel(factory = Pred
                                             Text(text = category, style = MaterialTheme.typography.bodyLarge)
                                             val riskLevel = viewModel.classifyRisk(risk)
                                             Text(
-                                                text = "$riskLevel (${(risk * 100).toInt()}%)",
+                                                text = "$riskLevel",
                                                 style = MaterialTheme.typography.bodyLarge,
                                                 color = when (riskLevel) {
                                                     "Stable" -> MaterialTheme.colorScheme.primary

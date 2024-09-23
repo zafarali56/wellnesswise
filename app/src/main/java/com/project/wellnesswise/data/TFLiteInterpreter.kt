@@ -15,6 +15,9 @@ class TFLiteInterpreter(context: Context, modelName: String) {
     init {
         val tfliteModel: MappedByteBuffer = loadModelFile(context, modelName)
         interpreter = Interpreter(tfliteModel)
+        Log.d("TFLiteInterpreter", "Model loaded: $modelName")
+        Log.d("TFLiteInterpreter", "Input tensor shape: ${interpreter.getInputTensor(0).shape().contentToString()}")
+        Log.d("TFLiteInterpreter", "Output tensor shape: ${interpreter.getOutputTensor(0).shape().contentToString()}")
     }
 
     private fun loadModelFile(context: Context, modelName: String): MappedByteBuffer {
@@ -26,32 +29,20 @@ class TFLiteInterpreter(context: Context, modelName: String) {
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
     }
 
+    fun predict(input: FloatArray): FloatArray {
+        Log.d("TFLiteInterpreter", "Input data: ${input.contentToString()}")
 
-    fun predict(input: List<Float>): List<Float> {
-        val inputShape = interpreter.getInputTensor(0).shape()
-        val outputShape = interpreter.getOutputTensor(0).shape()
-
-        Log.d("TFLiteInterpreter", "Input shape: ${inputShape.contentToString()}")
-        Log.d("TFLiteInterpreter", "Output shape: ${outputShape.contentToString()}")
-        Log.d("TFLiteInterpreter", "Input values: $input")
-
-        val inputBuffer = ByteBuffer.allocateDirect(4 * inputShape[1])
-            .order(ByteOrder.nativeOrder())
-        inputBuffer.rewind()
-        for (value in input) {
-            inputBuffer.putFloat(value)
-        }
-
-        val outputBuffer = ByteBuffer.allocateDirect(4 * outputShape[1])
-            .order(ByteOrder.nativeOrder())
+        val inputShape = intArrayOf(1, input.size)
+        val inputBuffer = Array(1) { input }
+        val outputShape = intArrayOf(1, 5)
+        val outputBuffer = Array(1) { FloatArray(5) }
 
         interpreter.run(inputBuffer, outputBuffer)
 
-        outputBuffer.rewind()
-        val output = List(outputShape[1]) { outputBuffer.float }
-        Log.d("TFLiteInterpreter", "Output values: $output")
-        return output
+        Log.d("TFLiteInterpreter", "Raw output: ${outputBuffer[0].contentToString()}")
+        return outputBuffer[0]
     }
+
     fun close() {
         interpreter.close()
     }
