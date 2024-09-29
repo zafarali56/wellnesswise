@@ -13,77 +13,113 @@ data class ModelInput(
     val labels: List<String>
 )
 
-class HealthDataProcessor(private val onDataChanged: () -> Unit) {
+class HealthDataProcessor {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private var firestoreListener: ListenerRegistration? = null
-
+    private val listeners = mutableSetOf<() -> Unit>()
     companion object {
         private val listeners = mutableSetOf<() -> Unit>()
-        val riskCategories = listOf("Diabetes", "Cardiovascular Disease", "Hypertension", "Obesity", "Cancer")
+        val riskCategories =
+            listOf("Diabetes", "Cardiovascular Disease", "Hypertension", "Obesity", "Cancer")
         val inputLabels = listOf(
             "Age", "Height", "Weight", "BMI", "Systolic_BP", "Diastolic_BP", "Heart_Rate",
-            "Blood_Sugar", "Cholesterol", "Smoking", "Alcohol_Consumption", "Physical_Activity",
+            "Blood_Sugar", "Cholesterol", "Triglycerides",
+            "Waist_Circumference", "Smoking", "Alcohol_Consumption", "Physical_Activity",
             "Diet_Quality", "Sleep_Hours", "Air_Quality_Index", "Stress_Level",
             "Exposure_to_Pollutants", "Access_to_Healthcare", "Family_History_Diabetes",
             "Family_History_Heart_Disease", "Family_History_Cancer", "Previous_Surgeries",
-            "Chronic_Conditions", "Gender_Female", "Gender_Male"
+            "Chronic_Conditions",
+            "Gender_Female",
+            "Gender_Male"
         )
 
-        // Mean values for z-score normalization
         val featureMeans = mapOf(
-            "Age" to 45f, "Height" to 170f, "Weight" to 70f, "BMI" to 24f,
-            "Systolic_BP" to 120f, "Diastolic_BP" to 80f, "Heart_Rate" to 70f,
-            "Blood_Sugar" to 100f, "Cholesterol" to 180f, "Smoking" to 0.5f,
-            "Alcohol_Consumption" to 2f, "Physical_Activity" to 2f, "Diet_Quality" to 2f,
-            "Sleep_Hours" to 7f, "Air_Quality_Index" to 50f, "Stress_Level" to 2f,
-            "Exposure_to_Pollutants" to 2f, "Access_to_Healthcare" to 2f,
-            "Family_History_Diabetes" to 0.5f, "Family_History_Heart_Disease" to 0.5f,
-            "Family_History_Cancer" to 0.5f, "Previous_Surgeries" to 0.5f,
-            "Chronic_Conditions" to 0.5f, "Gender_Female" to 0.5f, "Gender_Male" to 0.5f
+            "Age" to 43.6f,
+            "Height" to 171.6f,
+            "Weight" to 78.6f,
+            "BMI" to 26.76f,
+            "Systolic_BP" to 132.6f,
+            "Diastolic_BP" to 85.8f,
+            "Heart_Rate" to 72.8f,
+            "Blood_Sugar" to 121.0f,
+            "Cholesterol" to 222.0f,
+            "Triglycerides" to 160.0f,
+            "Waist_Circumference" to 93.0f,
+            "Smoking" to 0.6f,
+            "Alcohol_Consumption" to 1.8f,
+            "Physical_Activity" to 1.6f,
+            "Diet_Quality" to 2.0f,
+            "Sleep_Hours" to 6.6f,
+            "Air_Quality_Index" to 92.0f,
+            "Stress_Level" to 3.2f,
+            "Exposure_to_Pollutants" to 1.6f,
+            "Access_to_Healthcare" to 2.0f,
+            "Family_History_Diabetes" to 0.6f,
+            "Family_History_Heart_Disease" to 0.6f,
+            "Family_History_Cancer" to 0.4f,
+            "Previous_Surgeries" to 0.8f,
+            "Chronic_Conditions" to 0.8f,
+            "Gender_Female" to 0.6f,
+            "Gender_Male" to 0.4f
         )
 
-        // Standard deviation values for z-score normalization
         val featureStds = mapOf(
-            "Age" to 15f, "Height" to 10f, "Weight" to 15f, "BMI" to 5f,
-            "Systolic_BP" to 15f, "Diastolic_BP" to 10f, "Heart_Rate" to 10f,
-            "Blood_Sugar" to 20f, "Cholesterol" to 30f, "Smoking" to 0.5f,
-            "Alcohol_Consumption" to 1f, "Physical_Activity" to 1f, "Diet_Quality" to 1f,
-            "Sleep_Hours" to 1f, "Air_Quality_Index" to 25f, "Stress_Level" to 1f,
-            "Exposure_to_Pollutants" to 1f, "Access_to_Healthcare" to 1f,
-            "Family_History_Diabetes" to 0.5f, "Family_History_Heart_Disease" to 0.5f,
-            "Family_History_Cancer" to 0.5f, "Previous_Surgeries" to 0.5f,
-            "Chronic_Conditions" to 0.5f, "Gender_Female" to 0.5f, "Gender_Male" to 0.5f
+            "Age" to 18.16039647144302f,
+            "Height" to 8.677557259966656f,
+            "Weight" to 7.402702209328699f,
+            "BMI" to 2.841302518212377f,
+            "Systolic_BP" to 13.55728586406586f,
+            "Diastolic_BP" to 6.760177512462228f,
+            "Heart_Rate" to 4.969909455915671f,
+            "Blood_Sugar" to 18.16590212458495f,
+            "Cholesterol" to 23.874672772626646f,
+            "Triglycerides" to 30.822070014844883f,
+            "Waist_Circumference" to 8.366600265340756f,
+            "Smoking" to 0.5477225575051662f,
+            "Alcohol_Consumption" to 0.8366600265340756f,
+            "Physical_Activity" to 1.140175425099138f,
+            "Diet_Quality" to 1.224744871391589f,
+            "Sleep_Hours" to 1.51657508881031f,
+            "Air_Quality_Index" to 37.68288736283355f,
+            "Stress_Level" to 0.8366600265340756f,
+            "Exposure_to_Pollutants" to 1.140175425099138f,
+            "Access_to_Healthcare" to 1.224744871391589f,
+            "Family_History_Diabetes" to 0.5477225575051662f,
+            "Family_History_Heart_Disease" to 0.5477225575051662f,
+            "Family_History_Cancer" to 0.5477225575051662f,
+            "Previous_Surgeries" to 0.8366600265340756f,
+            "Chronic_Conditions" to 0.8366600265340756f,
+            "Gender_Female" to 0.5477225575051662f,
+            "Gender_Male" to 0.5477225575051662f
         )
-
-        fun addDataChangeListener(listener: () -> Unit) {
+    }
+        fun addListener(listener: () -> Unit) {
             listeners.add(listener)
         }
 
-        fun removeDataChangeListener(listener: () -> Unit) {
+        fun removeListener(listener: () -> Unit) {
             listeners.remove(listener)
         }
 
-        fun notifyDataChanged() {
+        private fun notifyListeners() {
             listeners.forEach { it() }
         }
-    }
 
-    fun startListeningForChanges() {
-        val userId = auth.currentUser?.uid ?: return
-        firestoreListener = firestore.collection("users").document(userId)
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    Log.w("HealthDataProcessor", "Listen failed.", e)
-                    return@addSnapshotListener
+        fun startListeningForChanges() {
+            val userId = auth.currentUser?.uid ?: return
+            firestoreListener = firestore.collection("users").document(userId)
+                .addSnapshotListener { snapshot, e ->
+                    if (e != null) {
+                        Log.w("HealthDataProcessor", "Listen failed.", e)
+                        return@addSnapshotListener
+                    }
+
+                    if (snapshot != null && snapshot.exists()) {
+                        notifyListeners() // Notify all listeners when data changes
+                    }
                 }
-
-                if (snapshot != null && snapshot.exists()) {
-                    notifyDataChanged()
-                }
-            }
-    }
-
+        }
     suspend fun getUserHealthData(): ModelInput? {
         val userId = auth.currentUser?.uid ?: return null
         val docSnapshot = firestore.collection("users").document(userId).get().await()
@@ -103,6 +139,8 @@ class HealthDataProcessor(private val onDataChanged: () -> Unit) {
                 "Heart_Rate" -> parseHealthValue(userData["heartRate"])
                 "Blood_Sugar" -> parseHealthValue(userData["bloodSugar"])
                 "Cholesterol" -> parseHealthValue(userData["cholesterol"])
+                "Triglycerides" -> parseHealthValue(userData["triglycerides"])
+                "Waist_Circumference" -> parseHealthValue(userData["waistCircumference"])
                 "Smoking" -> if (userData["smoking"] as? Boolean == true) 1f else 0f
                 "Alcohol_Consumption" -> (userData["alcoholConsumption"] as? Number)?.toFloat() ?: 0f
                 "Physical_Activity" -> (userData["physicalActivity"] as? Number)?.toFloat() ?: 0f
@@ -120,14 +158,17 @@ class HealthDataProcessor(private val onDataChanged: () -> Unit) {
                 "Gender_Female" -> if (userData["gender"] as? String == "FEMALE") 1f else 0f
                 "Gender_Male" -> if (userData["gender"] as? String == "MALE") 1f else 0f
                 else -> 0f
+
             }
             rawInputValues.add(value)
 
-            // Z-score normalization
+            // Normalize each feature individually
             val mean = featureMeans[label] ?: 0f
             val std = featureStds[label] ?: 1f
             val normalizedValue = (value - mean) / std
             normalizedValues.add(normalizedValue)
+
+            Log.d("HealthDataProcessor", "Feature: $label, Raw: $value, Normalized: $normalizedValue")
         }
 
         Log.d("HealthDataProcessor", "Raw input data: ${rawInputValues.zip(inputLabels)}")

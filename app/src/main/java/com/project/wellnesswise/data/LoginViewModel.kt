@@ -59,6 +59,7 @@ class LoginViewModel : ViewModel() {
                 }
             }
         }
+
     }
 
     private fun updateValidationResults() {

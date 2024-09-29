@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class PredictionsViewModel(private val context: Context) : ViewModel() {
-    private val healthDataProcessor = HealthDataProcessor { updateLastDataTimestamp() }
+    private val healthDataProcessor = HealthDataProcessor()
 
     var predictions by mutableStateOf<List<Triple<String, Float, String>>?>(null)
     var modelInput by mutableStateOf<List<Float>?>(null)
@@ -23,24 +23,21 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
 
     init {
         healthDataProcessor.startListeningForChanges()
-    }
-
-    private fun updateLastDataTimestamp() {
-        loadPredictions()
+        healthDataProcessor.addListener { loadPredictions() }
+        loadPredictions() // Load predictions immediately
     }
 
     fun loadPredictions() {
         viewModelScope.launch {
+            isLoading = true
+            errorMessage = null
             try {
                 val input = withContext(Dispatchers.IO) {
                     healthDataProcessor.getUserHealthData()
                 }
 
                 input?.let { modelInput ->
-                    Log.d("PredictionsViewModel", "Model input shape: ${modelInput.values.size}")
-                    Log.d("PredictionsViewModel", "Normalized model input values: ${modelInput.values}")
-
-                    this@PredictionsViewModel.modelInput = modelInput.values
+                    Log.d("PredictionsViewModel", "Raw input values: ${modelInput.values.zip(modelInput.labels)}")
 
                     val tfliteInterpreter = TFLiteInterpreter(context, "enhanced_health_risk_model.tflite")
 
@@ -51,21 +48,17 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
 
                     predictions = HealthDataProcessor.riskCategories.zip(outputData.toList()).map { (category, risk) ->
                         val riskLevel = classifyRisk(risk)
-                        val context = getRiskContext(category, risk, modelInput.values[0]) // Assuming age is the first input
+                        Log.d("PredictionsViewModel", "$category: $risk ($riskLevel)")
+                        val context = getRiskContext(category, risk, modelInput.values[0])
                         Log.d("PredictionsViewModel", "$category: $risk ($riskLevel)")
                         Log.d("PredictionsViewModel", "Context: $context")
                         Triple(category, risk, context)
                     }
 
                     tfliteInterpreter.close()
-                } ?: run {
-                    errorMessage = "Failed to retrieve user health data"
                 }
             } catch (e: Exception) {
-                errorMessage = when (e) {
-                    is IllegalArgumentException -> "Data processing error: ${e.message}"
-                    else -> "An error occurred: ${e.message}"
-                }
+                errorMessage = "An error occurred: ${e.message}"
                 Log.e("PredictionsViewModel", "Error: ", e)
             } finally {
                 isLoading = false
@@ -120,6 +113,7 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
+        healthDataProcessor.removeListener { loadPredictions() }
         healthDataProcessor.stopListeningForChanges()
     }
 }
