@@ -1,28 +1,24 @@
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ui.ButtonComponent
 import com.project.wellnesswise.components.ui.LoadingAnimation
-import com.project.wellnesswise.components.ui.UserImg
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,6 +33,7 @@ fun MainProfileView(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .padding()
         ) {
             item {
                 ProfileHeader(userData, isLoading)
@@ -47,75 +44,100 @@ fun MainProfileView(
             } else {
                 userData?.let { data ->
                     val groupedData = groupProfileData(data)
-                    groupedData.forEach { (groupTitle, items) ->
-                        item {
-                            ProfileSection(groupTitle, items)
-                        }
+                    items(groupedData) { (groupTitle, items) ->
+                        ProfileSection(groupTitle, items)
                     }
                 }
             }
 
             item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    ButtonComponent(value = "Edit Profile", onButtonClicked = onEditClick, isEnabled = true)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = onDeleteAccountClick,
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                    ) {
-                        Text("Delete Account")
-                    }
-                }
+                ActionsSection(onEditClick, onDeleteAccountClick)
+            }
         }
     }
-}
 
 @Composable
 fun ProfileHeader(userData: Map<String, Any>?, isLoading: Boolean) {
-    Column(
+    val user = FirebaseAuth.getInstance().currentUser
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.secondaryContainer
     ) {
-        UserImg()
-        Spacer(modifier = Modifier.height(16.dp))
-        if (isLoading) {
-            LoadingAnimation()
-        } else {
-            userData?.let { data ->
-                Text(
-                    text = data["fullName"] as? String ?: "N/A",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
+        Column(
+            modifier = Modifier
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                imageVector = Icons.Default.AccountCircle,
+                contentDescription = "Profile Picture",
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            if (isLoading) {
+                LoadingAnimation()
+            } else {
+                userData?.let { data ->
+                    Text(
+                        text = data["fullName"] as? String ?: "N/A",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                    Text(
+                        text = user?.email ?: "user@example.com",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                    )
+                }
             }
         }
     }
 }
-
 @Composable
 fun ProfileSection(title: String, items: List<Pair<String, Any?>>) {
-    Card(
+    var expanded by remember { mutableStateOf(false) }
+
+    ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .animateContentSize(),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        ),
+        onClick = { expanded = !expanded }
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            items.forEach { (label, value) ->
-                ProfileItem(label, value)
+        Column(modifier = Modifier.padding(10.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold
+                )
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = if (expanded) "Collapse" else "Expand",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+            if (expanded) {
+
+                items.forEach { (label, value) ->
+                    ProfileItem(label, value)
+                }
             }
         }
     }
@@ -126,24 +148,44 @@ fun ProfileItem(label: String, value: Any?) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val icon = getIconForLabel(label)
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
         Column {
-            Text(text = label, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer, fontWeight = FontWeight.SemiBold
+            )
             Text(
                 text = value?.toString() ?: "N/A",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             )
+        }
+    }
+}
+@Composable
+fun ActionsSection(onEditClick: () -> Unit, onDeleteAccountClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        ButtonComponent(
+            value = "Edit Profile",
+            onButtonClicked = onEditClick,
+            isEnabled = true,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedButton(
+            onClick = onDeleteAccountClick,
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.colorScheme.error
+            )
+        ) {
+            Text("Delete Account")
         }
     }
 }
@@ -193,24 +235,6 @@ fun groupProfileData(data: Map<String, Any>): List<Pair<String, List<Pair<String
             "Last Updated Source" to data["lastUpdatedSource"]
         )
     )
-}
-
-fun getIconForLabel(label: String): ImageVector {
-    return when (label.toLowerCase()) {
-        "age" -> Icons.Default.Cake
-        "gender" -> Icons.Default.Person
-        "height", "weight" -> Icons.Default.FitnessCenter
-        "blood pressure", "heart rate", "blood sugar", "cholesterol" -> Icons.Default.Attribution
-        "physical activity" -> Icons.Default.DirectionsRun
-        "sleep hours" -> Icons.Default.Bedtime
-        "diet quality" -> Icons.Default.Restaurant
-        "alcohol consumption" -> Icons.Default.LocalBar
-        "smoking" -> Icons.Default.SmokingRooms
-        "stress level" -> Icons.Default.Psychology
-        "air quality index"-> Icons.Default.Air
-        "exposure to pollutants" -> Icons.Default.WbSunny
-        else -> Icons.Default.Info
-    }
 }
 
 fun showToast(context: Context, message: String) {

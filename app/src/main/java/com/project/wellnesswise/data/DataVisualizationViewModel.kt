@@ -1,54 +1,86 @@
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.mikephil.charting.data.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class DataVisualizationViewModel : ViewModel() {
-    val bloodPressureData = listOf(
-        Pair(Entry(0f, 120f), Entry(0f, 80f)),
-        Pair(Entry(1f, 118f), Entry(1f, 78f)),
-        Pair(Entry(2f, 122f), Entry(2f, 82f)),
-        Pair(Entry(3f, 121f), Entry(3f, 79f)),
-        Pair(Entry(4f, 119f), Entry(4f, 81f)),
-        Pair(Entry(5f, 123f), Entry(5f, 83f)),
-        Pair(Entry(6f, 132f), Entry(6f, 80f)),
-        Pair(Entry(7f, 120f), Entry(7f, 80f)),
-        Pair(Entry(8f, 119f), Entry(8f, 78f)),
-        Pair(Entry(9f, 120f), Entry(9f, 73f)),
-        Pair(Entry(10f, 111f), Entry(10f, 89f)),
-        Pair(Entry(11f, 129f), Entry(11f, 84f)),
-        Pair(Entry(12f, 123f), Entry(12f, 82f)),
-        Pair(Entry(13f, 130f), Entry(13f, 81f))
-    )
+    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
-    val heartRateData = listOf(
-        BarEntry(0f, 72f),
-        BarEntry(1f, 62f),
-        BarEntry(2f, 61f),
-        BarEntry(3f, 73f),
-        BarEntry(4f, 75f),
-        BarEntry(5f, 77f),
-        BarEntry(6f, 72f),
-        BarEntry(7f, 92f),
-        BarEntry(8f, 75f),
-        BarEntry(9f, 76f),
-        BarEntry(10f, 53f),
-        BarEntry(11f, 90f),
-        BarEntry(12f, 74f),
-        BarEntry(13f, 92f)
+    private val _diseaseRiskData = MutableStateFlow<Map<String, List<Entry>>>(emptyMap())
+    val diseaseRiskData = _diseaseRiskData.asStateFlow()
 
-    )
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading = _isLoading.asStateFlow()
 
-    fun getOverallHealthData(color: Int): RadarData {
-        return RadarData(RadarDataSet(listOf(
-            RadarEntry(80f),  // Sleep
-            RadarEntry(70f),  // Diet
-            RadarEntry(85f),  // Exercise
-            RadarEntry(65f),  // Stress
-            RadarEntry(75f)   // Hydration
-        ), "Overall Health").apply {
+    private val _error = MutableStateFlow<String?>(null)
+    val error = _error.asStateFlow()
+
+    private var predictionListener: ListenerRegistration? = null
+
+    init {
+        setupPredictionListener()
+    }
+
+    private fun setupPredictionListener() {
+        val userId = auth.currentUser?.uid
+        if (userId == null) {
+            _error.value = "User not logged in"
+            _isLoading.value = false
+            return
+        }
+
+        predictionListener = firestore.collection("users").document(userId)
+            .collection("predictions")
+            .orderBy("timestamp")
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    _error.value = "Failed to listen for prediction updates: ${e.message}"
+                    _isLoading.value = false
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    processPredictionData(snapshot.documents)
+                }
+            }
+    }
+
+    private fun processPredictionData(documents: List<com.google.firebase.firestore.DocumentSnapshot>) {
+        val diseaseData = mutableMapOf<String, MutableList<Entry>>()
+        documents.forEachIndexed { index, document ->
+            val predictions = document.get("predictions") as? List<Map<String, Any>> ?: return@forEachIndexed
+            predictions.forEach { prediction ->
+                val category = prediction["category"] as? String ?: return@forEach
+                val risk = (prediction["risk"] as? Number)?.toFloat() ?: return@forEach
+                diseaseData.getOrPut(category) { mutableListOf() }.add(Entry(index.toFloat(), risk * 100))
+            }
+        }
+        _diseaseRiskData.value = diseaseData
+        _isLoading.value = false
+    }
+
+    fun getLineData(disease: String, color: Int): LineData? {
+        val entries = _diseaseRiskData.value[disease] ?: return null
+        val dataSet = LineDataSet(entries, disease).apply {
             this.color = color
-            fillColor = color
-            setDrawFilled(true)
-            fillAlpha = 180
-        })
+            setCircleColor(color)
+            setDrawValues(false)
+            lineWidth = 2f
+            circleRadius = 4f
+            highLightColor = color
+            setDrawHighlightIndicators(true)
+        }
+        return LineData(dataSet)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        predictionListener?.remove()
     }
 }

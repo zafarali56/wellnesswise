@@ -1,5 +1,6 @@
 package com.project.wellnesswise.data
 
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -7,26 +8,64 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.project.wellnesswise.ml.TFLiteInterpreter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class PredictionsViewModel(private val context: Context) : ViewModel() {
     private val healthDataProcessor = HealthDataProcessor()
-
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     var predictions by mutableStateOf<List<Triple<String, Float, String>>?>(null)
     var modelInput by mutableStateOf<List<Float>?>(null)
         private set
     var isLoading by mutableStateOf(true)
     var errorMessage by mutableStateOf<String?>(null)
-
+    private val _predictionHistory = MutableStateFlow<List<PredictionHistoryItem>>(emptyList())
+    val predictionHistory: StateFlow<List<PredictionHistoryItem>> = _predictionHistory.asStateFlow()
     init {
         healthDataProcessor.startListeningForChanges()
         healthDataProcessor.addListener { loadPredictions() }
         loadPredictions() // Load predictions immediately
     }
+    private fun savePredictionsToFirestore(predictions: List<Triple<String, Float, String>>) {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            Log.e(TAG, "No user logged in")
+            return
+        }
 
+        val userId = currentUser.uid
+        val timestamp = System.currentTimeMillis()
+
+        val predictionData = hashMapOf(
+            "timestamp" to timestamp,
+            "predictions" to predictions.map { (category, risk, context) ->
+                hashMapOf(
+                    "category" to category,
+                    "risk" to risk,
+                    "context" to context
+                )
+            }
+        )
+
+        firestore.collection("users").document(userId)
+            .collection("predictions")
+            .add(predictionData)
+            .addOnSuccessListener { documentReference ->
+                Log.d(TAG, "Prediction saved with ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error adding prediction", e)
+            }
+    }
     fun loadPredictions() {
         viewModelScope.launch {
             isLoading = true
@@ -37,29 +76,38 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
                 }
 
                 input?.let { modelInput ->
-                    Log.d("PredictionsViewModel", "Raw input values: ${modelInput.values.zip(modelInput.labels)}")
+                    Log.d(TAG, "Raw input values: ${modelInput.values.zip(modelInput.labels)}")
 
                     val tfliteInterpreter = TFLiteInterpreter(context, "enhanced_health_risk_model.tflite")
 
                     val outputData = withContext(Dispatchers.Default) {
                         tfliteInterpreter.predict(modelInput.values.toFloatArray())
                     }
-                    Log.d("PredictionsViewModel", "Raw model output: ${outputData.toList()}")
+                    Log.d(TAG, "Raw model output: ${outputData.toList()}")
 
-                    predictions = HealthDataProcessor.riskCategories.zip(outputData.toList()).map { (category, risk) ->
+                    val newPredictions = HealthDataProcessor.riskCategories.zip(outputData.toList()).map { (category, risk) ->
                         val riskLevel = classifyRisk(risk)
-                        Log.d("PredictionsViewModel", "$category: $risk ($riskLevel)")
+                        Log.d(TAG, "$category: $risk ($riskLevel)")
                         val context = getRiskContext(category, risk, modelInput.values[0])
-                        Log.d("PredictionsViewModel", "$category: $risk ($riskLevel)")
-                        Log.d("PredictionsViewModel", "Context: $context")
+                        Log.d(TAG, "$category: $risk ($riskLevel)")
+                        Log.d(TAG, "Context: $context")
                         Triple(category, risk, context)
                     }
+
+                    if (arePredictionsDifferent(predictions, newPredictions)) {
+                        predictions = newPredictions
+                        savePredictionsToFirestore(newPredictions)
+                        Log.d(TAG, "New predictions saved to Firestore")
+                    } else {
+                        Log.d(TAG, "Predictions unchanged, not saving to Firestore")
+                    }
+
 
                     tfliteInterpreter.close()
                 }
             } catch (e: Exception) {
                 errorMessage = "An error occurred: ${e.message}"
-                Log.e("PredictionsViewModel", "Error: ", e)
+                Log.e(TAG, "Error: ", e)
             } finally {
                 isLoading = false
             }
@@ -75,6 +123,9 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
             else -> "Critical"
         }
     }
+
+
+
 
     private fun getRiskContext(category: String, risk: Float, age: Number): String {
         val riskLevel = classifyRisk(risk)
@@ -116,4 +167,51 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
         healthDataProcessor.removeListener { loadPredictions() }
         healthDataProcessor.stopListeningForChanges()
     }
+    fun fetchPredictionHistory() {
+        viewModelScope.launch {
+            val currentUser = auth.currentUser
+            if (currentUser == null) {
+                Log.e(TAG, "No user logged in")
+                return@launch
+            }
+
+            val userId = currentUser.uid
+            firestore.collection("users").document(userId)
+                .collection("predictions")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(10) // Limit to the 10 most recent predictions
+                .get()
+                .addOnSuccessListener { result ->
+                    val history = result.mapNotNull { document ->
+                        val timestamp = document.getLong("timestamp") ?: return@mapNotNull null
+                        val predictions = document.get("predictions") as? List<Map<String, Any>> ?: return@mapNotNull null
+                        PredictionHistoryItem(
+                            timestamp = timestamp,
+                            predictions = predictions.map { pred ->
+                                Triple(
+                                    pred["category"] as String,
+                                    (pred["risk"] as Number).toFloat(),
+                                    pred["context"] as String
+                                )
+                            }
+                        )
+                    }.distinctBy { it.predictions } // Keep only unique predictions
+                    _predictionHistory.value = history
+                }
+                .addOnFailureListener { exception ->
+                    Log.w(TAG, "Error getting prediction history", exception)
+                }
+        }
+    }
+    private fun arePredictionsDifferent(oldPredictions: List<Triple<String, Float, String>>?, newPredictions: List<Triple<String, Float, String>>): Boolean {
+        if (oldPredictions == null) return true
+        if (oldPredictions.size != newPredictions.size) return true
+        return oldPredictions.zip(newPredictions).any { (old, new) ->
+            old.first != new.first || old.second != new.second
+        }
+    }
+    data class PredictionHistoryItem(
+        val timestamp: Long,
+        val predictions: List<Triple<String, Float, String>>
+    )
 }

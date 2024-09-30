@@ -113,6 +113,7 @@ fun EditProfileScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 22.dp)
+                    .padding(vertical = 6.dp)
             ) {
                 item {
                     MyTextField(

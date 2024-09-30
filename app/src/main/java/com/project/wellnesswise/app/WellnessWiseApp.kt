@@ -7,6 +7,7 @@ import HomeScreen
 import HomeViewModel
 import LoginScreen
 import LoginViewModel
+import PredictionHistoryScreen
 import UserProfileScreen
 import android.annotation.SuppressLint
 import androidx.compose.animation.Crossfade
@@ -81,6 +82,7 @@ fun WellnessWiseApp(
                         }
                     )
                 }
+                is Screen.PredictionHistoryScreen -> PredictionHistoryScreen()
             }
         }
     }

@@ -1,43 +1,79 @@
 package com.project.wellnesswise.screens
 
 import PredictionsViewModelFactory
-import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Dangerous
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.project.wellnesswise.components.ui.LoadingAnimation
 import com.project.wellnesswise.data.HealthDataProcessor
 import com.project.wellnesswise.data.PredictionsViewModel
-import com.project.wellnesswise.ml.TFLiteInterpreter
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlin.math.log
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
+
+
 @Composable
 
 fun PredictionsScreen(viewModel: PredictionsViewModel = viewModel(factory = PredictionsViewModelFactory(LocalContext.current))) {
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = !isSystemInDarkTheme()
     val context = LocalContext.current
-
-    val colorScheme = if (useDarkIcons) {
-        dynamicLightColorScheme(context)
-    } else {
-        dynamicDarkColorScheme(context)
+    // Use dynamic color scheme
+    val colorScheme = when {
+        useDarkIcons -> dynamicLightColorScheme(context)
+        else -> dynamicDarkColorScheme(context)
     }
 
     LaunchedEffect(colorScheme) {
@@ -46,116 +82,141 @@ fun PredictionsScreen(viewModel: PredictionsViewModel = viewModel(factory = Pred
             darkIcons = useDarkIcons
         )
     }
-
-    // Load predictions when the screen is first composed
-    LaunchedEffect(Unit) {
-        viewModel.loadPredictions()
-    }
-
     MaterialTheme(colorScheme = colorScheme) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(text = "Health Risk Predictions") },
+                    title = { Text("Health Risk Predictions") },
                     navigationIcon = {
-                        IconButton(onClick = {
-                            WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
-                        }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back"
-                            )
+                        IconButton(onClick = { WellnessWiseAppRouter.navigateTo(Screen.HomeScreen) }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { WellnessWiseAppRouter.navigateTo(Screen.PredictionHistoryScreen)  }) {
+                            Icon(Icons.Default.History, "Prediction History")
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                        titleContentColor = colorScheme.onPrimaryContainer
                     )
                 )
-            },
-            containerColor = colorScheme.background
+            }
         ) { innerPadding ->
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                color = colorScheme.background
-            ) {
-                when {
-                    viewModel.isLoading -> {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            CircularProgressIndicator(modifier = Modifier.align(androidx.compose.ui.Alignment.Center))
-                        }
-                    }
-                    viewModel.errorMessage != null -> {
-                        Text(
-                            text = viewModel.errorMessage!!,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                    else -> {
-                        LazyColumn(modifier = Modifier.padding(16.dp)) {
-                            item {
-                                Text(
-                                    text = "Your Health Data (Model Input):",
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    modifier = Modifier.padding(bottom = 16.dp)
-                                )
-                            }
-                            items(HealthDataProcessor.inputLabels.zip(viewModel.modelInput ?: emptyList())) { (label, value) ->
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 4.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(text = label, style = MaterialTheme.typography.bodyMedium)
-                                    Text(text = value.toString(), style = MaterialTheme.typography.bodyMedium)
-                                    Log.d("PredictionsScreen", "Label: $label, Value: $value")
-                                }
-                            }
+        when {
+            viewModel.isLoading -> {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    LoadingAnimation()
 
-                            viewModel.predictions?.let { preds ->
-                                items(preds) { (category, risk, context) ->
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(vertical = 8.dp)
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween
-                                        ) {
-                                            Text(text = category, style = MaterialTheme.typography.bodyLarge)
-                                            val riskLevel = viewModel.classifyRisk(risk)
-                                            Text(
-                                                text = "$riskLevel",
-                                                style = MaterialTheme.typography.bodyLarge,
-                                                color = when (riskLevel) {
-                                                    "Stable" -> MaterialTheme.colorScheme.primary
-                                                    "Mild" -> MaterialTheme.colorScheme.secondary
-                                                    "Moderate" -> MaterialTheme.colorScheme.tertiary
-                                                    "Severe", "Critical" -> MaterialTheme.colorScheme.error
-                                                    else -> MaterialTheme.colorScheme.onSurface
-                                                }
-                                            )
-                                        }
-                                        Text(
-                                            text = context,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            modifier = Modifier.padding(top = 4.dp)
-                                        )
-                                    }
-                                }
-                            }
+                }
+            }
+            viewModel.errorMessage != null -> {
+                Text(
+                    text = viewModel.errorMessage!!,
+                    color = colorScheme.error,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(horizontal = 16.dp)
+                        .padding(vertical = 10.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(HealthDataProcessor.inputLabels.zip(viewModel.modelInput ?: emptyList())) { (label, value) ->
+                        HealthDataItem(label, value.toString())
+                    }
+                    viewModel.predictions?.let { preds ->
+                        items(preds) { (category, risk, context) ->
+                            PredictionCard(category, risk, context, viewModel)
                         }
                     }
                 }
             }
         }
     }
+}
     SystemBackButtonHandler {
         WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
+    }
+}
+
+@Composable
+fun HealthDataItem(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, style = MaterialTheme.typography.bodyMedium)
+        Text(text = value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+fun PredictionCard(category: String, risk: Float, context: String, viewModel: PredictionsViewModel) {
+    val riskLevel = viewModel.classifyRisk(risk)
+    val (icon, color) = getRiskIconAndColor(riskLevel)
+
+    Card(
+
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = colorScheme.secondaryContainer,
+            contentColor = colorScheme.onSecondaryContainer
+        )) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                        text = category,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                )
+
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = color)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = colorScheme.onPrimary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = riskLevel,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = colorScheme.onPrimary
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = context, style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+}
+
+@Composable
+fun getRiskIconAndColor(riskLevel: String): Pair<ImageVector, Color> {
+    return when (riskLevel) {
+        "Stable" -> Icons.Default.CheckCircle to colorScheme.primary
+        "Mild" -> Icons.Default.Info to colorScheme.secondary
+        "Moderate" -> Icons.Default.Warning to colorScheme.tertiary
+        "Severe" -> Icons.Default.Error to colorScheme.error
+        "Critical" -> Icons.Default.Dangerous to colorScheme.error
+        else -> Icons.AutoMirrored.Filled.Help to colorScheme.outline
     }
 }
