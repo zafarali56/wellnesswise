@@ -43,8 +43,17 @@ class AuthViewModel(
             val credential = EmailAuthProvider.getCredential(user.email!!, password)
             user.reauthenticate(credential).await()
 
-            // Delete Firestore data
-            firestore.collection("users").document(user.uid).delete().await()
+            // Delete predictions subcollection
+            val userDocRef = firestore.collection("users").document(user.uid)
+            val predictionsRef = userDocRef.collection("predictions")
+            val predictionsSnapshot = predictionsRef.get().await()
+            for (doc in predictionsSnapshot.documents) {
+                doc.reference.delete().await()
+            }
+            Log.d(TAG, "User prediction history deleted successfully")
+
+            // Delete the main user document
+            userDocRef.delete().await()
             Log.d(TAG, "User Firestore data deleted successfully")
 
             // Delete the authentication account

@@ -89,7 +89,6 @@ fun UserProfileScreen(authViewModel: AuthViewModel, registrationViewModel: Regis
                 Box(modifier = Modifier.fillMaxSize()) {
                     when (currentView) {
                         "main" -> MainProfileView(
-                            user = user,
                             userData = userData,
                             isLoading = isLoading,
                             onEditClick = { currentView = "edit" },
@@ -152,7 +151,7 @@ fun UserProfileScreen(authViewModel: AuthViewModel, registrationViewModel: Regis
                     title = { Text("Delete Account") },
                     text = {
                         Column {
-                            Text("Are you sure you want to delete your account? This action cannot be undone. Please enter your password to confirm.")
+                            Text("Are you sure you want to delete your account? This action cannot be undone and will delete all your data, including prediction history. Please enter your password to confirm.")
                             Spacer(modifier = Modifier.height(16.dp))
                             MyPasswordField(
                                 labelValue = "Password",
@@ -163,7 +162,7 @@ fun UserProfileScreen(authViewModel: AuthViewModel, registrationViewModel: Regis
                             if (isDeleting) {
                                 Spacer(modifier = Modifier.height(16.dp))
                                 LoadingAnimation()
-                                Text("Deleting account... Please wait.",
+                                Text("Deleting account and all associated data... Please wait.",
                                     modifier = Modifier.padding(top = 8.dp))
                             }
                         }
