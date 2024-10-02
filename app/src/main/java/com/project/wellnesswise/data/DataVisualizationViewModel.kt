@@ -1,6 +1,9 @@
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -22,18 +25,29 @@ class DataVisualizationViewModel : ViewModel() {
     val error = _error.asStateFlow()
 
     private var predictionListener: ListenerRegistration? = null
+    private var authStateListener: FirebaseAuth.AuthStateListener? = null
 
     init {
-        setupPredictionListener()
+        setupAuthStateListener()
     }
 
-    private fun setupPredictionListener() {
-        val userId = auth.currentUser?.uid
-        if (userId == null) {
-            _error.value = "User not logged in"
-            _isLoading.value = false
-            return
+    private fun setupAuthStateListener() {
+        authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            val user = firebaseAuth.currentUser
+            if (user != null) {
+                setupPredictionListener(user.uid)
+            } else {
+                clearData()
+            }
         }
+        auth.addAuthStateListener(authStateListener!!)
+    }
+
+    private fun setupPredictionListener(userId: String) {
+        predictionListener?.remove() // Remove any existing listener
+
+        _isLoading.value = true
+        _error.value = null
 
         predictionListener = firestore.collection("users").document(userId)
             .collection("predictions")
@@ -46,7 +60,12 @@ class DataVisualizationViewModel : ViewModel() {
                 }
 
                 if (snapshot != null) {
-                    processPredictionData(snapshot.documents)
+                    viewModelScope.launch {
+                        processPredictionData(snapshot.documents)
+                    }
+                } else {
+                    _diseaseRiskData.value = emptyMap()
+                    _isLoading.value = false
                 }
             }
     }
@@ -70,17 +89,33 @@ class DataVisualizationViewModel : ViewModel() {
         val dataSet = LineDataSet(entries, disease).apply {
             this.color = color
             setCircleColor(color)
-            setDrawValues(false)
+            setDrawValues(true)
             lineWidth = 2f
             circleRadius = 4f
             highLightColor = color
             setDrawHighlightIndicators(true)
+            valueFormatter = PercentageValueFormatter()
+            valueTextColor = color
+            valueTextSize = 10f
         }
         return LineData(dataSet)
+    }
+
+    private inner class PercentageValueFormatter : ValueFormatter() {
+        override fun getFormattedValue(value: Float): String {
+            return String.format("%.1f%%", value)
+        }
+    }
+
+    private fun clearData() {
+        _diseaseRiskData.value = emptyMap()
+        _isLoading.value = false
+        _error.value = "Please log in to view your prediction history"
     }
 
     override fun onCleared() {
         super.onCleared()
         predictionListener?.remove()
+        authStateListener?.let { auth.removeAuthStateListener(it) }
     }
 }

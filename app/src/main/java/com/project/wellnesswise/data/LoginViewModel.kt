@@ -162,6 +162,7 @@ class LoginViewModel : ViewModel() {
     }
 
     fun resetLoginUIState() {
+        errorMessage.value = null
         loginUIState.value = LoginUIState()
         logInProgress.value = false
         needsGoogleFitPermissions.value = false

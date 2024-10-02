@@ -656,7 +656,6 @@ fun NavigationItem(
     }
 }
 
-// Add this function to get the appropriate title for each screen
 fun getScreenTitle(screen: Screen): String {
     return when (screen) {
         Screen.HomeScreen -> "Wellness Wise"
@@ -664,7 +663,6 @@ fun getScreenTitle(screen: Screen): String {
         Screen.DataVisualizationScreen -> "Data Visualization"
         Screen.PredictionsScreen -> "Health Risk Predictions"
         Screen.PersonalizedRecommendationsScreen -> "Recommendations"
-        // Add other screens as needed
         else -> "Wellness Wise" // Default title
     }
 }

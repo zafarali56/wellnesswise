@@ -1,12 +1,32 @@
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,7 +38,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
@@ -76,7 +101,6 @@ fun DataVisualizationScreen(dataVisualizationViewModel: DataVisualizationViewMod
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
             ) {
                 when {
                     isLoading -> {
@@ -105,12 +129,15 @@ fun DataVisualizationScreen(dataVisualizationViewModel: DataVisualizationViewMod
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
+                                .padding(innerPadding)
                                 .padding(horizontal = 16.dp),
                             verticalArrangement = Arrangement.spacedBy(24.dp)
                         ) {
                             diseaseRiskData.forEach { (disease, _) ->
                                 item {
+
                                     ChartBox(
+
                                         title = "$disease Risk Trend",
                                         content = {
                                             dataVisualizationViewModel.getLineData(disease, colorScheme.primary.toArgb())?.let { lineData ->
@@ -127,16 +154,17 @@ fun DataVisualizationScreen(dataVisualizationViewModel: DataVisualizationViewMod
                                         }
                                     )
                                 }
+
                             }
                         }
                     }
                 }
+
+                SystemBackButtonHandler {
+                    WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
+                }
             }
         }
-    }
-
-    SystemBackButtonHandler {
-        WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
     }
 }
 
@@ -152,10 +180,12 @@ fun LineChartComponent(
             LineChart(context).apply {
                 this.data = data
                 description.isEnabled = false
-                legend.isEnabled = true
-                legend.textColor = textColor
+                legend.isEnabled = false // Disable legend for cleaner look
                 axisLeft.textColor = textColor
                 axisLeft.setDrawGridLines(false)
+                axisLeft.valueFormatter = PercentFormatter()
+                axisLeft.axisMinimum = 0f
+                axisLeft.axisMaximum = 100f
                 axisRight.isEnabled = false
                 xAxis.position = XAxis.XAxisPosition.BOTTOM
                 xAxis.textColor = textColor
@@ -165,14 +195,55 @@ fun LineChartComponent(
                 isDragEnabled = true
                 setScaleEnabled(true)
                 setPinchZoom(true)
-                animateX(1000)
-                invalidate()
+
+                // Customize the appearance of the line and circles
+                data.dataSets.forEach { set ->
+                    if (set is LineDataSet) {
+                        set.setDrawFilled(true)
+                        set.fillAlpha = 50 // Semi-transparent fill
+                        set.setDrawCircles(true)
+                        set.setDrawCircleHole(true)
+                        set.circleRadius = 4f
+                        set.circleHoleRadius = 2f
+                        set.setDrawValues(false)
+                        set.highLightColor = androidx.compose.ui.graphics.Color.Red.toArgb()// Highlight color
+                        set.highlightLineWidth = 2f
+                    }
+                }
+
+                // Enable highlighting for interaction
+                data.isHighlightEnabled = true
+
+                // Set up value formatter for highlighted values
+                val formatter = PercentFormatter()
+                setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
+                    override fun onValueSelected(e: Entry?, h: Highlight?) {
+                        e?.let {
+                            val formattedValue = formatter.getFormattedValue(it.y)
+                            Log.d("ChartValue", "Selected value: $formattedValue")
+                            // You can use this formattedValue to display in a tooltip or some other UI element
+                        }
+                    }
+
+                    override fun onNothingSelected() {}
+                })
+
+                // Set visible range
+                val visibleRange = 20f
+                val totalEntries = data.entryCount.toFloat()
+                if (totalEntries > visibleRange) {
+                    val endX = totalEntries - 1
+                    setVisibleXRangeMaximum(visibleRange)
+                    moveViewToX(endX)
+                }
+
+                // Animate the chart
+                animateXY(1500, 1500)
             }
         },
         modifier = modifier
     )
 }
-
 @Composable
 fun ChartBox(
     title: String,
@@ -196,3 +267,5 @@ fun ChartBox(
         }
     }
 }
+
+

@@ -45,7 +45,6 @@ import com.project.wellnesswise.data.LoginUIEvent
 import com.project.wellnesswise.data.rules.Validator
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @Composable
 fun LoginScreen(loginViewModel: LoginViewModel) {
