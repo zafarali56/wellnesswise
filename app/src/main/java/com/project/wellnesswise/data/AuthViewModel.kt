@@ -1,5 +1,6 @@
 package com.project.wellnesswise.data
 
+import DataVisualizationViewModel
 import HealthDataViewModel
 import LoginViewModel
 import android.util.Log
@@ -17,7 +18,8 @@ class AuthViewModel(
     private val registrationViewModel: RegistrationViewModel,
     private val loginViewModel: LoginViewModel,
     private val healthDataViewModel: HealthDataViewModel,
-    private val predictionsViewModel: PredictionsViewModel
+    private val predictionsViewModel: PredictionsViewModel,
+    private val dataVisualizationViewModel: DataVisualizationViewModel
 ) : ViewModel() {
     private val TAG = AuthViewModel::class.simpleName
     private val firebaseAuth = FirebaseAuth.getInstance()
@@ -79,5 +81,6 @@ class AuthViewModel(
         loginViewModel.resetLoginUIState()
         healthDataViewModel.resetHealthData()
         predictionsViewModel.resetPredictions()
+        dataVisualizationViewModel.resetVisualizationData()
     }
 }

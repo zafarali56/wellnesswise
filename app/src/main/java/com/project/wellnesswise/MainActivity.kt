@@ -71,10 +71,10 @@ class MainActivity : ComponentActivity() {
             val predictionsViewModel: PredictionsViewModel = viewModel(
                 factory = PredictionsViewModelFactory(applicationContext)
             )
-            val authViewModel: AuthViewModel = viewModel {
-                AuthViewModel(registrationViewModel, loginViewModel, healthDataViewModel, predictionsViewModel)
-            }
             val dataVisualizationViewModel: DataVisualizationViewModel = viewModel()
+            val authViewModel: AuthViewModel = viewModel {
+                AuthViewModel(registrationViewModel, loginViewModel, healthDataViewModel, predictionsViewModel, dataVisualizationViewModel)
+            }
 
             WellnessWiseApp(
                 homeViewModel = homeViewModel,

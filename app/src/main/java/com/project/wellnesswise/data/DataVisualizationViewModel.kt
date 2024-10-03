@@ -118,4 +118,12 @@ class DataVisualizationViewModel : ViewModel() {
         predictionListener?.remove()
         authStateListener?.let { auth.removeAuthStateListener(it) }
     }
+
+    fun resetVisualizationData() {
+        _diseaseRiskData.value = emptyMap()
+        _isLoading.value = false
+        _error.value = null
+        predictionListener?.remove()
+        predictionListener = null
+    }
 }

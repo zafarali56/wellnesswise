@@ -48,7 +48,15 @@ object Validator {
         return isPolicyAccepted
     }
 
+    // Triglycerides validation
+    fun validateTriglycerides(triglycerides: String): Boolean {
+        return triglycerides.toFloatOrNull()?.let { it in 50f..500f } ?: false
+    }
 
+    // Waist Circumference validation
+    fun validateWaistCircumference(waistCircumference: String): Boolean {
+        return waistCircumference.toFloatOrNull()?.let { it in 50f..200f } ?: false
+    }
     // New validation methods for health assessment fields
     fun validateYesNoAnswer(answer: String): Boolean {
         return answer == "Yes" || answer == "No"
@@ -133,29 +141,34 @@ object Validator {
         return cholesterol.toFloatOrNull()?.let { it in 100f..300f } ?: false
     }
 
-    // Validate health parameters
     fun validateHealthParameters(
         bloodPressure: String,
         heartRate: String,
         bloodSugar: String,
-        cholesterol: String
+        cholesterol: String,
+        triglycerides: String,
+        waistCircumference: String
     ): Map<String, Boolean> {
         return mapOf(
             "bloodPressure" to validateBloodPressure(bloodPressure),
             "heartRate" to validateHeartRate(heartRate),
             "bloodSugar" to validateBloodSugar(bloodSugar),
-            "cholesterol" to validateCholesterol(cholesterol)
+            "cholesterol" to validateCholesterol(cholesterol),
+            "triglycerides" to validateTriglycerides(triglycerides),
+            "waistCircumference" to validateWaistCircumference(waistCircumference)
         )
     }
 
-    // Check if health parameters are valid
+    // Update isValidHealthParameters to include new parameters
     fun isValidHealthParameters(
         bloodPressure: String,
         heartRate: String,
         bloodSugar: String,
-        cholesterol: String
+        cholesterol: String,
+        triglycerides: String,
+        waistCircumference: String
     ): Boolean {
-        val validationResults = validateHealthParameters(bloodPressure, heartRate, bloodSugar, cholesterol)
+        val validationResults = validateHealthParameters(bloodPressure, heartRate, bloodSugar, cholesterol, triglycerides, waistCircumference)
         return validationResults.all { it.value }
     }
 }
