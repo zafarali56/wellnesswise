@@ -16,7 +16,8 @@ import kotlinx.coroutines.withContext
 class AuthViewModel(
     private val registrationViewModel: RegistrationViewModel,
     private val loginViewModel: LoginViewModel,
-    private val healthDataViewModel: HealthDataViewModel
+    private val healthDataViewModel: HealthDataViewModel,
+    private val predictionsViewModel: PredictionsViewModel
 ) : ViewModel() {
     private val TAG = AuthViewModel::class.simpleName
     private val firebaseAuth = FirebaseAuth.getInstance()
@@ -77,5 +78,6 @@ class AuthViewModel(
         registrationViewModel.resetRegistrationUIState()
         loginViewModel.resetLoginUIState()
         healthDataViewModel.resetHealthData()
+        predictionsViewModel.resetPredictions()
     }
 }

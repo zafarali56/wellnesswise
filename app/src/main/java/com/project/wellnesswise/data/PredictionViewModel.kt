@@ -30,11 +30,25 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
     var errorMessage by mutableStateOf<String?>(null)
     private val _predictionHistory = MutableStateFlow<List<PredictionHistoryItem>>(emptyList())
     val predictionHistory: StateFlow<List<PredictionHistoryItem>> = _predictionHistory.asStateFlow()
+    private var tfliteInterpreter: TFLiteInterpreter? = null
+    private var isModelLoaded = false
+
     init {
-        healthDataProcessor.startListeningForChanges()
-        healthDataProcessor.addListener { loadPredictions() }
-        loadPredictions() // Load predictions immediately
+        viewModelScope.launch {
+            loadModel()
+            healthDataProcessor.startListeningForChanges()
+            healthDataProcessor.addListener { loadPredictions() }
+            loadPredictions()
+        }
     }
+    private suspend fun loadModel() {
+        withContext(Dispatchers.Default) {
+            tfliteInterpreter = TFLiteInterpreter(context, "enhanced_health_risk_model.tflite")
+            isModelLoaded = true
+            loadPredictions() // Attempt to load predictions once the model is ready
+        }
+    }
+
     private fun savePredictionsToFirestore(predictions: List<Triple<String, Float, String>>) {
         val currentUser = auth.currentUser
         if (currentUser == null) {
@@ -71,17 +85,27 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
             isLoading = true
             errorMessage = null
             try {
+                if (!isModelLoaded) {
+                    Log.d(TAG, "Model not loaded yet, skipping predictions")
+                    return@launch
+                }
+
                 val input = withContext(Dispatchers.IO) {
                     healthDataProcessor.getUserHealthData()
                 }
 
-                input?.let { modelInput ->
+                if (input == null) {
+                    Log.d(TAG, "User health data not available yet")
+                    errorMessage = "Health data not available. Please complete your health assessment."
+                    isLoading = false
+                    return@launch
+                }
+
+                input.let { modelInput ->
                     Log.d(TAG, "Raw input values: ${modelInput.values.zip(modelInput.labels)}")
 
-                    val tfliteInterpreter = TFLiteInterpreter(context, "enhanced_health_risk_model.tflite")
-
                     val outputData = withContext(Dispatchers.Default) {
-                        tfliteInterpreter.predict(modelInput.values.toFloatArray())
+                        tfliteInterpreter?.predict(modelInput.values.toFloatArray()) ?: floatArrayOf()
                     }
                     Log.d(TAG, "Raw model output: ${outputData.toList()}")
 
@@ -101,9 +125,6 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
                     } else {
                         Log.d(TAG, "Predictions unchanged, not saving to Firestore")
                     }
-
-
-                    tfliteInterpreter.close()
                 }
             } catch (e: Exception) {
                 errorMessage = "An error occurred: ${e.message}"
@@ -166,6 +187,7 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
         super.onCleared()
         healthDataProcessor.removeListener { loadPredictions() }
         healthDataProcessor.stopListeningForChanges()
+        tfliteInterpreter?.close()
     }
     fun fetchPredictionHistory() {
         viewModelScope.launch {
@@ -203,6 +225,16 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
                 }
         }
     }
+
+    fun resetPredictions()
+    {
+        predictions = null
+        modelInput = null
+        isLoading = false
+        errorMessage = null
+        _predictionHistory.value = emptyList()
+    }
+
     private fun arePredictionsDifferent(oldPredictions: List<Triple<String, Float, String>>?, newPredictions: List<Triple<String, Float, String>>): Boolean {
         if (oldPredictions == null) return true
         if (oldPredictions.size != newPredictions.size) return true

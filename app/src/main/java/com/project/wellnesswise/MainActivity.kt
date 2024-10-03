@@ -5,6 +5,7 @@ import HealthDataSyncWorker
 import HealthDataViewModel
 import HomeViewModel
 import LoginViewModel
+import PredictionsViewModelFactory
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -29,6 +30,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.project.wellnesswise.app.WellnessWiseApp
 import com.project.wellnesswise.data.AuthViewModel
+import com.project.wellnesswise.data.PredictionsViewModel
 import com.project.wellnesswise.data.RegistrationViewModel
 
 class MainActivity : ComponentActivity() {
@@ -66,7 +68,12 @@ class MainActivity : ComponentActivity() {
             val registrationViewModel: RegistrationViewModel = viewModel()
             val loginViewModel: LoginViewModel = viewModel()
             val healthDataViewModel: HealthDataViewModel = viewModel()
-            val authViewModel: AuthViewModel = viewModel { AuthViewModel(registrationViewModel, loginViewModel, healthDataViewModel) }
+            val predictionsViewModel: PredictionsViewModel = viewModel(
+                factory = PredictionsViewModelFactory(applicationContext)
+            )
+            val authViewModel: AuthViewModel = viewModel {
+                AuthViewModel(registrationViewModel, loginViewModel, healthDataViewModel, predictionsViewModel)
+            }
             val dataVisualizationViewModel: DataVisualizationViewModel = viewModel()
 
             WellnessWiseApp(
@@ -78,7 +85,7 @@ class MainActivity : ComponentActivity() {
                 onRequestGoogleFitPermission = {
                     requestGoogleFitPermissions()
                 },
-                dataVisualizationViewModel = DataVisualizationViewModel(),
+                dataVisualizationViewModel = dataVisualizationViewModel,
             )
         }
     }

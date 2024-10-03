@@ -32,6 +32,7 @@ fun WellnessWiseApp(
     healthDataViewModel: HealthDataViewModel,
     onRequestGoogleFitPermission: () -> Unit,
     dataVisualizationViewModel : DataVisualizationViewModel ,
+
 ) {
     homeViewModel.checkForActiveSession()
 

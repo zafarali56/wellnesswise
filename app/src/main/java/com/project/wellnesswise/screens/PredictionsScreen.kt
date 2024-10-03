@@ -75,7 +75,9 @@ fun PredictionsScreen(viewModel: PredictionsViewModel = viewModel(factory = Pred
         useDarkIcons -> dynamicLightColorScheme(context)
         else -> dynamicDarkColorScheme(context)
     }
-
+    LaunchedEffect(Unit) {
+        viewModel.loadPredictions()
+    }
     LaunchedEffect(colorScheme) {
         systemUiController.setSystemBarsColor(
             color = colorScheme.background,
