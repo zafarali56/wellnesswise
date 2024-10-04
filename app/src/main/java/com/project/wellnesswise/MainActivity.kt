@@ -5,6 +5,8 @@ import HealthDataSyncWorker
 import HealthDataViewModel
 import HomeViewModel
 import LoginViewModel
+import PersonalizedRecommendationsViewModel
+import PersonalizedRecommendationsViewModelFactory
 import PredictionsViewModelFactory
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -75,6 +77,13 @@ class MainActivity : ComponentActivity() {
             val authViewModel: AuthViewModel = viewModel {
                 AuthViewModel(registrationViewModel, loginViewModel, healthDataViewModel, predictionsViewModel, dataVisualizationViewModel)
             }
+            val personalizedRecommendationsViewModel: PersonalizedRecommendationsViewModel = viewModel(
+                factory = PersonalizedRecommendationsViewModelFactory(
+                    FirebaseFirestore.getInstance(),
+                    FirebaseAuth.getInstance(),
+                    predictionsViewModel
+                )
+            )
 
             WellnessWiseApp(
                 homeViewModel = homeViewModel,
@@ -86,6 +95,7 @@ class MainActivity : ComponentActivity() {
                     requestGoogleFitPermissions()
                 },
                 dataVisualizationViewModel = dataVisualizationViewModel,
+                personalizedRecommendationsViewModel = personalizedRecommendationsViewModel
             )
         }
     }

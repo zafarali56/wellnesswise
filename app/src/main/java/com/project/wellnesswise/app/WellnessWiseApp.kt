@@ -7,6 +7,7 @@ import HomeScreen
 import HomeViewModel
 import LoginScreen
 import LoginViewModel
+import PersonalizedRecommendationsViewModel
 import PredictionHistoryScreen
 import UserProfileScreen
 import android.annotation.SuppressLint
@@ -17,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.project.wellnesswise.components.ui.HealthAssessmentMode
 import com.project.wellnesswise.data.AuthViewModel
+import com.project.wellnesswise.data.PredictionsViewModel
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
@@ -32,7 +34,7 @@ fun WellnessWiseApp(
     healthDataViewModel: HealthDataViewModel,
     onRequestGoogleFitPermission: () -> Unit,
     dataVisualizationViewModel : DataVisualizationViewModel ,
-
+    personalizedRecommendationsViewModel : PersonalizedRecommendationsViewModel
 ) {
     homeViewModel.checkForActiveSession()
 
@@ -59,7 +61,7 @@ fun WellnessWiseApp(
                 )
 
                 is Screen.PredictionsScreen -> PredictionsScreen()
-                is Screen.PersonalizedRecommendationsScreen -> PersonalizedRecommendationsScreen()
+                is Screen.PersonalizedRecommendationsScreen -> PersonalizedRecommendationsScreen(personalizedRecommendationsViewModel)
                 is Screen.HealthAssessmentScreen -> {
                     val mode = registrationViewModel.currentMode.value
                     HealthAssessmentScreen(
