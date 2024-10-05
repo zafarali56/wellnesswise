@@ -7,9 +7,11 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.project.wellnesswise.data.PredictionsViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.time.Instant
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 
 class PersonalizedRecommendationsViewModel(
     private val firestore: FirebaseFirestore,
@@ -26,6 +28,7 @@ class PersonalizedRecommendationsViewModel(
     private val recommendationSystem = HealthRecommendationSystem()
 
     private var userDataListener: ListenerRegistration? = null
+    private var updateJob: Job? = null
 
     init {
         setupDataListeners()
@@ -41,10 +44,27 @@ class PersonalizedRecommendationsViewModel(
                             return@addSnapshotListener
                         }
                         if (snapshot != null && snapshot.exists()) {
-                            loadRecommendations()
+                            triggerRecommendationUpdate()
                         }
                     }
+
+                // Listen for changes in predictions
+                launch {
+                    predictionsViewModel.predictions.collectLatest { predictions ->
+                        if (predictions != null) {
+                            triggerRecommendationUpdate()
+                        }
+                    }
+                }
             }
+        }
+    }
+
+    private fun triggerRecommendationUpdate() {
+        updateJob?.cancel()
+        updateJob = viewModelScope.launch {
+            delay(500) // Debounce for 500ms
+            loadRecommendations()
         }
     }
 
@@ -53,9 +73,13 @@ class PersonalizedRecommendationsViewModel(
             _isLoading.value = true
             try {
                 val userData = getUserData()
-                val predictions = predictionsViewModel.predictions ?: emptyList()
-                val newRecommendations = recommendationSystem.generateRecommendations(userData, predictions)
-                _recommendations.value = newRecommendations
+                val predictions = predictionsViewModel.predictions.value
+                if (predictions != null) {
+                    val newRecommendations = recommendationSystem.generateRecommendations(userData, predictions)
+                    _recommendations.value = newRecommendations
+                } else {
+                    _recommendations.value = listOf("Predictions not available. Please try again later.")
+                }
             } catch (e: Exception) {
                 _recommendations.value = listOf("Unable to load recommendations. Please try again later.")
             } finally {
@@ -77,6 +101,7 @@ class PersonalizedRecommendationsViewModel(
     override fun onCleared() {
         super.onCleared()
         userDataListener?.remove()
+        updateJob?.cancel()
     }
 }
 

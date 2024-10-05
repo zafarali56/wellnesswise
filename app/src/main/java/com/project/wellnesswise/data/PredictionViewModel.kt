@@ -28,9 +28,11 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
     private val healthDataProcessor = HealthDataProcessor()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    var predictions by mutableStateOf<List<Triple<String, Float, String>>?>(null)
-    var modelInput by mutableStateOf<List<Float>?>(null)
-        private set
+    private val _predictions = MutableStateFlow<List<Triple<String, Float, String>>?>(null)
+    val predictions: StateFlow<List<Triple<String, Float, String>>?> = _predictions.asStateFlow()
+
+    private val _modelInput = MutableStateFlow<List<Float>?>(null)
+    val modelInput: StateFlow<List<Float>?> = _modelInput.asStateFlow()
     var isLoading by mutableStateOf(true)
     var errorMessage by mutableStateOf<String?>(null)
     private val _predictionHistory = MutableStateFlow<List<PredictionHistoryItem>>(emptyList())
@@ -101,6 +103,7 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
                 }
 
                 input.let { modelInput ->
+                    _modelInput.value = modelInput.values
                     val outputData = withContext(Dispatchers.Default) {
                         tfliteInterpreter?.predict(modelInput.values.toFloatArray()) ?: floatArrayOf()
                     }
@@ -112,7 +115,7 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
                     }
 
                     if (arePredictionsDifferent(lastSavedPredictions, newPredictions)) {
-                        predictions = newPredictions
+                        _predictions.value = newPredictions
                         val currentTimestamp = System.currentTimeMillis()
                         savePredictionsToFirestore(newPredictions, currentTimestamp)
                         lastSavedPredictions = newPredictions
@@ -120,7 +123,7 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
                         saveLastPredictions(newPredictions, currentTimestamp)
                         Log.d(TAG, "New predictions saved to Firestore")
                     } else {
-                        predictions = newPredictions
+                        _predictions.value = newPredictions
                         Log.d(TAG, "Predictions unchanged, not saving to Firestore")
                     }
                 }
@@ -223,8 +226,8 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
     }
 
     fun resetPredictions() {
-        predictions = null
-        modelInput = null
+        _predictions.value = null
+        _modelInput.value = null
         isLoading = false
         errorMessage = null
         _predictionHistory.value = emptyList()

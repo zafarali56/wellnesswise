@@ -66,7 +66,9 @@ import java.util.Locale
 
 @Composable
 
-fun PredictionsScreen(viewModel: PredictionsViewModel = viewModel(factory = PredictionsViewModelFactory(LocalContext.current))) {
+fun PredictionsScreen(viewModel: PredictionsViewModel = viewModel(factory = PredictionsViewModelFactory(LocalContext.current))) {    val predictions by viewModel.predictions.collectAsState()
+    val modelInput by viewModel.modelInput.collectAsState()
+
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = !isSystemInDarkTheme()
     val context = LocalContext.current
@@ -128,10 +130,12 @@ fun PredictionsScreen(viewModel: PredictionsViewModel = viewModel(factory = Pred
                         .padding(vertical = 10.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(HealthDataProcessor.inputLabels.zip(viewModel.modelInput ?: emptyList())) { (label, value) ->
-                        HealthDataItem(label, value.toString())
+                    modelInput?.let { input ->
+                        items(HealthDataProcessor.inputLabels.zip(input)) { (label, value) ->
+                            HealthDataItem(label, value.toString())
+                        }
                     }
-                    viewModel.predictions?.let { preds ->
+                    predictions?.let { preds ->
                         items(preds) { (category, risk, context) ->
                             PredictionCard(category, risk, context, viewModel)
                         }
@@ -139,8 +143,8 @@ fun PredictionsScreen(viewModel: PredictionsViewModel = viewModel(factory = Pred
                 }
             }
         }
+        }
     }
-}
     SystemBackButtonHandler {
         WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
     }

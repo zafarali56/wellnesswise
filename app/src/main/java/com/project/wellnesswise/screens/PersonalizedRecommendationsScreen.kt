@@ -54,15 +54,16 @@ fun PersonalizedRecommendationsScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Personalized Recommendations") },
+                    title = { Text("Your Health Insights") },
                     navigationIcon = {
                         IconButton(onClick = { WellnessWiseAppRouter.navigateTo(Screen.HomeScreen) }) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                        containerColor = colorScheme.primaryContainer,
+                        titleContentColor = colorScheme.onPrimaryContainer,
+                        navigationIconContentColor = colorScheme.onPrimaryContainer
                     )
                 )
             },
@@ -95,26 +96,113 @@ fun PersonalizedRecommendationsScreen(
     }
 }
 
+
+
 @Composable
-fun ErrorState(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
+fun RecommendationsList(recommendations: List<String>) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Icon(
-            imageVector = Icons.Default.Warning,
-            contentDescription = "Error",
-            tint = MaterialTheme.colorScheme.error,
-            modifier = Modifier.size(64.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "Unable to load recommendations.",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.error
-        )
+        items(recommendations) { recommendation ->
+            RecommendationCard(recommendation = recommendation)
+        }
     }
 }
+
+
+@Composable
+fun RecommendationCard(recommendation: String) {
+    val (icon, category, description) = getDetailedCategoryInfo(recommendation)
+    var expanded by remember { mutableStateOf(false) }
+
+    ElevatedCard(
+        onClick = { expanded = !expanded },
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(32.dp)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column {
+                    Text(
+                        text = category,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    )
+                }
+            }
+            AnimatedVisibility(
+                visible = expanded,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Column(modifier = Modifier.padding(top = 16.dp)) {
+                    Divider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = recommendation,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun getDetailedCategoryInfo(recommendation: String): Triple<ImageVector, String, String> {
+    return when {
+        recommendation.contains("diabetes", ignoreCase = true) ->
+            Triple(Icons.Default.Bloodtype, "Diabetes Risk", "Blood sugar management and lifestyle factors")
+        recommendation.contains("cardiovascular", ignoreCase = true) ->
+            Triple(Icons.Default.Favorite, "Heart Health", "Cardiovascular disease risk and prevention")
+        recommendation.contains("hypertension", ignoreCase = true) ->
+            Triple(Icons.Default.Speed, "Blood Pressure", "Hypertension risk and management")
+        recommendation.contains("obesity", ignoreCase = true) ->
+            Triple(Icons.Default.MonitorWeight, "Weight Management", "BMI and healthy weight strategies")
+        recommendation.contains("cancer", ignoreCase = true) ->
+            Triple(Icons.Default.Biotech, "Cancer Prevention", "Risk factors and screening recommendations")
+        recommendation.contains("diet", ignoreCase = true) ->
+            Triple(Icons.Default.Restaurant, "Nutrition", "Dietary habits and nutritional advice")
+        recommendation.contains("exercise", ignoreCase = true) ->
+            Triple(Icons.Default.FitnessCenter, "Physical Activity", "Exercise routines and benefits")
+        recommendation.contains("sleep", ignoreCase = true) ->
+            Triple(Icons.Default.Bedtime, "Sleep Health", "Sleep patterns and quality improvement")
+        recommendation.contains("stress", ignoreCase = true) ->
+            Triple(Icons.Default.SelfImprovement, "Mental Wellbeing", "Stress management and mental health")
+        recommendation.contains("smoking", ignoreCase = true) ->
+            Triple(Icons.Default.SmokeFree, "Smoking Cessation", "Tobacco use and quitting strategies")
+        recommendation.contains("alcohol", ignoreCase = true) ->
+            Triple(Icons.Default.LocalBar, "Alcohol Consumption", "Drinking habits and moderation advice")
+        recommendation.contains("check", ignoreCase = true) ->
+            Triple(Icons.Default.HealthAndSafety, "Health Check-ups", "Regular screenings and preventive care")
+        recommendation.contains("environmental", ignoreCase = true) ->
+            Triple(Icons.Default.Eco, "Environmental Health", "Air quality and pollution exposure")
+        else -> Triple(Icons.Default.Lightbulb, "General Health", "Overall wellness and lifestyle tips")
+    }
+}
+
 
 @Composable
 fun LoadingAnimation(modifier: Modifier = Modifier) {
@@ -136,82 +224,23 @@ fun LoadingAnimation(modifier: Modifier = Modifier) {
         tint = MaterialTheme.colorScheme.primary
     )
 }
-
 @Composable
-fun RecommendationsList(recommendations: List<String>) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+fun ErrorState(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(recommendations) { recommendation ->
-            RecommendationCard(recommendation = recommendation)
-        }
-    }
-}
-
-@Composable
-fun RecommendationCard(recommendation: String) {
-    val (icon, category) = getCategoryInfo(recommendation)
-    var expanded by remember { mutableStateOf(false) }
-
-    ElevatedCard(
-        onClick = { expanded = !expanded },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(
-                    text = category,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            AnimatedVisibility(
-                visible = expanded,
-                enter = expandVertically() + fadeIn(),
-                exit = shrinkVertically() + fadeOut()
-            ) {
-                Text(
-                    text = recommendation,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun getCategoryInfo(recommendation: String): Pair<ImageVector, String> {
-    return when {
-        recommendation.contains("diet", ignoreCase = true) ->
-            Pair(Icons.Default.Restaurant, "Diet & Nutrition")
-        recommendation.contains("exercise", ignoreCase = true) ->
-            Pair(Icons.Default.FitnessCenter, "Physical Activity")
-        recommendation.contains("sleep", ignoreCase = true) ->
-            Pair(Icons.Default.Bedtime, "Sleep")
-        recommendation.contains("stress", ignoreCase = true) ->
-            Pair(Icons.Default.SelfImprovement, "Mental Health")
-        recommendation.contains("smoking", ignoreCase = true) ->
-            Pair(Icons.Default.SmokeFree, "Smoking")
-        recommendation.contains("alcohol", ignoreCase = true) ->
-            Pair(Icons.Default.LocalBar, "Alcohol Consumption")
-        recommendation.contains("check", ignoreCase = true) ->
-            Pair(Icons.Default.HealthAndSafety, "Health Check-ups")
-        recommendation.contains("environmental", ignoreCase = true) ->
-            Pair(Icons.Default.Eco, "Environmental Health")
-        else -> Pair(Icons.Default.Lightbulb, "General Health")
+        Icon(
+            imageVector = Icons.Default.Warning,
+            contentDescription = "Error",
+            tint = MaterialTheme.colorScheme.error,
+            modifier = Modifier.size(64.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Unable to load recommendations.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.error
+        )
     }
 }
