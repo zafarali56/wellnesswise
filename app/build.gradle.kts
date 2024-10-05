@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.gms.google-services")
+    kotlin("plugin.serialization") version "1.9.0"
 }
 
 android {
@@ -86,5 +87,5 @@ dependencies {
     implementation(libs.compose)
     implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation ("org.tensorflow:tensorflow-lite:2.8.0")
-
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     }

@@ -70,13 +70,12 @@ class MainActivity : ComponentActivity() {
             val registrationViewModel: RegistrationViewModel = viewModel()
             val loginViewModel: LoginViewModel = viewModel()
             val healthDataViewModel: HealthDataViewModel = viewModel()
+
             val predictionsViewModel: PredictionsViewModel = viewModel(
                 factory = PredictionsViewModelFactory(applicationContext)
             )
             val dataVisualizationViewModel: DataVisualizationViewModel = viewModel()
-            val authViewModel: AuthViewModel = viewModel {
-                AuthViewModel(registrationViewModel, loginViewModel, healthDataViewModel, predictionsViewModel, dataVisualizationViewModel)
-            }
+
             val personalizedRecommendationsViewModel: PersonalizedRecommendationsViewModel = viewModel(
                 factory = PersonalizedRecommendationsViewModelFactory(
                     FirebaseFirestore.getInstance(),
@@ -84,7 +83,9 @@ class MainActivity : ComponentActivity() {
                     predictionsViewModel
                 )
             )
-
+            val authViewModel: AuthViewModel = viewModel {
+                AuthViewModel(registrationViewModel, loginViewModel, healthDataViewModel, predictionsViewModel, dataVisualizationViewModel)
+            }
             WellnessWiseApp(
                 homeViewModel = homeViewModel,
                 registrationViewModel = registrationViewModel,

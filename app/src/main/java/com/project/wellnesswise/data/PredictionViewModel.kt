@@ -18,6 +18,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class PredictionsViewModel(private val context: Context) : ViewModel() {
     private val healthDataProcessor = HealthDataProcessor()
@@ -32,54 +37,48 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
     val predictionHistory: StateFlow<List<PredictionHistoryItem>> = _predictionHistory.asStateFlow()
     private var tfliteInterpreter: TFLiteInterpreter? = null
     private var isModelLoaded = false
-
+    private var lastSavedPredictions: List<Triple<String, Float, String>>? = null
+    private var lastSavedTimestamp: Long = 0
+    @Serializable
+    private data class PredictionTriple(val first: String, val second: Float, val third: String)
     init {
         viewModelScope.launch {
+            loadLastSavedPredictions()
             loadModel()
             healthDataProcessor.startListeningForChanges()
             healthDataProcessor.addListener { loadPredictions() }
-            loadPredictions()
         }
     }
+
+    private suspend fun loadLastSavedPredictions() {
+        withContext(Dispatchers.IO) {
+            val sharedPrefs = context.getSharedPreferences("PredictionsPrefs", Context.MODE_PRIVATE)
+            lastSavedTimestamp = sharedPrefs.getLong("last_saved_timestamp", 0)
+            lastSavedPredictions = sharedPrefs.getString("last_saved_predictions", null)?.let {
+                Json.decodeFromString<List<PredictionTriple>>(it).map { triple ->
+                    Triple(triple.first, triple.second, triple.third)
+                }
+            }
+        }
+    }   private suspend fun saveLastPredictions(predictions: List<Triple<String, Float, String>>, timestamp: Long) {
+        withContext(Dispatchers.IO) {
+            val sharedPrefs = context.getSharedPreferences("PredictionsPrefs", Context.MODE_PRIVATE)
+            with(sharedPrefs.edit()) {
+                putLong("last_saved_timestamp", timestamp)
+                putString("last_saved_predictions", Json.encodeToString(predictions.map { PredictionTriple(it.first, it.second, it.third) }))
+                apply()
+            }
+        }
+    }
+
     private suspend fun loadModel() {
         withContext(Dispatchers.Default) {
             tfliteInterpreter = TFLiteInterpreter(context, "enhanced_health_risk_model.tflite")
             isModelLoaded = true
-            loadPredictions() // Attempt to load predictions once the model is ready
+            loadPredictions()
         }
     }
 
-    private fun savePredictionsToFirestore(predictions: List<Triple<String, Float, String>>) {
-        val currentUser = auth.currentUser
-        if (currentUser == null) {
-            Log.e(TAG, "No user logged in")
-            return
-        }
-
-        val userId = currentUser.uid
-        val timestamp = System.currentTimeMillis()
-
-        val predictionData = hashMapOf(
-            "timestamp" to timestamp,
-            "predictions" to predictions.map { (category, risk, context) ->
-                hashMapOf(
-                    "category" to category,
-                    "risk" to risk,
-                    "context" to context
-                )
-            }
-        )
-
-        firestore.collection("users").document(userId)
-            .collection("predictions")
-            .add(predictionData)
-            .addOnSuccessListener { documentReference ->
-                Log.d(TAG, "Prediction saved with ID: ${documentReference.id}")
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error adding prediction", e)
-            }
-    }
     fun loadPredictions() {
         viewModelScope.launch {
             isLoading = true
@@ -102,27 +101,26 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
                 }
 
                 input.let { modelInput ->
-                    Log.d(TAG, "Raw input values: ${modelInput.values.zip(modelInput.labels)}")
-
                     val outputData = withContext(Dispatchers.Default) {
                         tfliteInterpreter?.predict(modelInput.values.toFloatArray()) ?: floatArrayOf()
                     }
-                    Log.d(TAG, "Raw model output: ${outputData.toList()}")
 
                     val newPredictions = HealthDataProcessor.riskCategories.zip(outputData.toList()).map { (category, risk) ->
                         val riskLevel = classifyRisk(risk)
-                        Log.d(TAG, "$category: $risk ($riskLevel)")
                         val context = getRiskContext(category, risk, modelInput.values[0])
-                        Log.d(TAG, "$category: $risk ($riskLevel)")
-                        Log.d(TAG, "Context: $context")
                         Triple(category, risk, context)
                     }
 
-                    if (arePredictionsDifferent(predictions, newPredictions)) {
+                    if (arePredictionsDifferent(lastSavedPredictions, newPredictions)) {
                         predictions = newPredictions
-                        savePredictionsToFirestore(newPredictions)
+                        val currentTimestamp = System.currentTimeMillis()
+                        savePredictionsToFirestore(newPredictions, currentTimestamp)
+                        lastSavedPredictions = newPredictions
+                        lastSavedTimestamp = currentTimestamp
+                        saveLastPredictions(newPredictions, currentTimestamp)
                         Log.d(TAG, "New predictions saved to Firestore")
                     } else {
+                        predictions = newPredictions
                         Log.d(TAG, "Predictions unchanged, not saving to Firestore")
                     }
                 }
@@ -145,12 +143,9 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
         }
     }
 
-
-
-
     private fun getRiskContext(category: String, risk: Float, age: Number): String {
         val riskLevel = classifyRisk(risk)
-        val ageValue = age.toInt() // Convert to Int for comparison
+        val ageValue = age.toInt()
         return when (category) {
             "Diabetes" -> when {
                 ageValue < 40 && riskLevel == "Moderate" -> "Consider lifestyle changes to reduce risk."
@@ -189,6 +184,7 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
         healthDataProcessor.stopListeningForChanges()
         tfliteInterpreter?.close()
     }
+
     fun fetchPredictionHistory() {
         viewModelScope.launch {
             val currentUser = auth.currentUser
@@ -201,7 +197,7 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
             firestore.collection("users").document(userId)
                 .collection("predictions")
                 .orderBy("timestamp", Query.Direction.DESCENDING)
-                .limit(10) // Limit to the 10 most recent predictions
+                .limit(10)
                 .get()
                 .addOnSuccessListener { result ->
                     val history = result.mapNotNull { document ->
@@ -217,7 +213,7 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
                                 )
                             }
                         )
-                    }.distinctBy { it.predictions } // Keep only unique predictions
+                    }.distinctBy { it.predictions }
                     _predictionHistory.value = history
                 }
                 .addOnFailureListener { exception ->
@@ -226,8 +222,7 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
         }
     }
 
-    fun resetPredictions()
-    {
+    fun resetPredictions() {
         predictions = null
         modelInput = null
         isLoading = false
@@ -239,9 +234,41 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
         if (oldPredictions == null) return true
         if (oldPredictions.size != newPredictions.size) return true
         return oldPredictions.zip(newPredictions).any { (old, new) ->
-            old.first != new.first || old.second != new.second
+            old.first != new.first || kotlin.math.abs(old.second - new.second) > 0.001f || old.third != new.third
         }
     }
+
+    private fun savePredictionsToFirestore(predictions: List<Triple<String, Float, String>>, timestamp: Long) {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            Log.e(TAG, "No user logged in")
+            return
+        }
+
+        val userId = currentUser.uid
+        val predictionData = hashMapOf(
+            "timestamp" to timestamp,
+            "predictions" to predictions.map { (category, risk, context) ->
+                hashMapOf(
+                    "category" to category,
+                    "risk" to risk,
+                    "context" to context
+                )
+            }
+        )
+
+        firestore.collection("users").document(userId)
+            .collection("predictions")
+            .document(timestamp.toString())
+            .set(predictionData)
+            .addOnSuccessListener {
+                Log.d(TAG, "Prediction saved with timestamp: $timestamp")
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error adding prediction", e)
+            }
+    }
+
     data class PredictionHistoryItem(
         val timestamp: Long,
         val predictions: List<Triple<String, Float, String>>

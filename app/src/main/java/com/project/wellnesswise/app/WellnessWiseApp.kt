@@ -14,15 +14,19 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.project.wellnesswise.components.ui.HealthAssessmentMode
 import com.project.wellnesswise.data.AuthViewModel
-import com.project.wellnesswise.data.PredictionsViewModel
 import com.project.wellnesswise.data.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
-import com.project.wellnesswise.screens.*
+import com.project.wellnesswise.screens.EmailVerificationScreen
+import com.project.wellnesswise.screens.HealthAssessmentScreen
+import com.project.wellnesswise.screens.PersonalizedRecommendationsScreen
+import com.project.wellnesswise.screens.PredictionsScreen
+import com.project.wellnesswise.screens.SignUpScreen
+import com.project.wellnesswise.screens.TermsAndConditionsScreen
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
