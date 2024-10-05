@@ -41,6 +41,7 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
     private var isModelLoaded = false
     private var lastSavedPredictions: List<Triple<String, Float, String>>? = null
     private var lastSavedTimestamp: Long = 0
+    private var lastHealthData: ModelInput? = null
     @Serializable
     private data class PredictionTriple(val first: String, val second: Float, val third: String)
     init {
@@ -48,10 +49,18 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
             loadLastSavedPredictions()
             loadModel()
             healthDataProcessor.startListeningForChanges()
-            healthDataProcessor.addListener { loadPredictions() }
+            healthDataProcessor.addListener { checkAndLoadPredictions() }
         }
     }
-
+    private fun checkAndLoadPredictions() {
+        viewModelScope.launch {
+            val currentHealthData = healthDataProcessor.getUserHealthData()
+            if (currentHealthData != lastHealthData) {
+                lastHealthData = currentHealthData
+                loadPredictions()
+            }
+        }
+    }
     private suspend fun loadLastSavedPredictions() {
         withContext(Dispatchers.IO) {
             val sharedPrefs = context.getSharedPreferences("PredictionsPrefs", Context.MODE_PRIVATE)
@@ -91,10 +100,7 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
                     return@launch
                 }
 
-                val input = withContext(Dispatchers.IO) {
-                    healthDataProcessor.getUserHealthData()
-                }
-
+                val input = lastHealthData
                 if (input == null) {
                     Log.d(TAG, "User health data not available yet")
                     errorMessage = "Health data not available. Please complete your health assessment."
@@ -102,30 +108,29 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
                     return@launch
                 }
 
-                input.let { modelInput ->
-                    _modelInput.value = modelInput.values
-                    val outputData = withContext(Dispatchers.Default) {
-                        tfliteInterpreter?.predict(modelInput.values.toFloatArray()) ?: floatArrayOf()
-                    }
+                _modelInput.value = input.values
 
-                    val newPredictions = HealthDataProcessor.riskCategories.zip(outputData.toList()).map { (category, risk) ->
-                        val riskLevel = classifyRisk(risk)
-                        val context = getRiskContext(category, risk, modelInput.values[0])
-                        Triple(category, risk, context)
-                    }
+                val outputData = withContext(Dispatchers.Default) {
+                    tfliteInterpreter?.predict(input.values.toFloatArray()) ?: floatArrayOf()
+                }
 
-                    if (arePredictionsDifferent(lastSavedPredictions, newPredictions)) {
-                        _predictions.value = newPredictions
-                        val currentTimestamp = System.currentTimeMillis()
-                        savePredictionsToFirestore(newPredictions, currentTimestamp)
-                        lastSavedPredictions = newPredictions
-                        lastSavedTimestamp = currentTimestamp
-                        saveLastPredictions(newPredictions, currentTimestamp)
-                        Log.d(TAG, "New predictions saved to Firestore")
-                    } else {
-                        _predictions.value = newPredictions
-                        Log.d(TAG, "Predictions unchanged, not saving to Firestore")
-                    }
+                val newPredictions = HealthDataProcessor.riskCategories.zip(outputData.toList()).map { (category, risk) ->
+                    val riskLevel = classifyRisk(risk)
+                    val context = getRiskContext(category, risk, input.values[0])
+                    Triple(category, risk, context)
+                }
+
+                if (arePredictionsDifferent(lastSavedPredictions, newPredictions)) {
+                    _predictions.value = newPredictions
+                    val currentTimestamp = System.currentTimeMillis()
+                    savePredictionsToFirestore(newPredictions, currentTimestamp)
+                    lastSavedPredictions = newPredictions
+                    lastSavedTimestamp = currentTimestamp
+                    saveLastPredictions(newPredictions, currentTimestamp)
+                    Log.d(TAG, "New predictions saved to Firestore")
+                } else {
+                    _predictions.value = newPredictions
+                    Log.d(TAG, "Predictions unchanged, not saving to Firestore")
                 }
             } catch (e: Exception) {
                 errorMessage = "An error occurred: ${e.message}"
@@ -183,7 +188,7 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        healthDataProcessor.removeListener { loadPredictions() }
+        healthDataProcessor.removeListener { checkAndLoadPredictions() }
         healthDataProcessor.stopListeningForChanges()
         tfliteInterpreter?.close()
     }
@@ -240,7 +245,6 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
             old.first != new.first || kotlin.math.abs(old.second - new.second) > 0.001f || old.third != new.third
         }
     }
-
     private fun savePredictionsToFirestore(predictions: List<Triple<String, Float, String>>, timestamp: Long) {
         val currentUser = auth.currentUser
         if (currentUser == null) {

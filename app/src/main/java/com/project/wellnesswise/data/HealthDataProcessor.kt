@@ -92,34 +92,49 @@ class HealthDataProcessor {
             "Chronic_Conditions" to 0.8366600265340756f,
             "Gender_Female" to 0.5477225575051662f,
             "Gender_Male" to 0.5477225575051662f
+
+
+
+        )
+
+
+        private val relevantFields = setOf(
+            "age", "height", "weight", "bloodPressure", "heartRate", "bloodSugar",
+            "cholesterol", "triglycerides", "waistCircumference", "smoking",
+            "alcoholConsumption", "physicalActivity", "dietQuality", "sleepHours",
+            "airQualityIndex", "stressLevel", "exposureToPollutants", "accessToHealthcare",
+            "familyDiabetes", "familyHeart", "familyCancer", "previousSurgeries",
+            "chronicConditions", "gender"
         )
     }
-        fun addListener(listener: () -> Unit) {
-            listeners.add(listener)
-        }
+    fun addListener(listener: () -> Unit) {
+        listeners.add(listener)
+    }
 
-        fun removeListener(listener: () -> Unit) {
-            listeners.remove(listener)
-        }
-
+    fun removeListener(listener: () -> Unit) {
+        listeners.remove(listener)
+    }
         private fun notifyListeners() {
             listeners.forEach { it() }
         }
 
-        fun startListeningForChanges() {
-            val userId = auth.currentUser?.uid ?: return
-            firestoreListener = firestore.collection("users").document(userId)
-                .addSnapshotListener { snapshot, e ->
-                    if (e != null) {
-                        Log.w("HealthDataProcessor", "Listen failed.", e)
-                        return@addSnapshotListener
-                    }
+    fun startListeningForChanges() {
+        val userId = auth.currentUser?.uid ?: return
+        firestoreListener = firestore.collection("users").document(userId)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w("HealthDataProcessor", "Listen failed.", e)
+                    return@addSnapshotListener
+                }
 
-                    if (snapshot != null && snapshot.exists()) {
-                        notifyListeners() // Notify all listeners when data changes
+                if (snapshot != null && snapshot.exists()) {
+                    val changedFields = snapshot.data?.filterKeys { it in relevantFields } ?: emptyMap()
+                    if (changedFields.isNotEmpty()) {
+                        notifyListeners() // Notify listeners only when relevant fields change
                     }
                 }
-        }
+            }
+    }
     suspend fun getUserHealthData(): ModelInput? {
         val userId = auth.currentUser?.uid ?: return null
         val docSnapshot = firestore.collection("users").document(userId).get().await()
