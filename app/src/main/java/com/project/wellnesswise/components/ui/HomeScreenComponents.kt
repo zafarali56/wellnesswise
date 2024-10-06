@@ -95,7 +95,7 @@ fun HealthMetricCard(
             .clip(shape),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = colorScheme.secondaryContainer,
+            containerColor = colorScheme.surfaceVariant,
             contentColor = colorScheme.onSecondaryContainer
         )
     ) {
@@ -109,7 +109,7 @@ fun HealthMetricCard(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = color,
+                tint = colorScheme.primary,
                 modifier = Modifier.size(if (isLargeCard) 40.dp else 25.dp),
             )
             Spacer(modifier = Modifier.width(16.dp))

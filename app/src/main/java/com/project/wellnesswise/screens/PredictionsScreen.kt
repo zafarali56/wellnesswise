@@ -52,14 +52,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.wellnesswise.components.ui.LoadingAnimation
-import com.project.wellnesswise.data.HealthDataProcessor
 import com.project.wellnesswise.data.PredictionsViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 
@@ -67,7 +63,6 @@ import java.util.Locale
 @Composable
 
 fun PredictionsScreen(viewModel: PredictionsViewModel = viewModel(factory = PredictionsViewModelFactory(LocalContext.current))) {    val predictions by viewModel.predictions.collectAsState()
-    val modelInput by viewModel.modelInput.collectAsState()
 
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = !isSystemInDarkTheme()
@@ -127,14 +122,10 @@ fun PredictionsScreen(viewModel: PredictionsViewModel = viewModel(factory = Pred
                         .fillMaxSize()
                         .padding(innerPadding)
                         .padding(horizontal = 16.dp)
-                        .padding(vertical = 10.dp),
+,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    modelInput?.let { input ->
-                        items(HealthDataProcessor.inputLabels.zip(input)) { (label, value) ->
-                            HealthDataItem(label, value.toString())
-                        }
-                    }
+
                     predictions?.let { preds ->
                         items(preds) { (category, risk, context) ->
                             PredictionCard(category, risk, context, viewModel)
@@ -150,18 +141,7 @@ fun PredictionsScreen(viewModel: PredictionsViewModel = viewModel(factory = Pred
     }
 }
 
-@Composable
-fun HealthDataItem(label: String, value: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(text = label, style = MaterialTheme.typography.bodyMedium)
-        Text(text = value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-    }
-}
+
 
 @Composable
 fun PredictionCard(category: String, risk: Float, context: String, viewModel: PredictionsViewModel) {
@@ -172,8 +152,8 @@ fun PredictionCard(category: String, risk: Float, context: String, viewModel: Pr
 
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = colorScheme.secondaryContainer,
-            contentColor = colorScheme.onSecondaryContainer
+            containerColor = colorScheme.surfaceVariant,
+            contentColor = colorScheme.onSurfaceVariant
         )) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(

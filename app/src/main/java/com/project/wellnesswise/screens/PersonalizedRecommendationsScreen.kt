@@ -18,8 +18,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
@@ -61,7 +59,6 @@ fun PersonalizedRecommendationsScreen(
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = colorScheme.primaryContainer,
                         titleContentColor = colorScheme.onPrimaryContainer,
                         navigationIconContentColor = colorScheme.onPrimaryContainer
                     )
@@ -75,17 +72,13 @@ fun PersonalizedRecommendationsScreen(
                     .padding(innerPadding),
                 color = colorScheme.background
             ) {
-                SwipeRefresh(
-                    state = rememberSwipeRefreshState(isLoading),
-                    onRefresh = { viewModel.refreshRecommendations() }
-                ) {
+
                     Box(modifier = Modifier.fillMaxSize()) {
                         when {
                             isLoading -> LoadingAnimation(modifier = Modifier.align(Alignment.Center))
                             recommendations.isEmpty() -> ErrorState(modifier = Modifier.align(Alignment.Center))
                             else -> RecommendationsList(recommendations = recommendations)
                         }
-                    }
                 }
             }
         }
