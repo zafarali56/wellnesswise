@@ -1,6 +1,7 @@
 package com.project.wellnesswise
 
 import DataVisualizationViewModel
+import HealthAlerts
 import HealthDataSyncWorker
 import HealthDataViewModel
 import HomeViewModel
@@ -12,8 +13,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
@@ -34,6 +37,8 @@ import com.project.wellnesswise.app.WellnessWiseApp
 import com.project.wellnesswise.data.AuthViewModel
 import com.project.wellnesswise.data.PredictionsViewModel
 import com.project.wellnesswise.data.RegistrationViewModel
+import android.Manifest // import java.util.concurrent.TimeUnit
+
 
 class MainActivity : ComponentActivity() {
     private lateinit var googleFitPermissionLauncher: ActivityResultLauncher<Intent>
@@ -44,10 +49,24 @@ class MainActivity : ComponentActivity() {
     companion object {
         private const val TAG = "MainActivity"
     }
-
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ){ isGranted: Boolean ->
+        if (isGranted) {
+            HealthAlerts.startPeriodicMonitoring(this)
+        } else {
+            // Inform the user that the permission was denied
+            Toast.makeText(this, "Notification permission denied. You won't receive health alerts.", Toast.LENGTH_LONG).show()
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if (!HealthAlerts.hasNotificationPermission(this)) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            HealthAlerts.startPeriodicMonitoring(this)
+        }
         // Initialize Firebase
         FirebaseApp.initializeApp(this)
 
@@ -162,22 +181,19 @@ class MainActivity : ComponentActivity() {
             scheduleHealthDataSync() // Trigger a sync if permissions are already granted
         }
     }
-
     private fun registerUpdateReceiver() {
-        updateReceiver =
-            object : BroadcastReceiver() {
-                override fun onReceive(
-                    context: Context?,
-                    intent: Intent?,
-                ) {
-                    if (intent?.action == "com.project.wellnesswise.HEALTH_DATA_UPDATED") {
-                        Log.d(TAG, "Received health data update broadcast")
-                        homeViewModel.refreshData()
-                    }
+        updateReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (intent?.action == "com.project.wellnesswise.HEALTH_DATA_UPDATED") {
+                    Log.d(TAG, "Received health data update broadcast")
+                    homeViewModel.refreshData()
+                    HealthAlerts.performImmediateHealthCheck(this@MainActivity)
                 }
             }
+        }
         registerReceiver(updateReceiver, IntentFilter("com.project.wellnesswise.HEALTH_DATA_UPDATED"))
     }
+
 
     private fun setupAuthStateListener() {
         FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
@@ -187,7 +203,21 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
+    @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)} passing\n      in a {@link RequestMultiplePermissions} object for the {@link ActivityResultContract} and\n      handling the result in the {@link ActivityResultCallback#onActivityResult(Object) callback}.")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            HealthAlerts.NOTIFICATION_PERMISSION_REQUEST_CODE -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    // Permission was granted, you can start your monitoring here if you haven't already
+                    HealthAlerts.startPeriodicMonitoring(this)
+                } else {
+                    // Permission denied. You might want to inform the user that they won't receive health alerts
+                }
+                return
+            }
+        }
+    }
     override fun onResume() {
         super.onResume()
         homeViewModel.checkForActiveSession()
