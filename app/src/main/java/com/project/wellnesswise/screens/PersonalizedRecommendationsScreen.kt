@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,7 +53,7 @@ fun PersonalizedRecommendationsScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Your Health Insights") },
+                    title = { Text("Recommendations") },
                     navigationIcon = {
                         IconButton(onClick = { WellnessWiseAppRouter.navigateTo(Screen.HomeScreen) }) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -113,8 +114,9 @@ fun RecommendationCard(recommendation: String) {
     ElevatedCard(
         onClick = { expanded = !expanded },
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        colors = CardDefaults.cardColors(
+            containerColor = colorScheme.secondaryContainer,
+            contentColor = colorScheme.onSecondaryContainer
         )
     ) {
         Column(
@@ -179,7 +181,7 @@ fun getDetailedCategoryInfo(recommendation: String): Triple<ImageVector, String,
         recommendation.contains("diet", ignoreCase = true) ->
             Triple(Icons.Default.Restaurant, "Nutrition", "Dietary habits and nutritional advice")
         recommendation.contains("exercise", ignoreCase = true) ->
-            Triple(Icons.Default.FitnessCenter, "Physical Activity", "Exercise routines and benefits")
+            Triple(Icons.Default.FitnessCenter, "Stress Level", "Stress level and exercise recommendations")
         recommendation.contains("sleep", ignoreCase = true) ->
             Triple(Icons.Default.Bedtime, "Sleep Health", "Sleep patterns and quality improvement")
         recommendation.contains("stress", ignoreCase = true) ->

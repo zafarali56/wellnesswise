@@ -152,8 +152,8 @@ fun PredictionCard(category: String, risk: Float, context: String, viewModel: Pr
 
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = colorScheme.surfaceVariant,
-            contentColor = colorScheme.onSurfaceVariant
+            containerColor = colorScheme.secondaryContainer,
+            contentColor = colorScheme.onSecondaryContainer
         )) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(

@@ -36,6 +36,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -66,7 +67,7 @@ fun MainProfileView(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onEditClick,
-                containerColor = MaterialTheme.colorScheme.primary
+                containerColor = colorScheme.primary
             ) {
                 Icon(
                     imageVector = Icons.Default.Edit,
@@ -116,6 +117,10 @@ fun ProfileHeader(userData: Map<String, Any>?, isLoading: Boolean) {
             .padding(16.dp),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ,
+        colors = CardDefaults.elevatedCardColors(
+                containerColor = colorScheme.secondaryContainer
+                )
     ) {
         Row(
             modifier = Modifier
@@ -128,13 +133,13 @@ fun ProfileHeader(userData: Map<String, Any>?, isLoading: Boolean) {
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .background(colorScheme.primaryContainer)
             ) {
                 Icon(
                     imageVector = Icons.Default.AccountCircle,
                     contentDescription = "Profile Picture",
                     modifier = Modifier.size(80.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = colorScheme.primary
                 )
             }
 
@@ -159,7 +164,7 @@ fun ProfileHeader(userData: Map<String, Any>?, isLoading: Boolean) {
                         Text(
                             text = user?.email ?: "No email",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = colorScheme.onSurfaceVariant
                         )
                     }
                 }

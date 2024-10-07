@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -98,8 +99,10 @@ fun PredictionHistoryScreen(viewModel: PredictionsViewModel = viewModel(factory 
 @Composable
 fun PredictionHistoryCard(historyItem: PredictionsViewModel.PredictionHistoryItem, viewModel: PredictionsViewModel) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = colorScheme.secondaryContainer,
+            contentColor = colorScheme.onSecondaryContainer
+        )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
