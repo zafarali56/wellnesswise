@@ -5,8 +5,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.tasks.await
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 data class ModelInput(
     val values: List<Float>,
@@ -19,7 +17,6 @@ class HealthDataProcessor {
     private var firestoreListener: ListenerRegistration? = null
     private val listeners = mutableSetOf<() -> Unit>()
     companion object {
-        private val listeners = mutableSetOf<() -> Unit>()
         val riskCategories =
             listOf("Diabetes", "Cardiovascular Disease", "Hypertension", "Obesity", "Cancer")
         val inputLabels = listOf(

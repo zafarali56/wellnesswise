@@ -18,9 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -32,7 +30,6 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
     val predictions: StateFlow<List<Triple<String, Float, String>>?> = _predictions.asStateFlow()
 
     private val _modelInput = MutableStateFlow<List<Float>?>(null)
-    val modelInput: StateFlow<List<Float>?> = _modelInput.asStateFlow()
     var isLoading by mutableStateOf(true)
     var errorMessage by mutableStateOf<String?>(null)
     private val _predictionHistory = MutableStateFlow<List<PredictionHistoryItem>>(emptyList())
@@ -115,7 +112,6 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
                 }
 
                 val newPredictions = HealthDataProcessor.riskCategories.zip(outputData.toList()).map { (category, risk) ->
-                    val riskLevel = classifyRisk(risk)
                     val context = getRiskContext(category, risk, input.values[0])
                     Triple(category, risk, context)
                 }

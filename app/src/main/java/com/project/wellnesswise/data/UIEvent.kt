@@ -14,15 +14,15 @@ sealed class UIEvent {
     data class FamilyCancerChanged(val value: String) : UIEvent()
     data class PreviousSurgeriesChanged(val value: String) : UIEvent()
     data class ChronicConditionsChanged(val value: String) : UIEvent()
-    data class SmokingChanged(val value: Boolean) : UIEvent()  // Changed to Boolean
-    data class AlcoholConsumptionChanged(val value: Int) : UIEvent()  // Changed to Int
-    data class PhysicalActivityChanged(val value: Int) : UIEvent()  // Changed to Int
-    data class DietQualityChanged(val value: Int) : UIEvent()  // Changed to Int
-    data class SleepHoursChanged(val value: Int) : UIEvent()  // Changed to Int
-    data class AirQualityIndexChanged(val value: Int) : UIEvent()  // Changed to Int
-    data class ExposureToPollutantsChanged(val value: Int) : UIEvent()  // Changed to Int
-    data class StressLevelChanged(val value: Int) : UIEvent()  // Changed to Int
-    data class AccessToHealthcareChanged(val value: Int) : UIEvent()  // Changed to Int
+    data class SmokingChanged(val value: Boolean) : UIEvent()
+    data class AlcoholConsumptionChanged(val value: Int) : UIEvent()
+    data class PhysicalActivityChanged(val value: Int) : UIEvent()
+    data class DietQualityChanged(val value: Int) : UIEvent()
+    data class SleepHoursChanged(val value: Int) : UIEvent()
+    data class AirQualityIndexChanged(val value: Int) : UIEvent()
+    data class ExposureToPollutantsChanged(val value: Int) : UIEvent()
+    data class StressLevelChanged(val value: Int) : UIEvent()
+    data class AccessToHealthcareChanged(val value: Int) : UIEvent()
     object SaveHealthAssessmentClicked : UIEvent()
 
     object RegisterButtonClicked : UIEvent()

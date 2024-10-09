@@ -42,11 +42,9 @@ class AuthViewModel(
         try {
             val user = firebaseAuth.currentUser ?: throw Exception("No user is currently signed in")
 
-            // Re-authenticate the user
             val credential = EmailAuthProvider.getCredential(user.email!!, password)
             user.reauthenticate(credential).await()
 
-            // Delete predictions subcollection
             val userDocRef = firestore.collection("users").document(user.uid)
             val predictionsRef = userDocRef.collection("predictions")
             val predictionsSnapshot = predictionsRef.get().await()

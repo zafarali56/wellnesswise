@@ -128,7 +128,7 @@ fun RecommendationCard(recommendation: String) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = colorScheme.primary,
                     modifier = Modifier.size(32.dp)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
@@ -137,12 +137,12 @@ fun RecommendationCard(recommendation: String) {
                         text = category,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = colorScheme.onSurfaceVariant
                     )
                     Text(
                         text = description,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        color = colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
                 }
             }
@@ -152,12 +152,12 @@ fun RecommendationCard(recommendation: String) {
                 exit = shrinkVertically() + fadeOut()
             ) {
                 Column(modifier = Modifier.padding(top = 16.dp)) {
-                    Divider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f))
+                    Divider(color = colorScheme.onSurfaceVariant.copy(alpha = 0.1f))
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = recommendation,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -216,7 +216,7 @@ fun LoadingAnimation(modifier: Modifier = Modifier) {
         modifier = modifier
             .size(64.dp)
             .graphicsLayer(rotationZ = currentRotation),
-        tint = MaterialTheme.colorScheme.primary
+        tint = colorScheme.primary
     )
 }
 @Composable
@@ -228,14 +228,14 @@ fun ErrorState(modifier: Modifier = Modifier) {
         Icon(
             imageVector = Icons.Default.Warning,
             contentDescription = "Error",
-            tint = MaterialTheme.colorScheme.error,
+            tint = colorScheme.error,
             modifier = Modifier.size(64.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Unable to load recommendations.",
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.error
+            color = colorScheme.error
         )
     }
 }

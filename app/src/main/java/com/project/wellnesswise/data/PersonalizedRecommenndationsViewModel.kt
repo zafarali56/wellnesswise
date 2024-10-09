@@ -94,9 +94,6 @@ class PersonalizedRecommendationsViewModel(
         return snapshot.data ?: emptyMap()
     }
 
-    fun refreshRecommendations() {
-        loadRecommendations()
-    }
 
     override fun onCleared() {
         super.onCleared()

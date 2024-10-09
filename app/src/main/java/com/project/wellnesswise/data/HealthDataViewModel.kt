@@ -122,7 +122,6 @@ class HealthDataViewModel : ViewModel() {
     fun updateCholesterol(cholesterol: String) {
         _cholesterol.value = cholesterol
     }
-    // New update methods for ML model fields
     fun updateTriglycerides(triglycerides: String) {
         _triglycerides.value = triglycerides
     }

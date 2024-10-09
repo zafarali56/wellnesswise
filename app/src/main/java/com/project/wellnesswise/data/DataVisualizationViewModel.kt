@@ -72,22 +72,6 @@ class DataVisualizationViewModel : ViewModel() {
                 }
             }
     }
-    private fun setupUserDataListener(userId: String) {
-        userDataListener?.remove()
-
-        userDataListener = firestore.collection("users").document(userId)
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    _error.value = "Failed to listen for user data updates: ${e.message}"
-                    return@addSnapshotListener
-                }
-
-                if (snapshot != null && snapshot.exists()) {
-                    calculateOverallHealthScore(snapshot.data)
-                }
-            }
-    }
-
 
     fun getLineData(disease: String, color: Int): LineData? {
         val entries = _diseaseRiskData.value[disease] ?: return null
