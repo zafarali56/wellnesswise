@@ -68,7 +68,8 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
                 }
             }
         }
-    }   private suspend fun saveLastPredictions(predictions: List<Triple<String, Float, String>>, timestamp: Long) {
+    }
+    private suspend fun saveLastPredictions(predictions: List<Triple<String, Float, String>>, timestamp: Long) {
         withContext(Dispatchers.IO) {
             val sharedPrefs = context.getSharedPreferences("PredictionsPrefs", Context.MODE_PRIVATE)
             with(sharedPrefs.edit()) {
@@ -232,6 +233,12 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
         isLoading = false
         errorMessage = null
         _predictionHistory.value = emptyList()
+        lastSavedPredictions = null
+        lastSavedTimestamp = 0
+        lastHealthData = null
+        tfliteInterpreter?.close()
+        tfliteInterpreter = null
+        isModelLoaded = false
     }
 
     private fun arePredictionsDifferent(oldPredictions: List<Triple<String, Float, String>>?, newPredictions: List<Triple<String, Float, String>>): Boolean {
