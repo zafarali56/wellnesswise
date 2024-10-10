@@ -101,7 +101,7 @@ class DataVisualizationViewModel : ViewModel() {
         // Deduct points based on user data
         userData?.let {
             val age = (it["age"] as? Number)?.toInt() ?: 0
-            score -= (age / 100f) * 10 // Deduct up to 10 points based on age
+            score -= (age / 100f) * 10
 
             val bmi = calculateBMI(it["height"] as? Number, it["weight"] as? Number)
             score -= when {

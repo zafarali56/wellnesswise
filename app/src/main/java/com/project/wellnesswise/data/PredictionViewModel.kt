@@ -43,10 +43,17 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
     private data class PredictionTriple(val first: String, val second: Float, val third: String)
     init {
         viewModelScope.launch {
+            Log.d(TAG, "Initializing PredictionsViewModel")
             loadLastSavedPredictions()
             loadModel()
             healthDataProcessor.startListeningForChanges()
             healthDataProcessor.addListener { checkAndLoadPredictions() }
+            auth.addAuthStateListener { firebaseAuth ->
+                if (firebaseAuth.currentUser != null) {
+                    Log.d(TAG, "User logged in, loading predictions")
+                    loadPredictions()
+                }
+            }
         }
     }
     private fun checkAndLoadPredictions() {
@@ -81,23 +88,27 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
 
     private suspend fun loadModel() {
         withContext(Dispatchers.Default) {
+            Log.d(TAG, "Loading TFLite model")
             tfliteInterpreter = TFLiteInterpreter(context, "enhanced_health_risk_model.tflite")
             isModelLoaded = true
+            Log.d(TAG, "TFLite model loaded successfully")
             loadPredictions()
         }
     }
 
     fun loadPredictions() {
         viewModelScope.launch {
+            Log.d(TAG, "Starting to load predictions")
             isLoading = true
             errorMessage = null
             try {
                 if (!isModelLoaded) {
-                    Log.d(TAG, "Model not loaded yet, skipping predictions")
+                    Log.d(TAG, "Model not loaded yet, loading model")
+                    loadModel()
                     return@launch
                 }
 
-                val input = lastHealthData
+                val input = healthDataProcessor.getUserHealthData()
                 if (input == null) {
                     Log.d(TAG, "User health data not available yet")
                     errorMessage = "Health data not available. Please complete your health assessment."
@@ -105,16 +116,21 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
                     return@launch
                 }
 
+                Log.d(TAG, "Health data loaded: $input")
                 _modelInput.value = input.values
 
                 val outputData = withContext(Dispatchers.Default) {
                     tfliteInterpreter?.predict(input.values.toFloatArray()) ?: floatArrayOf()
                 }
 
+                Log.d(TAG, "Prediction output: ${outputData.toList()}")
+
                 val newPredictions = HealthDataProcessor.riskCategories.zip(outputData.toList()).map { (category, risk) ->
                     val context = getRiskContext(category, risk, input.values[0])
                     Triple(category, risk, context)
                 }
+
+                Log.d(TAG, "New predictions: $newPredictions")
 
                 if (arePredictionsDifferent(lastSavedPredictions, newPredictions)) {
                     _predictions.value = newPredictions
@@ -130,13 +146,12 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
                 }
             } catch (e: Exception) {
                 errorMessage = "An error occurred: ${e.message}"
-                Log.e(TAG, "Error: ", e)
+                Log.e(TAG, "Error loading predictions: ", e)
             } finally {
                 isLoading = false
             }
         }
     }
-
     fun classifyRisk(prediction: Float): String {
         return when {
             prediction < 0.2f -> "Stable"
