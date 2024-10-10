@@ -31,11 +31,11 @@ class HealthRecommendationSystem {
         when (userData["smoking"] as? Boolean) {
             true -> recommendations.add("Consider quitting smoking or seek support to reduce tobacco use. This can significantly improve your overall health and reduce risks of various diseases.")
             false -> recommendations.add("Great job on not smoking! Continue to avoid tobacco products to maintain your health.")
-            null -> TODO()
+            null -> recommendations.add("If you smoke, consider quitting. If you don't, continue to avoid tobacco products for optimal health.")
         }
 
         // Alcohol consumption
-        when (val alcoholConsumption = userData["alcoholConsumption"] as? Int ?: 0) {
+        when (userData["alcoholConsumption"] as? Int ?: 0) {
             0 -> recommendations.add("Maintaining abstinence from alcohol is beneficial for your health. Keep it up!")
             in 1..2 -> recommendations.add("Your moderate alcohol consumption is within recommended limits. Remember, less is always better for your health.")
             in 3..4 -> recommendations.add("Consider reducing your alcohol intake to no more than 1-2 drinks per day. This can improve your overall health and reduce risks of various diseases.")
@@ -43,7 +43,7 @@ class HealthRecommendationSystem {
         }
 
         // Physical activity
-        when (val physicalActivity = userData["physicalActivity"] as? Int ?: 0) {
+        when (userData["physicalActivity"] as? Int ?: 0) {
             0 -> recommendations.add("Start incorporating physical activity into your daily routine. Begin with short walks and gradually increase duration and intensity.")
             in 1..2 -> recommendations.add("Aim to increase your physical activity. Try to achieve at least 150 minutes of moderate-intensity or 75 minutes of vigorous-intensity aerobic activity per week.")
             3 -> recommendations.add("Good job on maintaining regular physical activity. Consider adding variety to your exercises and gradually increasing intensity for optimal health benefits.")
@@ -51,7 +51,7 @@ class HealthRecommendationSystem {
         }
 
         // Diet quality
-        when (val dietQuality = userData["dietQuality"] as? Int ?: 0) {
+        when (userData["dietQuality"] as? Int ?: 0) {
             0, 1 -> recommendations.add("Focus on improving your diet. Incorporate more fruits, vegetables, whole grains, and lean proteins. Reduce processed foods and sugary drinks.")
             2 -> recommendations.add("Your diet is on the right track. Continue to increase your intake of fruits, vegetables, and whole grains while reducing processed foods.")
             3 -> recommendations.add("You're maintaining a good diet. Consider fine-tuning it by ensuring a variety of nutrient-rich foods and staying hydrated.")
@@ -59,15 +59,42 @@ class HealthRecommendationSystem {
         }
 
         // Sleep hours
-        when (val sleepHours = userData["sleepHours"] as? Int ?: 0) {
+        when (userData["sleepHours"] as? Int ?: 0) {
             in 0..5 -> recommendations.add("You're not getting enough sleep. Aim for 7-9 hours of sleep per night. Establish a consistent sleep schedule and create a relaxing bedtime routine.")
             6 -> recommendations.add("You're close to the recommended amount of sleep. Try to increase your sleep duration by 30-60 minutes for optimal health benefits.")
             in 7..9 -> recommendations.add("Great job on maintaining a healthy sleep schedule. Continue prioritizing your sleep for optimal health and well-being.")
             in 10..24 -> recommendations.add("You might be oversleeping. While sleep is crucial, too much can be detrimental. Try to adjust your sleep schedule to 7-9 hours per night.")
         }
 
+        // Combination recommendations
+        val alcoholConsumption = userData["alcoholConsumption"] as? Int ?: 0
+        val physicalActivity = userData["physicalActivity"] as? Int ?: 0
+        val dietQuality = userData["dietQuality"] as? Int ?: 0
+        val sleepHours = userData["sleepHours"] as? Int ?: 0
+
+        if (alcoholConsumption > 2 && physicalActivity < 2) {
+            recommendations.add("Consider reducing alcohol intake and increasing physical activity. This combination can significantly improve your overall health and reduce disease risks.")
+        }
+
+        if (dietQuality < 2 && physicalActivity < 2) {
+            recommendations.add("Improving both your diet and physical activity levels can have synergistic health benefits. Start with small, sustainable changes in both areas.")
+        }
+
+        if (sleepHours < 6 && (alcoholConsumption > 2 || dietQuality < 2)) {
+            recommendations.add("Poor sleep combined with high alcohol intake or poor diet can negatively impact your health. Focus on improving your sleep habits and consider how your diet or alcohol consumption might be affecting your sleep quality.")
+        }
+
+        if (physicalActivity > 2 && dietQuality < 2) {
+            recommendations.add("While your physical activity level is good, pairing it with an improved diet can enhance your overall health and fitness results.")
+        }
+
+        if (sleepHours > 9 && physicalActivity < 2) {
+            recommendations.add("Excessive sleep coupled with low physical activity may indicate underlying health issues. Consider reducing sleep slightly and increasing physical activity for better overall health.")
+        }
+
         return recommendations
     }
+
 
     private fun generateDiabetesRecommendations(risk: Float, userData: Map<String, Any>): String {
         val age = userData["age"] as? Int ?: 0

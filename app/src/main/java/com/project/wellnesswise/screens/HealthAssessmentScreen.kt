@@ -2,11 +2,18 @@ package com.project.wellnesswise.screens
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -114,14 +121,54 @@ fun HealthAssessmentScreen    (
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(horizontal = 26.dp, vertical = 10.dp),
+                    .padding(horizontal = 16.dp)
+                    .padding(innerPadding),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                item { MedicalHistorySection(registrationViewModel, validationResults) }
-                item { LifestyleHabitsSection(registrationViewModel, validationResults) }
-                item { EnvironmentalFactorsSection(registrationViewModel, validationResults) }
-                item { AdditionalDataSection(registrationViewModel, validationResults) }
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Box(modifier = Modifier.padding(16.dp)) {
+                            MedicalHistorySection(registrationViewModel, validationResults)
+                        }
+                    }
+                }
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Box(modifier = Modifier.padding(16.dp)) {
+                            LifestyleHabitsSection(registrationViewModel, validationResults)
+                        }
+                    }
+                }
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Box(modifier = Modifier.padding(16.dp)) {
+                            EnvironmentalFactorsSection(registrationViewModel, validationResults)
+                        }
+                    }
+                }
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Box(modifier = Modifier.padding(16.dp)) {
+                            AdditionalDataSection(registrationViewModel, validationResults)
+                        }
+                    }
+                }
                 item {
                     ButtonComponent(
                         value = when (mode) {
@@ -140,7 +187,8 @@ fun HealthAssessmentScreen    (
                         },
                         isEnabled = true
                     )
-
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
 
             }

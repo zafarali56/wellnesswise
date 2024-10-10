@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -32,31 +33,54 @@ class PersonalizedRecommendationsViewModel(
 
     init {
         setupDataListeners()
+        loadRecommendationsIfLoggedIn()
     }
 
     private fun setupDataListeners() {
         viewModelScope.launch {
-            auth.currentUser?.let { user ->
-                userDataListener = firestore.collection("users").document(user.uid)
-                    .addSnapshotListener { snapshot, error ->
-                        if (error != null) {
-                            // Handle error
-                            return@addSnapshotListener
-                        }
-                        if (snapshot != null && snapshot.exists()) {
-                            triggerRecommendationUpdate()
-                        }
-                    }
-
-                // Listen for changes in predictions
-                launch {
-                    predictionsViewModel.predictions.collectLatest { predictions ->
-                        if (predictions != null) {
-                            triggerRecommendationUpdate()
-                        }
-                    }
+            auth.addAuthStateListener { firebaseAuth ->
+                if (firebaseAuth.currentUser != null) {
+                    Log.d(TAG, "User logged in, setting up listeners")
+                    setupUserDataListener(firebaseAuth.currentUser!!.uid)
+                    setupPredictionListener()
+                } else {
+                    Log.d(TAG, "User logged out, clearing recommendations")
+                    _recommendations.value = emptyList()
+                    userDataListener?.remove()
                 }
             }
+        }
+    }
+
+    private fun setupUserDataListener(userId: String) {
+        userDataListener = firestore.collection("users").document(userId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e(TAG, "Listen failed.", error)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null && snapshot.exists()) {
+                    Log.d(TAG, "User data changed, triggering recommendation update")
+                    triggerRecommendationUpdate()
+                }
+            }
+    }
+
+    private fun setupPredictionListener() {
+        viewModelScope.launch {
+            predictionsViewModel.predictions.collectLatest { predictions ->
+                if (predictions != null) {
+                    Log.d(TAG, "Predictions changed, triggering recommendation update")
+                    triggerRecommendationUpdate()
+                }
+            }
+        }
+    }
+
+    private fun loadRecommendationsIfLoggedIn() {
+        if (auth.currentUser != null) {
+            Log.d(TAG, "User already logged in, loading recommendations")
+            triggerRecommendationUpdate()
         }
     }
 
@@ -77,11 +101,14 @@ class PersonalizedRecommendationsViewModel(
                 if (predictions != null) {
                     val newRecommendations = recommendationSystem.generateRecommendations(userData, predictions)
                     _recommendations.value = newRecommendations
+                    Log.d(TAG, "New recommendations loaded: $newRecommendations")
                 } else {
                     _recommendations.value = listOf("Predictions not available. Please try again later.")
+                    Log.d(TAG, "Predictions not available, couldn't generate recommendations")
                 }
             } catch (e: Exception) {
                 _recommendations.value = listOf("Unable to load recommendations. Please try again later.")
+                Log.e(TAG, "Error loading recommendations", e)
             } finally {
                 _isLoading.value = false
             }
@@ -99,6 +126,10 @@ class PersonalizedRecommendationsViewModel(
         super.onCleared()
         userDataListener?.remove()
         updateJob?.cancel()
+    }
+
+    companion object {
+        private const val TAG = "PersonalizedRecommendationsViewModel"
     }
 }
 
