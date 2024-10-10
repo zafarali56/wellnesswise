@@ -111,9 +111,6 @@ class MainActivity : ComponentActivity() {
                 loginViewModel = loginViewModel,
                 authViewModel = authViewModel,
                 healthDataViewModel = healthDataViewModel,
-                onRequestGoogleFitPermission = {
-                    requestGoogleFitPermissions()
-                },
                 dataVisualizationViewModel = dataVisualizationViewModel,
                 personalizedRecommendationsViewModel = personalizedRecommendationsViewModel
             )

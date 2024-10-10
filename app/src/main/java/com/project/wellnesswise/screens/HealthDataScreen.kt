@@ -48,7 +48,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun HealthDataScreen(
     healthDataViewModel: HealthDataViewModel,
-    loginViewModel: LoginViewModel
 ) {
     var systolic by remember { mutableStateOf("") }
     var diastolic by remember { mutableStateOf("") }
@@ -70,7 +69,6 @@ fun HealthDataScreen(
 
     colorResource(id = R.color.primary)
     val healthData by healthDataViewModel.healthData.collectAsState()
-    val cholesterol by healthDataViewModel.cholesterol.collectAsState()
     val isSyncing by healthDataViewModel.isSyncing.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
@@ -253,7 +251,7 @@ fun HealthDataScreen(
 @Composable
 @Preview
 fun HealthDataScreenPreview() {
-    HealthDataScreen(HealthDataViewModel(), LoginViewModel())
+    HealthDataScreen(HealthDataViewModel())
 }
 private fun updateBloodPressure(systolic: String, diastolic: String, viewModel: HealthDataViewModel) {
     if (systolic.isNotEmpty() && diastolic.isNotEmpty()) {

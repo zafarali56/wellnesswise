@@ -68,8 +68,7 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
                 }
             }
         }
-    }
-    private suspend fun saveLastPredictions(predictions: List<Triple<String, Float, String>>, timestamp: Long) {
+    }   private suspend fun saveLastPredictions(predictions: List<Triple<String, Float, String>>, timestamp: Long) {
         withContext(Dispatchers.IO) {
             val sharedPrefs = context.getSharedPreferences("PredictionsPrefs", Context.MODE_PRIVATE)
             with(sharedPrefs.edit()) {

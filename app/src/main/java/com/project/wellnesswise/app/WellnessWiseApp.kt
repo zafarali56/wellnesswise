@@ -36,7 +36,6 @@ fun WellnessWiseApp(
     authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel,
     healthDataViewModel: HealthDataViewModel,
-    onRequestGoogleFitPermission: () -> Unit,
     dataVisualizationViewModel : DataVisualizationViewModel ,
     personalizedRecommendationsViewModel : PersonalizedRecommendationsViewModel
 ) {
@@ -54,7 +53,7 @@ fun WellnessWiseApp(
                 is Screen.LoginScreen -> LoginScreen(loginViewModel)
                 is Screen.HomeScreen -> HomeScreen(homeViewModel, authViewModel)
                 is Screen.EmailVerificationScreen -> EmailVerificationScreen(registrationViewModel)
-                is Screen.HealthDataScreen -> HealthDataScreen(healthDataViewModel, loginViewModel)
+                is Screen.HealthDataScreen -> HealthDataScreen(healthDataViewModel)
                 is Screen.UserProfileScreen -> UserProfileScreen(
                     authViewModel,
                     registrationViewModel
