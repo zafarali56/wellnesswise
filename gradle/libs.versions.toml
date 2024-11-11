@@ -26,6 +26,7 @@ runtimeLivedata = "1.6.8"
 workRuntimeKtx = "2.9.1"
 lifecycleRuntimeComposeAndroid = "2.8.4"
 lifecycleCompiler = "2.8.4"
+composeMaterial = "1.4.0"
 
 [libraries]
 
@@ -67,6 +68,7 @@ androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtim
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
 androidx-lifecycle-runtime-compose-android = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose-android", version.ref = "lifecycleRuntimeComposeAndroid" }
 androidx-lifecycle-compiler = { group = "androidx.lifecycle", name = "lifecycle-compiler", version.ref = "lifecycleCompiler" }
+androidx-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "composeMaterial" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

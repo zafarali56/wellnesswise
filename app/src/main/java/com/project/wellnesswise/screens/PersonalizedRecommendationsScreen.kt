@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.material.Chip
+import androidx.wear.compose.material.ChipDefaults
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
@@ -104,45 +106,99 @@ fun RecommendationsList(recommendations: List<String>) {
         }
     }
 }
-
+enum class RiskLevel {
+    STABLE, MILD, MODERATE, SEVERE, CRITICAL
+}
 
 @Composable
 fun RecommendationCard(recommendation: String) {
-    val (icon, category, description) = getDetailedCategoryInfo(recommendation)
+    val (icon, category, description, riskLevel) = getDetailedCategoryInfo(recommendation)
     var expanded by remember { mutableStateOf(false) }
 
     ElevatedCard(
         onClick = { expanded = !expanded },
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = colorScheme.secondaryContainer,
-            contentColor = colorScheme.onSecondaryContainer
+            containerColor = when(riskLevel) {
+                RiskLevel.CRITICAL -> colorScheme.errorContainer
+                RiskLevel.SEVERE -> colorScheme.errorContainer.copy(alpha = 0.7f)
+                RiskLevel.MODERATE -> colorScheme.tertiaryContainer
+                RiskLevel.MILD -> colorScheme.secondaryContainer
+                RiskLevel.STABLE -> colorScheme.surfaceVariant
+            },
+            contentColor = when(riskLevel) {
+                RiskLevel.CRITICAL -> colorScheme.onErrorContainer
+                RiskLevel.SEVERE -> colorScheme.onErrorContainer
+                RiskLevel.MODERATE -> colorScheme.onTertiaryContainer
+                RiskLevel.MILD -> colorScheme.onSecondaryContainer
+                RiskLevel.STABLE -> colorScheme.onSurfaceVariant
+            }
         )
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = colorScheme.primary,
-                    modifier = Modifier.size(32.dp)
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Column {
-                    Text(
-                        text = category,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = colorScheme.onSurfaceVariant
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = when(riskLevel) {
+                            RiskLevel.CRITICAL -> colorScheme.error
+                            RiskLevel.SEVERE -> colorScheme.error.copy(alpha = 0.7f)
+                            RiskLevel.MODERATE -> colorScheme.tertiary
+                            RiskLevel.MILD -> colorScheme.secondary
+                            RiskLevel.STABLE -> colorScheme.primary
+                        },
+                        modifier = Modifier.size(32.dp)
                     )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column {
+                        Text(
+                            text = category,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = description,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = LocalContentColor.current.copy(alpha = 0.7f)
+                        )
+                    }
+                }
+                FilledTonalButton(
+                    onClick = { },
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = when(riskLevel) {
+                            RiskLevel.CRITICAL -> colorScheme.error.copy(alpha = 0.1f)
+                            RiskLevel.SEVERE -> colorScheme.error.copy(alpha = 0.08f)
+                            RiskLevel.MODERATE -> colorScheme.tertiary.copy(alpha = 0.1f)
+                            RiskLevel.MILD -> colorScheme.secondary.copy(alpha = 0.1f)
+                            RiskLevel.STABLE -> colorScheme.primary.copy(alpha = 0.1f)
+                        },
+                        contentColor = when(riskLevel) {
+                            RiskLevel.CRITICAL -> colorScheme.error
+                            RiskLevel.SEVERE -> colorScheme.error.copy(alpha = 0.7f)
+                            RiskLevel.MODERATE -> colorScheme.tertiary
+                            RiskLevel.MILD -> colorScheme.secondary
+                            RiskLevel.STABLE -> colorScheme.primary
+                        }
+                    ),
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .height(32.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp)
+                ) {
                     Text(
-                        text = description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        text = riskLevel.name.capitalize(),
+                        style = MaterialTheme.typography.labelSmall
                     )
                 }
             }
@@ -152,60 +208,117 @@ fun RecommendationCard(recommendation: String) {
                 exit = shrinkVertically() + fadeOut()
             ) {
                 Column(modifier = Modifier.padding(top = 16.dp)) {
-                    Divider(color = colorScheme.onSurfaceVariant.copy(alpha = 0.1f))
+                    Divider(color = LocalContentColor.current.copy(alpha = 0.1f))
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = recommendation,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = colorScheme.onSurfaceVariant
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
         }
     }
 }
-
 @Composable
-fun getDetailedCategoryInfo(recommendation: String): Triple<ImageVector, String, String> {
+fun getDetailedCategoryInfo(recommendation: String): Quadruple<ImageVector, String, String, RiskLevel> {
+    val riskLevel = when {
+        recommendation.contains("critical", ignoreCase = true) -> RiskLevel.CRITICAL
+        recommendation.contains("severe", ignoreCase = true) -> RiskLevel.SEVERE
+        recommendation.contains("moderate", ignoreCase = true) -> RiskLevel.MODERATE
+        recommendation.contains("mild", ignoreCase = true) -> RiskLevel.MILD
+        else -> RiskLevel.STABLE
+    }
+
+    // For combined health alerts
+    if (recommendation.contains("Important health alert", ignoreCase = true) ||
+        recommendation.contains("Great job!", ignoreCase = true)) {
+        return Quadruple(
+            Icons.Default.HealthAndSafety,
+            "Health Summary",
+            if (recommendation.contains("Great job!", ignoreCase = true))
+                "Overall health status and achievements"
+            else
+                "Multiple health concerns requiring attention",
+            riskLevel
+        )
+    }
+
     return when {
         recommendation.contains("diabetes", ignoreCase = true) ->
-            Triple(Icons.Default.Bloodtype, "Diabetes Risk", "Blood sugar management and lifestyle factors")
+            Quadruple(
+                Icons.Default.Bloodtype,
+                "Diabetes Risk",
+                if (riskLevel == RiskLevel.CRITICAL || riskLevel == RiskLevel.SEVERE)
+                    "Urgent: Blood sugar management required"
+                else
+                    "Blood sugar management and lifestyle factors",
+                riskLevel
+            )
         recommendation.contains("cardiovascular", ignoreCase = true) ->
-            Triple(Icons.Default.Favorite, "Heart Health", "Cardiovascular disease risk and prevention")
+            Quadruple(
+                Icons.Default.Favorite,
+                "Heart Health",
+                if (riskLevel == RiskLevel.CRITICAL || riskLevel == RiskLevel.SEVERE)
+                    "Urgent: Cardiovascular attention needed"
+                else
+                    "Cardiovascular disease risk and prevention",
+                riskLevel
+            )
         recommendation.contains("hypertension", ignoreCase = true) ->
-            Triple(Icons.Default.Speed, "Blood Pressure", "Hypertension risk and management")
+            Quadruple(
+                Icons.Default.Speed,
+                "Blood Pressure",
+                if (riskLevel == RiskLevel.CRITICAL || riskLevel == RiskLevel.SEVERE)
+                    "Urgent: Blood pressure management needed"
+                else
+                    "Hypertension risk and management",
+                riskLevel
+            )
         recommendation.contains("obesity", ignoreCase = true) ->
-            Triple(Icons.Default.MonitorWeight, "Weight Management", "BMI and healthy weight strategies")
+            Quadruple(
+                Icons.Default.MonitorWeight,
+                "Weight Management",
+                if (riskLevel == RiskLevel.CRITICAL || riskLevel == RiskLevel.SEVERE)
+                    "Urgent: Weight management attention needed"
+                else
+                    "BMI and healthy weight strategies",
+                riskLevel
+            )
         recommendation.contains("cancer", ignoreCase = true) ->
-            Triple(Icons.Default.Biotech, "Cancer Prevention", "Risk factors and screening recommendations")
-        recommendation.contains("diet", ignoreCase = true) ->
-            Triple(Icons.Default.Restaurant, "Nutrition", "Dietary habits and nutritional advice")
-        recommendation.contains("exercise", ignoreCase = true) ->
-            Triple(Icons.Default.FitnessCenter, "Stress Level", "Stress level and exercise recommendations")
-        recommendation.contains("sleep", ignoreCase = true) ->
-            Triple(Icons.Default.Bedtime, "Sleep Health", "Sleep patterns and quality improvement")
-        recommendation.contains("stress", ignoreCase = true) ->
-            Triple(Icons.Default.SelfImprovement, "Mental Wellbeing", "Stress management and mental health")
-        recommendation.contains("smoking", ignoreCase = true) ->
-            Triple(Icons.Default.SmokeFree, "Smoking Cessation", "Tobacco use and quitting strategies")
-        recommendation.contains("alcohol", ignoreCase = true) ->
-            Triple(Icons.Default.LocalBar, "Alcohol Consumption", "Drinking habits and moderation advice")
-        recommendation.contains("check", ignoreCase = true) ->
-            Triple(Icons.Default.HealthAndSafety, "Health Check-ups", "Regular screenings and preventive care")
-        recommendation.contains("environmental", ignoreCase = true) ->
-            Triple(Icons.Default.Eco, "Environmental Health", "Air quality and pollution exposure")
-        else -> Triple(Icons.Default.Lightbulb, "General Health", "Overall wellness and lifestyle tips")
+            Quadruple(
+                Icons.Default.Biotech,
+                "Cancer Risk",
+                if (riskLevel == RiskLevel.CRITICAL || riskLevel == RiskLevel.SEVERE)
+                    "Urgent: Cancer risk assessment needed"
+                else
+                    "Cancer prevention and screening",
+                riskLevel
+            )
+        else ->
+            Quadruple(
+                Icons.Default.HealthAndSafety,
+                "Health Alert",
+                "Important health information",
+                riskLevel
+            )
     }
 }
 
+data class Quadruple<out A, out B, out C, out D>(
+    val first: A,
+    val second: B,
+    val third: C,
+    val fourth: D
+)
 
+fun String.capitalize() = this.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
 @Composable
 fun LoadingAnimation(modifier: Modifier = Modifier) {
     var currentRotation by remember { mutableStateOf(0f) }
 
     LaunchedEffect(Unit) {
         while(true) {
-            delay(16) // approximately 60 FPS
+            delay(16)
             currentRotation = (currentRotation + 5) % 360
         }
     }

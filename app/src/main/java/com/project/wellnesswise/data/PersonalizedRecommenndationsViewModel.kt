@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import com.project.wellnesswise.data.PredictionsViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -87,7 +88,7 @@ class PersonalizedRecommendationsViewModel(
     private fun triggerRecommendationUpdate() {
         updateJob?.cancel()
         updateJob = viewModelScope.launch {
-            delay(500) // Debounce for 500ms
+            delay(500)
             loadRecommendations()
         }
     }
@@ -96,16 +97,34 @@ class PersonalizedRecommendationsViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val userData = getUserData()
-                val predictions = predictionsViewModel.predictions.value
-                if (predictions != null) {
-                    val newRecommendations = recommendationSystem.generateRecommendations(userData, predictions)
-                    _recommendations.value = newRecommendations
-                    Log.d(TAG, "New recommendations loaded: $newRecommendations")
-                } else {
-                    _recommendations.value = listOf("Predictions not available. Please try again later.")
-                    Log.d(TAG, "Predictions not available, couldn't generate recommendations")
+                val user = auth.currentUser ?: throw Exception("User not authenticated")
+
+
+                val latestPrediction = firestore.collection("users")
+                    .document(user.uid)
+                    .collection("predictions")
+                    .orderBy("timestamp", Query.Direction.DESCENDING)
+                    .limit(1)
+                    .get()
+                    .await()
+
+                if (latestPrediction.isEmpty) {
+                    _recommendations.value = listOf("No predictions available. Please complete your health assessment.")
+                    return@launch
                 }
+
+                val predictionDoc = latestPrediction.documents[0]
+                val predictions = (predictionDoc.get("predictions") as? List<Map<String, Any>>)?.map { pred ->
+                    Triple(
+                        pred["category"] as String,
+                        (pred["risk"] as Number).toFloat(),
+                        pred["context"] as String
+                    )
+                } ?: throw Exception("Invalid prediction data format")
+
+                val newRecommendations = recommendationSystem.generateRecommendations(predictions)
+                _recommendations.value = newRecommendations
+                Log.d(TAG, "New recommendations generated from latest predictions")
             } catch (e: Exception) {
                 _recommendations.value = listOf("Unable to load recommendations. Please try again later.")
                 Log.e(TAG, "Error loading recommendations", e)
