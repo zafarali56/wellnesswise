@@ -57,7 +57,7 @@ fun GoogleFitPermissionRequest(
                     style = MaterialTheme.typography.titleLarge
                 )
                 Text(
-                    "To provide you with the best experience, we need access to your Google Fit data.",
+                    "To provide you with the best experience, we need access to your Google Fit viewModels.",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Row(

@@ -42,9 +42,9 @@ import com.project.wellnesswise.components.ui.LoadingAnimation
 import com.project.wellnesswise.components.ui.MyNumberField
 import com.project.wellnesswise.components.ui.MyPasswordField
 import com.project.wellnesswise.components.ui.MyTextField
-import com.project.wellnesswise.data.RegistrationViewModel
-import com.project.wellnesswise.data.UIEvent
-import com.project.wellnesswise.data.rules.Validator
+import com.project.wellnesswise.viewModels.RegistrationViewModel
+import com.project.wellnesswise.viewModels.UIEvent
+import com.project.wellnesswise.viewModels.rules.Validator
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 

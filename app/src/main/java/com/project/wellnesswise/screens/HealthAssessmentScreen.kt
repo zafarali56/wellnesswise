@@ -37,8 +37,8 @@ import com.project.wellnesswise.components.ui.EnvironmentalFactorsSection
 import com.project.wellnesswise.components.ui.HealthAssessmentMode
 import com.project.wellnesswise.components.ui.LifestyleHabitsSection
 import com.project.wellnesswise.components.ui.MedicalHistorySection
-import com.project.wellnesswise.data.RegistrationViewModel
-import com.project.wellnesswise.data.UIEvent
+import com.project.wellnesswise.viewModels.RegistrationViewModel
+import com.project.wellnesswise.viewModels.UIEvent
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter

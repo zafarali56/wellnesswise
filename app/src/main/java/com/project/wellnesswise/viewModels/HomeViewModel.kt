@@ -48,7 +48,7 @@ class HomeViewModel : ViewModel() {
                         callback(null)
                     }
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error fetching user data", e)
+                    Log.e(TAG, "Error fetching user viewModels", e)
                     callback(null)
                 }
             } else {
@@ -94,11 +94,11 @@ class HomeViewModel : ViewModel() {
                                 "Data updated: BP: ${_bloodPressure.value}, HR: ${_heartRate.value}, BS: ${_bloodSugar.value}, Chol: ${_cholesterol.value}",
                             )
                         } catch (e: Exception) {
-                            Log.e(TAG, "Error parsing Firestore data", e)
+                            Log.e(TAG, "Error parsing Firestore viewModels", e)
                             setDefaultValues()
                         }
                     } else {
-                        Log.d(TAG, "Current data: null")
+                        Log.d(TAG, "Current viewModels: null")
                         setDefaultValues()
                     }
                 }
@@ -132,7 +132,7 @@ class HomeViewModel : ViewModel() {
                     setDefaultValues()
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error refreshing data", e)
+                Log.e(TAG, "Error refreshing viewModels", e)
                 setDefaultValues()
             } finally {
                 _isRefreshing.value = false

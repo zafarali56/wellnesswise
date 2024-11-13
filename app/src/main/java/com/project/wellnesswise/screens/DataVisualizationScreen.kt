@@ -98,7 +98,7 @@ fun DataVisualizationScreen(dataVisualizationViewModel: DataVisualizationViewMod
                     }
                     diseaseRiskData.isEmpty() -> {
                         Text(
-                            text = "No health data available",
+                            text = "No health viewModels available",
                             modifier = Modifier
                                 .align(Alignment.Center)
                                 .padding(16.dp)

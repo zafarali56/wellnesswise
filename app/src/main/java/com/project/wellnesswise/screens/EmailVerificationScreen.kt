@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.auth.FirebaseAuth
 import com.project.wellnesswise.components.ui.ButtonComponent
-import com.project.wellnesswise.data.RegistrationViewModel
+import com.project.wellnesswise.viewModels.RegistrationViewModel
 import kotlinx.coroutines.delay
 
 @Composable

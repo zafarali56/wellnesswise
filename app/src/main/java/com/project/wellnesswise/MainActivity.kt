@@ -34,9 +34,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.project.wellnesswise.app.WellnessWiseApp
-import com.project.wellnesswise.data.AuthViewModel
-import com.project.wellnesswise.data.PredictionsViewModel
-import com.project.wellnesswise.data.RegistrationViewModel
+import com.project.wellnesswise.viewModels.AuthViewModel
+import com.project.wellnesswise.viewModels.PredictionsViewModel
+import com.project.wellnesswise.viewModels.RegistrationViewModel
 import android.Manifest // import java.util.concurrent.TimeUnit
 
 
@@ -73,13 +73,13 @@ class MainActivity : ComponentActivity() {
         // Configure Firestore for real-time updates
         configureFirestore()
 
-        // Schedule periodic health data sync
+        // Schedule periodic health viewModels sync
         scheduleHealthDataSync()
 
         // Set up Google Fit permission launcher
         setupGoogleFitPermissionLauncher()
 
-        // Register broadcast receiver for health data updates
+        // Register broadcast receiver for health viewModels updates
         registerUpdateReceiver()
 
         // Set up auth state listener
@@ -182,7 +182,7 @@ class MainActivity : ComponentActivity() {
         updateReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent?.action == "com.project.wellnesswise.HEALTH_DATA_UPDATED") {
-                    Log.d(TAG, "Received health data update broadcast")
+                    Log.d(TAG, "Received health viewModels update broadcast")
                     homeViewModel.refreshData()
                     HealthAlerts.performImmediateHealthCheck(this@MainActivity)
                 }
@@ -206,10 +206,8 @@ class MainActivity : ComponentActivity() {
         when (requestCode) {
             HealthAlerts.NOTIFICATION_PERMISSION_REQUEST_CODE -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    // Permission was granted, you can start your monitoring here if you haven't already
                     HealthAlerts.startPeriodicMonitoring(this)
                 } else {
-                    // Permission denied. You might want to inform the user that they won't receive health alerts
                 }
                 return
             }
@@ -219,7 +217,6 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         homeViewModel.checkForActiveSession()
 
-        // Trigger an immediate sync when the app comes to the foreground
         val immediateSync =
             OneTimeWorkRequestBuilder<HealthDataSyncWorker>()
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())

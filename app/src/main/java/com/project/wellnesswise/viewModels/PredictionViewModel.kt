@@ -1,4 +1,4 @@
-package com.project.wellnesswise.data
+package com.project.wellnesswise.viewModels
 
 import android.content.ContentValues.TAG
 import android.content.Context
@@ -110,13 +110,13 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
 
                 val input = healthDataProcessor.getUserHealthData()
                 if (input == null) {
-                    Log.d(TAG, "User health data not available yet")
-                    errorMessage = "Health data not available. Please complete your health assessment."
+                    Log.d(TAG, "User health viewModels not available yet")
+                    errorMessage = "Health viewModels not available. Please complete your health assessment."
                     isLoading = false
                     return@launch
                 }
 
-                Log.d(TAG, "Health data loaded: $input")
+                Log.d(TAG, "Health viewModels loaded: $input")
                 _modelInput.value = input.values
 
                 val outputData = withContext(Dispatchers.Default) {

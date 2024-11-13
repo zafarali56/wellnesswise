@@ -6,7 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
-import com.project.wellnesswise.data.PredictionsViewModel
+import com.project.wellnesswise.viewModels.PredictionsViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -61,7 +61,7 @@ class PersonalizedRecommendationsViewModel(
                     return@addSnapshotListener
                 }
                 if (snapshot != null && snapshot.exists()) {
-                    Log.d(TAG, "User data changed, triggering recommendation update")
+                    Log.d(TAG, "User viewModels changed, triggering recommendation update")
                     triggerRecommendationUpdate()
                 }
             }
@@ -120,7 +120,7 @@ class PersonalizedRecommendationsViewModel(
                         (pred["risk"] as Number).toFloat(),
                         pred["context"] as String
                     )
-                } ?: throw Exception("Invalid prediction data format")
+                } ?: throw Exception("Invalid prediction viewModels format")
 
                 val newRecommendations = recommendationSystem.generateRecommendations(predictions)
                 _recommendations.value = newRecommendations

@@ -1,4 +1,4 @@
-package com.project.wellnesswise.data
+package com.project.wellnesswise.viewModels
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
@@ -183,8 +183,8 @@ class HealthDataProcessor {
             Log.d("HealthDataProcessor", "Feature: $label, Raw: $value, Normalized: $normalizedValue")
         }
 
-        Log.d("HealthDataProcessor", "Raw input data: ${rawInputValues.zip(inputLabels)}")
-        Log.d("HealthDataProcessor", "Normalized input data: ${normalizedValues.zip(inputLabels)}")
+        Log.d("HealthDataProcessor", "Raw input viewModels: ${rawInputValues.zip(inputLabels)}")
+        Log.d("HealthDataProcessor", "Normalized input viewModels: ${normalizedValues.zip(inputLabels)}")
 
         return ModelInput(normalizedValues, inputLabels)
     }

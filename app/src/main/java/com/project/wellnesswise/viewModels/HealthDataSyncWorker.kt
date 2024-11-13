@@ -63,7 +63,7 @@ class HealthDataSyncWorker(
             updateFirestore(mergedData)
             Result.success()
         } catch (e: Exception) {
-            Log.e(TAG, "Error syncing health data", e)
+            Log.e(TAG, "Error syncing health viewModels", e)
             Result.retry()
         }
     }
@@ -90,11 +90,11 @@ class HealthDataSyncWorker(
     ): Map<String, Any> {
         val mergedData = existingData.toMutableMap()
 
-        // Check global data source preference
+        // Check global viewModels source preference
         val globalDataSource = mergedData["dataSourcePreference"] as? String ?: "MANUAL"
 
         if (globalDataSource == "GOOGLE_FIT") {
-            // If global preference is Google Fit, update all data from Google Fit
+            // If global preference is Google Fit, update all viewModels from Google Fit
             for ((key, value) in googleFitData) {
                 mergedData[key] = value
                 mergedData["${key}Source"] = "GOOGLE_FIT"
@@ -124,7 +124,7 @@ class HealthDataSyncWorker(
                     com.google.firebase.firestore.SetOptions
                         .merge(),
                 ).await()
-            Log.d(TAG, "Health data updated successfully: $healthData")
+            Log.d(TAG, "Health viewModels updated successfully: $healthData")
         } else {
             throw Exception("User not authenticated")
         }

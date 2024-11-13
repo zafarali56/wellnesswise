@@ -1,4 +1,4 @@
-package com.project.wellnesswise.data
+package com.project.wellnesswise.viewModels
 
 import android.content.ContentValues.TAG
 import android.util.Log
@@ -10,7 +10,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.project.wellnesswise.components.ui.HealthAssessmentMode
-import com.project.wellnesswise.data.rules.Validator
+import com.project.wellnesswise.viewModels.rules.Validator
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 
@@ -266,10 +266,10 @@ class RegistrationViewModel : ViewModel() {
                     .document(user.uid)
                     .set(getUserData())
                     .addOnSuccessListener {
-                        Log.d(TAG, "User data stored successfully")
+                        Log.d(TAG, "User viewModels stored successfully")
                         WellnessWiseAppRouter.navigateTo(Screen.HealthDataScreen)
                     }.addOnFailureListener { e ->
-                        Log.w(TAG, "Error storing user data", e)
+                        Log.w(TAG, "Error storing user viewModels", e)
                     }
             } else {
                 Log.w(TAG, "Error reloading user or email not verified", task.exception)

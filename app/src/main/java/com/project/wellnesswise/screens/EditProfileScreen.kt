@@ -30,7 +30,7 @@ import com.project.wellnesswise.components.ui.CustomBloodPressureInput
 import com.project.wellnesswise.components.ui.HealthDataTextField
 import com.project.wellnesswise.components.ui.MyNumberField
 import com.project.wellnesswise.components.ui.MyTextField
-import com.project.wellnesswise.data.rules.Validator
+import com.project.wellnesswise.viewModels.rules.Validator
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import showToast
 

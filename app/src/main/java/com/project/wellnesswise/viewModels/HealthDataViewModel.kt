@@ -59,7 +59,7 @@ class HealthDataViewModel : ViewModel() {
                         resetHealthData()
                     }
                 } catch (e: Exception) {
-                    Log.e("HealthDataViewModel", "Error loading user health data", e)
+                    Log.e("HealthDataViewModel", "Error loading user health viewModels", e)
                 }
             } else {
                 resetHealthData()
@@ -157,7 +157,7 @@ class HealthDataViewModel : ViewModel() {
 
             setSyncMessage("Sync completed successfully")
         } catch (e: Exception) {
-            Log.e("HealthDataViewModel", "Error syncing health data", e)
+            Log.e("HealthDataViewModel", "Error syncing health viewModels", e)
             setSyncMessage("Error syncing with Google Fit: ${e.message}")
         } finally {
             _isSyncing.value = false
@@ -167,16 +167,16 @@ class HealthDataViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 _isSyncing.value = true
-                setSyncMessage("Updating health data...")
+                setSyncMessage("Updating health viewModels...")
                 val combinedData = _healthData.value.toMutableMap()
                 combinedData["cholesterol"] = _cholesterol.value
                 combinedData["triglycerides"] = _triglycerides.value
                 combinedData["waistCircumference"] = _waistCircumference.value
                 updateFirestore(combinedData)
-                setSyncMessage("Health data updated successfully")
+                setSyncMessage("Health viewModels updated successfully")
             } catch (e: Exception) {
-                Log.e("HealthDataViewModel", "Error updating health data", e)
-                setSyncMessage("Error updating health data: ${e.message}")
+                Log.e("HealthDataViewModel", "Error updating health viewModels", e)
+                setSyncMessage("Error updating health viewModels: ${e.message}")
             } finally {
                 _isSyncing.value = false
             }
@@ -188,7 +188,7 @@ class HealthDataViewModel : ViewModel() {
             firestore.collection("users").document(user.uid)
                 .set(healthData, com.google.firebase.firestore.SetOptions.merge())
                 .await()
-            Log.d("HealthDataViewModel", "Health data updated successfully: $healthData")
+            Log.d("HealthDataViewModel", "Health viewModels updated successfully: $healthData")
         } else {
             throw Exception("User not authenticated")
         }

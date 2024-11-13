@@ -1,4 +1,4 @@
-package com.project.wellnesswise.data
+package com.project.wellnesswise.viewModels
 
 
 

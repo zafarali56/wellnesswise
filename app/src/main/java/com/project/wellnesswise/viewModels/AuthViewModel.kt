@@ -1,4 +1,4 @@
-package com.project.wellnesswise.data
+package com.project.wellnesswise.viewModels
 
 import DataVisualizationViewModel
 import HealthDataViewModel
@@ -55,7 +55,7 @@ class AuthViewModel(
 
             // Delete the main user document
             userDocRef.delete().await()
-            Log.d(TAG, "User Firestore data deleted successfully")
+            Log.d(TAG, "User Firestore viewModels deleted successfully")
 
             // Delete the authentication account
             user.delete().await()

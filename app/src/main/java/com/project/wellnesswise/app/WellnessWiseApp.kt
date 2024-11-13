@@ -17,8 +17,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.project.wellnesswise.components.ui.HealthAssessmentMode
-import com.project.wellnesswise.data.AuthViewModel
-import com.project.wellnesswise.data.RegistrationViewModel
+import com.project.wellnesswise.viewModels.AuthViewModel
+import com.project.wellnesswise.viewModels.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import com.project.wellnesswise.screens.EmailVerificationScreen

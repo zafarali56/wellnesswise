@@ -1,4 +1,4 @@
-package com.project.wellnesswise.data
+package com.project.wellnesswise.viewModels
 
 sealed class UIEvent {
     data class EmailChanged(val email: String) : UIEvent()

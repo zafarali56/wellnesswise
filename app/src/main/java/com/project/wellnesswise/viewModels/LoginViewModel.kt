@@ -9,10 +9,10 @@ import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.HealthDataTypes
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.project.wellnesswise.data.LoginUIEvent
-import com.project.wellnesswise.data.LoginUIState
-import com.project.wellnesswise.data.RegistrationViewModel
-import com.project.wellnesswise.data.rules.Validator
+import com.project.wellnesswise.viewModels.LoginUIEvent
+import com.project.wellnesswise.viewModels.LoginUIState
+import com.project.wellnesswise.viewModels.RegistrationViewModel
+import com.project.wellnesswise.viewModels.rules.Validator
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import kotlinx.coroutines.launch
@@ -119,13 +119,13 @@ class LoginViewModel : ViewModel() {
                 } else {
                     Log.d(TAG, "No such document")
                     logInProgress.value = false
-                    errorMessage.value = "Error fetching user data"
+                    errorMessage.value = "Error fetching user viewModels"
                 }
             }
             .addOnFailureListener { exception ->
                 Log.d(TAG, "get failed with ", exception)
                 logInProgress.value = false
-                errorMessage.value = "Error fetching user data"
+                errorMessage.value = "Error fetching user viewModels"
             }
     }
 

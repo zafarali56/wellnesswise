@@ -31,7 +31,7 @@ class TFLiteInterpreter(context: Context, modelName: String) {
     }
 
     fun predict(input: FloatArray): FloatArray {
-        Log.d("TFLiteInterpreter", "Input data: ${input.contentToString()}")
+        Log.d("TFLiteInterpreter", "Input viewModels: ${input.contentToString()}")
         Log.d("TFLiteInterpreter", "Input shape: ${input.size}")
 
         val inputTensor = interpreter.getInputTensor(0)

@@ -98,7 +98,7 @@ class DataVisualizationViewModel : ViewModel() {
     private fun calculateOverallHealthScore(userData: Map<String, Any>?, latestPredictions: List<Map<String, Any>>? = null) {
         var score = 100f
 
-        // Deduct points based on user data
+        // Deduct points based on user viewModels
         userData?.let {
             val age = (it["age"] as? Number)?.toInt() ?: 0
             score -= (age / 100f) * 10
@@ -208,7 +208,7 @@ class DataVisualizationViewModel : ViewModel() {
         _diseaseRiskData.value = emptyMap()
         _overallHealthScore.value = null
         _isLoading.value = false
-        _error.value = "Please log in to view your health data"
+        _error.value = "Please log in to view your health viewModels"
     }
     override fun onCleared() {
         super.onCleared()

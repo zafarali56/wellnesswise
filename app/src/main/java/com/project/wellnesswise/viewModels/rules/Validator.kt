@@ -1,8 +1,8 @@
-package com.project.wellnesswise.data.rules
+package com.project.wellnesswise.viewModels.rules
 
-import com.project.wellnesswise.data.Gender
-import com.project.wellnesswise.data.RegistrationUIState
-import com.project.wellnesswise.data.LoginUIState
+import com.project.wellnesswise.viewModels.Gender
+import com.project.wellnesswise.viewModels.RegistrationUIState
+import com.project.wellnesswise.viewModels.LoginUIState
 
 object Validator {
 
@@ -120,7 +120,7 @@ object Validator {
     }
 
 
-//Health data validations from now here
+//Health viewModels validations from now here
     fun validateBloodPressure(bloodPressure: String): Boolean {
         val bloodPressureRegex = Regex("^\\d+(\\.\\d+)?/\\d+(\\.\\d+)?$")
         return bloodPressure.matches(bloodPressureRegex)

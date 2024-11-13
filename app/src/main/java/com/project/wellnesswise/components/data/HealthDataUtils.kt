@@ -33,7 +33,8 @@ object HealthDataUtils {
 
         if (heartRateResponse.dataSets.isNotEmpty() && heartRateResponse.dataSets[0].dataPoints.isNotEmpty()) {
             val latestHeartRate = heartRateResponse.dataSets[0].dataPoints[0]
-            healthData["heartRate"] = latestHeartRate.getValue(Field.FIELD_BPM).asFloat()
+            val heartRateValue = latestHeartRate.getValue(Field.FIELD_BPM).asFloat().toInt()
+            healthData["heartRate"] = heartRateValue.toString()  // Convert to String
         }
 
 
@@ -63,8 +64,9 @@ object HealthDataUtils {
                 }
                 HealthDataTypes.TYPE_BLOOD_GLUCOSE -> {
                     for (dataPoint in dataSet.dataPoints.sortedByDescending { it.getEndTime(TimeUnit.MILLISECONDS) }) {
-                        healthData["bloodSugar"] = dataPoint.getValue(HealthFields.FIELD_BLOOD_GLUCOSE_LEVEL).asFloat()
-                        break // Take the most recent reading
+                        val bloodSugarValue = dataPoint.getValue(HealthFields.FIELD_BLOOD_GLUCOSE_LEVEL).asFloat().toInt()
+                        healthData["bloodSugar"] = bloodSugarValue.toString()  // Convert to String
+                        break
                     }
                 }
             }

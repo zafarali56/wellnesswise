@@ -32,7 +32,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.wellnesswise.components.ui.NavigationDrawer
-import com.project.wellnesswise.data.AuthViewModel
+import com.project.wellnesswise.viewModels.AuthViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 

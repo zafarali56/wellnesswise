@@ -41,8 +41,8 @@ import com.project.wellnesswise.components.ui.LoadingAnimation
 import com.project.wellnesswise.components.ui.MyPasswordField
 import com.project.wellnesswise.components.ui.MyTextField
 import com.project.wellnesswise.components.ui.UnderLinedTextComponent
-import com.project.wellnesswise.data.LoginUIEvent
-import com.project.wellnesswise.data.rules.Validator
+import com.project.wellnesswise.viewModels.LoginUIEvent
+import com.project.wellnesswise.viewModels.rules.Validator
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 

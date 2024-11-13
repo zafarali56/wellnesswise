@@ -88,9 +88,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.project.wellnesswise.R
-import com.project.wellnesswise.data.Gender
-import com.project.wellnesswise.data.RegistrationViewModel
-import com.project.wellnesswise.data.UIEvent
+import com.project.wellnesswise.viewModels.Gender
+import com.project.wellnesswise.viewModels.RegistrationViewModel
+import com.project.wellnesswise.viewModels.UIEvent
 import com.project.wellnesswise.navigations.Screen
 import kotlinx.coroutines.launch
 
@@ -658,12 +658,12 @@ fun NavigationItem(
 
 fun getScreenTitle(screen: Screen): String {
     return when (screen) {
-        Screen.HomeScreen -> "Wellness Wise"
-        Screen.UserProfileScreen -> "User Profile"
-        Screen.DataVisualizationScreen -> "Data Visualization"
-        Screen.PredictionsScreen -> "Health Risk Predictions"
-        Screen.PersonalizedRecommendationsScreen -> "Recommendations"
-        else -> "Wellness Wise" // Default title
+        Screen.HomeScreen -> "WellnessWise"
+        Screen.UserProfileScreen -> "User profile"
+        Screen.DataVisualizationScreen -> "Data visualization"
+        Screen.PredictionsScreen -> "Health risk predictions"
+        Screen.PersonalizedRecommendationsScreen -> "Health Recommendations"
+        else -> "WellnessWise"
     }
 }
 

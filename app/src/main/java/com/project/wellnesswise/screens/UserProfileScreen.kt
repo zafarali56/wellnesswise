@@ -19,8 +19,8 @@ import com.project.wellnesswise.components.ui.HealthAssessmentMode
 import com.project.wellnesswise.components.ui.LoadingAnimation
 import com.project.wellnesswise.components.ui.MyPasswordField
 import com.project.wellnesswise.components.ui.NavigationDrawer
-import com.project.wellnesswise.data.AuthViewModel
-import com.project.wellnesswise.data.RegistrationViewModel
+import com.project.wellnesswise.viewModels.AuthViewModel
+import com.project.wellnesswise.viewModels.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
@@ -151,7 +151,7 @@ fun UserProfileScreen(authViewModel: AuthViewModel, registrationViewModel: Regis
                     title = { Text("Delete Account") },
                     text = {
                         Column {
-                            Text("Are you sure you want to delete your account? This action cannot be undone and will delete all your data. Please enter your password to confirm.")
+                            Text("Are you sure you want to delete your account? This action cannot be undone and will delete all your viewModels. Please enter your password to confirm.")
                             Spacer(modifier = Modifier.height(16.dp))
                             MyPasswordField(
                                 labelValue = "Password",
@@ -162,7 +162,7 @@ fun UserProfileScreen(authViewModel: AuthViewModel, registrationViewModel: Regis
                             if (isDeleting) {
                                 Spacer(modifier = Modifier.height(16.dp))
                                 LoadingAnimation()
-                                Text("Deleting account and all associated data... Please wait.",
+                                Text("Deleting account and all associated viewModels... Please wait.",
                                     modifier = Modifier.padding(top = 8.dp))
                             }
                         }
