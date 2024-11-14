@@ -1,3 +1,6 @@
+package com.project.wellnesswise.screens
+
+import DataVisualizationViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -179,7 +182,7 @@ fun OverallHealthScoreCard(score: Float?, colorScheme: ColorScheme) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             LinearProgressIndicator(
-                progress = score?.div(100f) ?: 0f,
+                progress = { score?.div(100f) ?: 0f },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(12.dp)
@@ -190,7 +193,7 @@ fun OverallHealthScoreCard(score: Float?, colorScheme: ColorScheme) {
                     score >= 60 -> colorScheme.tertiary
                     else -> colorScheme.error
                 },
-                trackColor = colorScheme.onSecondaryContainer.copy(alpha = 0.2f)
+                trackColor = colorScheme.onSecondaryContainer.copy(alpha = 0.2f),
             )
         }
     }

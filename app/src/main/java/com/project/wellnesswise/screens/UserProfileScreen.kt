@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.project.wellnesswise.components.ui.HealthAssessmentMode
 import com.project.wellnesswise.components.ui.LoadingAnimation
+import com.project.wellnesswise.components.ui.MainProfileView
 import com.project.wellnesswise.components.ui.MyPasswordField
 import com.project.wellnesswise.components.ui.NavigationDrawer
 import com.project.wellnesswise.viewModels.AuthViewModel

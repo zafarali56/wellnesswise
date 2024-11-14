@@ -1,9 +1,9 @@
 package com.project.wellnesswise.screens
 
-import ErrorState
-import LoadingAnimation
+import com.project.wellnesswise.components.ui.ErrorState
+import com.project.wellnesswise.components.ui.LoadingAnimation
 import PersonalizedRecommendationsViewModel
-import RecommendationsList
+import com.project.wellnesswise.components.ui.RecommendationsList
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons

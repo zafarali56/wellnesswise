@@ -1,3 +1,5 @@
+package com.project.wellnesswise.components.ui
+
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
@@ -50,7 +52,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
-import com.project.wellnesswise.components.ui.LoadingAnimation
 
 @Composable
 fun MainProfileView(
@@ -68,7 +69,7 @@ fun MainProfileView(
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Edit profile",
-                    tint = MaterialTheme.colorScheme.onPrimary
+                    tint = colorScheme.onPrimary
                 )
             }
         },
@@ -146,7 +147,7 @@ fun ProfileHeader(userData: Map<String, Any>?, isLoading: Boolean) {
                 if (isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.secondary
+                        color = colorScheme.secondary
                     )
                 } else {
                     userData?.let { data ->
@@ -154,7 +155,7 @@ fun ProfileHeader(userData: Map<String, Any>?, isLoading: Boolean) {
                             text = data["fullName"] as? String ?: "N/A",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
@@ -172,12 +173,12 @@ fun ProfileHeader(userData: Map<String, Any>?, isLoading: Boolean) {
 fun DeleteAccountButton(onDeleteAccountClick: () -> Unit) {
     var isPressed by remember { mutableStateOf(false) }
     val backgroundColor by animateColorAsState(
-        if (isPressed) MaterialTheme.colorScheme.errorContainer
-        else MaterialTheme.colorScheme.surface, label = ""
+        if (isPressed) colorScheme.errorContainer
+        else colorScheme.surface, label = ""
     )
     val contentColor by animateColorAsState(
-        if (isPressed) MaterialTheme.colorScheme.onErrorContainer
-        else MaterialTheme.colorScheme.error, label = ""
+        if (isPressed) colorScheme.onErrorContainer
+        else colorScheme.error, label = ""
     )
 
     ElevatedButton(
@@ -231,7 +232,7 @@ fun ProfileSection(title: String, items: List<Pair<String, Any?>>) {
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .animateContentSize(),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            containerColor = colorScheme.secondaryContainer
         ),
         onClick = { expanded = !expanded }
     ) {
@@ -244,13 +245,13 @@ fun ProfileSection(title: String, items: List<Pair<String, Any?>>) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold
+                    color = colorScheme.onSurface, fontWeight = FontWeight.Bold
                 )
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(
                         imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                         contentDescription = if (expanded) "Collapse" else "Expand",
-                        tint = MaterialTheme.colorScheme.onSurface
+                        tint = colorScheme.onSurface
                     )
                 }
             }
@@ -276,12 +277,12 @@ fun ProfileItem(label: String, value: Any?) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer, fontWeight = FontWeight.SemiBold
+                color = colorScheme.onSecondaryContainer, fontWeight = FontWeight.SemiBold
             )
             Text(
                 text = value?.toString() ?: "N/A",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
+                color = colorScheme.onSecondaryContainer
             )
         }
     }

@@ -3,8 +3,12 @@ package com.project.wellnesswise.navigations
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcherOwner
-import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 
 private val LocalBackPressedDispatcher =
     staticCompositionLocalOf<OnBackPressedDispatcherOwner?> { null }
@@ -45,7 +49,7 @@ internal fun ComposableHandler(
 @Composable
 internal fun SystemBackButtonHandler(onBackPressed: () -> Unit) {
     CompositionLocalProvider(
-        LocalBackPressedDispatcher provides LocalLifecycleOwner.current as ComponentActivity
+        LocalBackPressedDispatcher provides androidx.lifecycle.compose.LocalLifecycleOwner.current as ComponentActivity
     ) {
         ComposableHandler {
             onBackPressed()

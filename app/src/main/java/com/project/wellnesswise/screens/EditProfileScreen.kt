@@ -32,7 +32,7 @@ import com.project.wellnesswise.components.ui.MyNumberField
 import com.project.wellnesswise.components.ui.MyTextField
 import com.project.wellnesswise.viewModels.rules.Validator
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
-import showToast
+import com.project.wellnesswise.components.ui.showToast
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

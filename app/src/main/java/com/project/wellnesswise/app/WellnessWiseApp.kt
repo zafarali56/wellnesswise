@@ -1,11 +1,11 @@
 package com.project.wellnesswise.app
-import DataVisualizationScreen
+import com.project.wellnesswise.screens.DataVisualizationScreen
 import DataVisualizationViewModel
-import HealthDataScreen
+import com.project.wellnesswise.screens.HealthDataScreen
 import HealthDataViewModel
-import HomeScreen
+import com.project.wellnesswise.screens.HomeScreen
 import HomeViewModel
-import LoginScreen
+import com.project.wellnesswise.screens.LoginScreen
 import LoginViewModel
 import PersonalizedRecommendationsViewModel
 import PredictionHistoryScreen
