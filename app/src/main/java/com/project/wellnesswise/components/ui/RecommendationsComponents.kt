@@ -77,7 +77,7 @@ fun RecommendationCard(recommendation: String) {
         colors = CardDefaults.cardColors(
             containerColor = when(riskLevel) {
                 RiskLevel.CRITICAL -> colorScheme.errorContainer
-                RiskLevel.SEVERE -> colorScheme.errorContainer.copy(alpha = 0.7f)
+                RiskLevel.SEVERE -> colorScheme.errorContainer
                 RiskLevel.MODERATE -> colorScheme.tertiaryContainer
                 RiskLevel.MILD -> colorScheme.secondaryContainer
                 RiskLevel.STABLE -> colorScheme.surfaceVariant
@@ -133,15 +133,15 @@ fun RecommendationCard(recommendation: String) {
                     onClick = { },
                     colors = ButtonDefaults.filledTonalButtonColors(
                         containerColor = when(riskLevel) {
-                            RiskLevel.CRITICAL -> colorScheme.error.copy(alpha = 0.1f)
-                            RiskLevel.SEVERE -> colorScheme.error.copy(alpha = 0.08f)
+                            RiskLevel.CRITICAL -> colorScheme.error.copy(alpha = 0.15f)
+                            RiskLevel.SEVERE -> colorScheme.error.copy(alpha = 0.15f)
                             RiskLevel.MODERATE -> colorScheme.tertiary.copy(alpha = 0.1f)
                             RiskLevel.MILD -> colorScheme.secondary.copy(alpha = 0.1f)
                             RiskLevel.STABLE -> colorScheme.primary.copy(alpha = 0.1f)
                         },
                         contentColor = when(riskLevel) {
                             RiskLevel.CRITICAL -> colorScheme.error
-                            RiskLevel.SEVERE -> colorScheme.error.copy(alpha = 0.7f)
+                            RiskLevel.SEVERE -> colorScheme.error
                             RiskLevel.MODERATE -> colorScheme.tertiary
                             RiskLevel.MILD -> colorScheme.secondary
                             RiskLevel.STABLE -> colorScheme.primary

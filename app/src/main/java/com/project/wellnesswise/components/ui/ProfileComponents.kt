@@ -157,7 +157,7 @@ fun ProfileHeader(userData: Map<String, Any>?, isLoading: Boolean) {
                             fontWeight = FontWeight.Bold,
                             color = colorScheme.onSurface
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+
                         Text(
                             text = user?.email ?: "No email",
                             style = MaterialTheme.typography.bodyMedium,
@@ -173,12 +173,12 @@ fun ProfileHeader(userData: Map<String, Any>?, isLoading: Boolean) {
 fun DeleteAccountButton(onDeleteAccountClick: () -> Unit) {
     var isPressed by remember { mutableStateOf(false) }
     val backgroundColor by animateColorAsState(
-        if (isPressed) colorScheme.errorContainer
-        else colorScheme.surface, label = ""
+        if (isPressed) colorScheme.onSecondary
+        else colorScheme.secondary, label = ""
     )
     val contentColor by animateColorAsState(
-        if (isPressed) colorScheme.onErrorContainer
-        else colorScheme.error, label = ""
+        if (isPressed) colorScheme.onSecondary
+        else colorScheme.onSecondary, label = ""
     )
 
     ElevatedButton(
@@ -214,10 +214,9 @@ fun DeleteAccountButton(onDeleteAccountClick: () -> Unit) {
         }
     }
 
-    // This will trigger the color animation when the button is pressed
     LaunchedEffect(isPressed) {
         if (isPressed) {
-            kotlinx.coroutines.delay(200)
+            kotlinx.coroutines.delay(50)
             isPressed = false
         }
     }
@@ -273,16 +272,16 @@ fun ProfileItem(label: String, value: Any?) {
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
-                color = colorScheme.onSecondaryContainer, fontWeight = FontWeight.SemiBold
+                color = colorScheme.onSecondaryContainer,
             )
             Text(
                 text = value?.toString() ?: "N/A",
-                style = MaterialTheme.typography.bodyMedium,
-                color = colorScheme.onSecondaryContainer
+                style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold,
+                color = colorScheme.onSecondaryContainer,
             )
         }
     }

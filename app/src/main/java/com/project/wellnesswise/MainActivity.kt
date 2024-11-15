@@ -1,13 +1,13 @@
 package com.project.wellnesswise
 
 import com.project.wellnesswise.viewModels.DataVisualizationViewModel
-import com.project.wellnesswise.viewModels.HealthAlerts
+import com.project.wellnesswise.utils.HealthAlerts
 import com.project.wellnesswise.viewModels.HealthDataSyncWorker
 import com.project.wellnesswise.viewModels.HealthDataViewModel
 import com.project.wellnesswise.viewModels.HomeViewModel
 import com.project.wellnesswise.viewModels.LoginViewModel
-import PersonalizedRecommendationsViewModel
-import PersonalizedRecommendationsViewModelFactory
+import com.project.wellnesswise.viewModels.PersonalizedRecommendationsViewModel
+import com.project.wellnesswise.viewModels.PersonalizedRecommendationsViewModelFactory
 import com.project.wellnesswise.viewModels.PredictionsViewModelFactory
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -32,7 +32,7 @@ import com.project.wellnesswise.app.WellnessWiseApp
 import com.project.wellnesswise.viewModels.AuthViewModel
 import com.project.wellnesswise.viewModels.PredictionsViewModel
 import com.project.wellnesswise.viewModels.RegistrationViewModel
-import android.Manifest // import java.util.concurrent.TimeUnit
+import android.Manifest
 
 
 class MainActivity : ComponentActivity() {

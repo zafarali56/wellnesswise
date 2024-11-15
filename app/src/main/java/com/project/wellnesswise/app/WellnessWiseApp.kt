@@ -7,7 +7,7 @@ import com.project.wellnesswise.screens.HomeScreen
 import com.project.wellnesswise.viewModels.HomeViewModel
 import com.project.wellnesswise.screens.LoginScreen
 import com.project.wellnesswise.viewModels.LoginViewModel
-import PersonalizedRecommendationsViewModel
+import com.project.wellnesswise.viewModels.PersonalizedRecommendationsViewModel
 import com.project.wellnesswise.screens.PredictionHistoryScreen
 import com.project.wellnesswise.screens.UserProfileScreen
 import android.annotation.SuppressLint
@@ -25,6 +25,7 @@ import com.project.wellnesswise.screens.EmailVerificationScreen
 import com.project.wellnesswise.screens.HealthAssessmentScreen
 import com.project.wellnesswise.screens.PersonalizedRecommendationsScreen
 import com.project.wellnesswise.screens.PredictionsScreen
+import com.project.wellnesswise.screens.RecommendationSetupScreen
 import com.project.wellnesswise.screens.SignUpScreen
 import com.project.wellnesswise.screens.TermsAndConditionsScreen
 
@@ -89,6 +90,7 @@ fun WellnessWiseApp(
                     )
                 }
                 is Screen.PredictionHistoryScreen -> PredictionHistoryScreen()
+                is Screen.RecommendationSetupScreen -> RecommendationSetupScreen()
             }
         }
     }

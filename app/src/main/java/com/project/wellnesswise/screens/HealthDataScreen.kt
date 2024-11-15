@@ -38,6 +38,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.HealthDataTypes
+import com.google.firebase.firestore.FirebaseFirestore
 import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ui.ButtonComponent
 import com.project.wellnesswise.components.ui.CustomBloodPressureInput
@@ -46,6 +47,7 @@ import com.project.wellnesswise.components.ui.HealthDataTextField
 import com.project.wellnesswise.components.ui.LoadingAnimation
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
+import com.project.wellnesswise.utils.RecommendationDataUploader
 import kotlinx.coroutines.launch
 
 @Composable
@@ -241,8 +243,19 @@ fun HealthDataScreen(
                     ButtonComponent(
                         value = "Submit",
                         onButtonClicked = {
-                            healthDataViewModel.sendHealthDataToFirestore()
-                            WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
+                            coroutineScope.launch {
+                                try {
+                                    // First, send health data to Firestore
+                                    healthDataViewModel.sendHealthDataToFirestore()
+
+                                    // After health data is saved, navigate to recommendation setup screen
+                                    WellnessWiseAppRouter.navigateTo(Screen.RecommendationSetupScreen)
+
+                                } catch (e: Exception) {
+                                    // Handle error for health data saving
+                                    println("Error saving health data: ${e.message}")
+                                }
+                            }
                         },
                         isEnabled = true
                     )
