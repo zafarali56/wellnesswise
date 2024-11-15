@@ -1,3 +1,5 @@
+package com.project.wellnesswise.viewModels
+
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
@@ -9,9 +11,6 @@ import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.HealthDataTypes
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.project.wellnesswise.viewModels.LoginUIEvent
-import com.project.wellnesswise.viewModels.LoginUIState
-import com.project.wellnesswise.viewModels.RegistrationViewModel
 import com.project.wellnesswise.viewModels.rules.Validator
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
@@ -25,7 +24,7 @@ class LoginViewModel : ViewModel() {
         private set
     var errorMessage = mutableStateOf<String?>(null)
         private set
-    private val _dataSourcePreference = mutableStateOf<RegistrationViewModel.DataSourcePreference>(
+    private val _dataSourcePreference = mutableStateOf(
         RegistrationViewModel.DataSourcePreference.MANUAL)
 
     var logInProgress = mutableStateOf(false)

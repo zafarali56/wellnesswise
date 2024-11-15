@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import com.project.wellnesswise.viewModels.HealthRecommendationSystem
 import com.project.wellnesswise.viewModels.PredictionsViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -120,7 +121,7 @@ class PersonalizedRecommendationsViewModel(
                         (pred["risk"] as Number).toFloat(),
                         pred["context"] as String
                     )
-                } ?: throw Exception("Invalid prediction viewModels format")
+                } ?: throw Exception("Invalid prediction viewModels com.project.wellnesswise.screens.format")
 
                 val newRecommendations = recommendationSystem.generateRecommendations(predictions)
                 _recommendations.value = newRecommendations

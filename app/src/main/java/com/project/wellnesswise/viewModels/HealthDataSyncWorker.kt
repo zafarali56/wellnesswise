@@ -1,3 +1,5 @@
+package com.project.wellnesswise.viewModels
+
 import android.content.Context
 import android.util.Log
 import androidx.work.*
@@ -16,7 +18,7 @@ class HealthDataSyncWorker(
     params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
     companion object {
-        private const val TAG = "HealthDataSyncWorker"
+        private const val TAG = "com.project.wellnesswise.viewModels.HealthDataSyncWorker"
         private const val WORK_NAME = "healthDataSync"
 
         fun startPeriodicSync(context: Context) {

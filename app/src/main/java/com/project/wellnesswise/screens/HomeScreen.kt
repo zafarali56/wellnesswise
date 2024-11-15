@@ -1,6 +1,6 @@
 package com.project.wellnesswise.screens
 
-import HomeViewModel
+import com.project.wellnesswise.viewModels.HomeViewModel
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

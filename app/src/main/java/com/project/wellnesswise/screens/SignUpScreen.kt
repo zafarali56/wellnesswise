@@ -57,7 +57,6 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
     val useDarkIcons = !isSystemInDarkTheme()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val scrollState = rememberLazyListState()
-    // Use dynamic color scheme
     val colorScheme = when {
         useDarkIcons -> dynamicLightColorScheme(LocalContext.current)
         else -> dynamicDarkColorScheme(LocalContext.current)

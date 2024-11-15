@@ -1,27 +1,31 @@
-import android.app.Activity
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.auth.FirebaseAuth
-import androidx.work.*
-import android.content.Context
+package com.project.wellnesswise.viewModels
+
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Build
-import androidx.core.app.ActivityCompat
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import android.Manifest
-import android.annotation.SuppressLint
-import android.app.PendingIntent
-import android.content.Intent
-import android.graphics.Color
-import android.util.Log
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import androidx.work.WorkerParameters
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.project.wellnesswise.MainActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 class HealthAlerts(
@@ -42,17 +46,17 @@ class HealthAlerts(
         val userId = auth.currentUser?.uid ?: return Result.failure()
 
         try {
-            Log.d("HealthAlerts", "Starting health check for user: $userId")
+            Log.d("com.project.wellnesswise.viewModels.HealthAlerts", "Starting health check for user: $userId")
             val userData = firestore.collection("users").document(userId).get().await().data
             if (userData != null) {
-                Log.d("HealthAlerts", "User viewModels retrieved: $userData")
+                Log.d("com.project.wellnesswise.viewModels.HealthAlerts", "User viewModels retrieved: $userData")
                 checkHealthParameters(userData)
             } else {
-                Log.w("HealthAlerts", "No user viewModels found for user: $userId")
+                Log.w("com.project.wellnesswise.viewModels.HealthAlerts", "No user viewModels found for user: $userId")
             }
             return Result.success()
         } catch (e: Exception) {
-            Log.e("HealthAlerts", "Error during health check: ${e.message}")
+            Log.e("com.project.wellnesswise.viewModels.HealthAlerts", "Error during health check: ${e.message}")
             return Result.retry()
         }
     }
@@ -62,7 +66,7 @@ class HealthAlerts(
         val bloodPressure = userData["bloodPressure"] as? String
         if (bloodPressure != null) {
             val (systolic, diastolic) = bloodPressure.split("/").map { it.toInt() }
-            Log.d("HealthAlerts", "Checking blood pressure: $systolic/$diastolic")
+            Log.d("com.project.wellnesswise.viewModels.HealthAlerts", "Checking blood pressure: $systolic/$diastolic")
             if (systolic >= 140 || diastolic >= 90) {
                 sendNotification(
                     "blood_pressure",
@@ -79,7 +83,7 @@ class HealthAlerts(
             is String -> heartRate.toIntOrNull()
             else -> null
         }
-        Log.d("HealthAlerts", "Checking heart rate: $heartRateValue")
+        Log.d("com.project.wellnesswise.viewModels.HealthAlerts", "Checking heart rate: $heartRateValue")
         if (heartRateValue != null && (heartRateValue >= 100 || heartRateValue < 60)) {
             sendNotification(
                 "heart_rate",
@@ -95,7 +99,7 @@ class HealthAlerts(
             is String -> bloodSugar.toDoubleOrNull()
             else -> null
         }
-        Log.d("HealthAlerts", "Checking blood sugar: $bloodSugarValue")
+        Log.d("com.project.wellnesswise.viewModels.HealthAlerts", "Checking blood sugar: $bloodSugarValue")
         if (bloodSugarValue != null && bloodSugarValue > 200.0) {
             sendNotification(
                 "blood_sugar",
@@ -111,7 +115,7 @@ class HealthAlerts(
             is String -> cholesterol.toDoubleOrNull()
             else -> null
         }
-        Log.d("HealthAlerts", "Checking cholesterol: $cholesterolValue")
+        Log.d("com.project.wellnesswise.viewModels.HealthAlerts", "Checking cholesterol: $cholesterolValue")
         if (cholesterolValue != null && cholesterolValue > 240.0) {
             sendNotification(
                 "cholesterol",
@@ -164,7 +168,7 @@ class HealthAlerts(
             .build()
 
         notificationManager.notify(notificationId, notification)
-        Log.d("HealthAlerts", "Notification sent: $title - $shortContent")
+        Log.d("com.project.wellnesswise.viewModels.HealthAlerts", "Notification sent: $title - $shortContent")
     }
 
     private fun createNotificationChannel() {
@@ -191,7 +195,7 @@ class HealthAlerts(
 
         fun startPeriodicMonitoring(context: Context) {
             if (!hasNotificationPermission(context)) {
-                Log.w("HealthAlerts", "Notification permission not granted")
+                Log.w("com.project.wellnesswise.viewModels.HealthAlerts", "Notification permission not granted")
                 return
             }
 
@@ -213,12 +217,12 @@ class HealthAlerts(
                 ExistingPeriodicWorkPolicy.UPDATE,
                 monitoringWork
             )
-            Log.d("HealthAlerts", "Periodic monitoring started")
+            Log.d("com.project.wellnesswise.viewModels.HealthAlerts", "Periodic monitoring started")
         }
 
         fun performImmediateHealthCheck(context: Context) {
             if (!hasNotificationPermission(context)) {
-                Log.w("HealthAlerts", "Notification permission not granted")
+                Log.w("com.project.wellnesswise.viewModels.HealthAlerts", "Notification permission not granted")
                 return
             }
 
@@ -231,7 +235,7 @@ class HealthAlerts(
                 .build()
 
             WorkManager.getInstance(context).enqueue(workRequest)
-            Log.d("HealthAlerts", "Immediate health check enqueued")
+            Log.d("com.project.wellnesswise.viewModels.HealthAlerts", "Immediate health check enqueued")
         }
 
         fun hasNotificationPermission(context: Context): Boolean {

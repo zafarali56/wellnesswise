@@ -1,7 +1,8 @@
+package com.project.wellnesswise.viewModels
+
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.project.wellnesswise.viewModels.PredictionsViewModel
 
 class PredictionsViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

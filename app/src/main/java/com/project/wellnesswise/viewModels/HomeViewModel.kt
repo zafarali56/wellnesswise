@@ -1,3 +1,5 @@
+package com.project.wellnesswise.viewModels
+
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,7 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class HomeViewModel : ViewModel() {
-    private val TAG = "HomeViewModel"
+    private val TAG = "com.project.wellnesswise.viewModels.HomeViewModel"
 
     private val _isUserLoggedIn = MutableStateFlow(false)
     val isUserLoggedIn: StateFlow<Boolean> = _isUserLoggedIn

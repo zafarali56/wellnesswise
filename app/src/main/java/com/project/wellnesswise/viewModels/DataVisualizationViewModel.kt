@@ -1,3 +1,5 @@
+package com.project.wellnesswise.viewModels
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.mikephil.charting.data.Entry

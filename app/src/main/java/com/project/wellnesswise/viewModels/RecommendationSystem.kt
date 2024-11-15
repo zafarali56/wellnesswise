@@ -1,3 +1,5 @@
+package com.project.wellnesswise.viewModels
+
 class HealthRecommendationSystem {
     fun generateRecommendations(predictions: List<Triple<String, Float, String>>): List<String> {
         val recommendations = mutableListOf<String>()
@@ -12,7 +14,6 @@ class HealthRecommendationSystem {
             }
         }
 
-        // Add general recommendations based on highest and lowest risks
         val highRiskConditions = predictions.filter { it.second >= 0.6f }
         val lowRiskConditions = predictions.filter { it.second < 0.2f }
 

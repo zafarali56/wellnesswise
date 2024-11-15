@@ -1,14 +1,14 @@
 package com.project.wellnesswise
 
-import DataVisualizationViewModel
-import HealthAlerts
-import HealthDataSyncWorker
-import HealthDataViewModel
-import HomeViewModel
-import LoginViewModel
+import com.project.wellnesswise.viewModels.DataVisualizationViewModel
+import com.project.wellnesswise.viewModels.HealthAlerts
+import com.project.wellnesswise.viewModels.HealthDataSyncWorker
+import com.project.wellnesswise.viewModels.HealthDataViewModel
+import com.project.wellnesswise.viewModels.HomeViewModel
+import com.project.wellnesswise.viewModels.LoginViewModel
 import PersonalizedRecommendationsViewModel
 import PersonalizedRecommendationsViewModelFactory
-import PredictionsViewModelFactory
+import com.project.wellnesswise.viewModels.PredictionsViewModelFactory
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -24,11 +24,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.*
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.fitness.FitnessOptions
-import com.google.android.gms.fitness.data.DataType
-import com.google.android.gms.fitness.data.HealthDataTypes
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -154,30 +149,6 @@ class MainActivity : ComponentActivity() {
             }
     }
 
-    private fun requestGoogleFitPermissions() {
-        val fitnessOptions =
-            FitnessOptions
-                .builder()
-                .addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ)
-                .addDataType(HealthDataTypes.TYPE_BLOOD_PRESSURE, FitnessOptions.ACCESS_READ)
-                .addDataType(HealthDataTypes.TYPE_BLOOD_GLUCOSE, FitnessOptions.ACCESS_READ)
-                .build()
-
-        val account = GoogleSignIn.getAccountForExtension(this, fitnessOptions)
-
-        if (!GoogleSignIn.hasPermissions(account, fitnessOptions)) {
-            val signInOptions =
-                GoogleSignInOptions
-                    .Builder()
-                    .addExtension(fitnessOptions)
-                    .build()
-            googleFitPermissionLauncher.launch(GoogleSignIn.getClient(this, signInOptions).signInIntent)
-        } else {
-            Log.i(TAG, "Google Fit permissions already granted")
-            onPermissionGranted?.invoke()
-            scheduleHealthDataSync() // Trigger a sync if permissions are already granted
-        }
-    }
     private fun registerUpdateReceiver() {
         updateReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {

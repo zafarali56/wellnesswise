@@ -1,3 +1,5 @@
+package com.project.wellnesswise.screens
+
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.AlertDialog
@@ -25,8 +27,6 @@ import com.project.wellnesswise.viewModels.RegistrationViewModel
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
-import com.project.wellnesswise.screens.EditProfileScreen
-import com.project.wellnesswise.screens.HealthAssessmentScreen
 import kotlinx.coroutines.launch
 
 @Composable

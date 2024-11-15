@@ -1,6 +1,6 @@
 package com.project.wellnesswise.screens
 
-import HealthDataViewModel
+import com.project.wellnesswise.viewModels.HealthDataViewModel
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme

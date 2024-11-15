@@ -1,6 +1,6 @@
 package com.project.wellnesswise.screens
 
-import LoginViewModel
+import com.project.wellnesswise.viewModels.LoginViewModel
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -169,7 +169,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                         }
                     }
 
-                    item() {
+                    item {
                         Spacer(modifier = Modifier.height(10.dp))
                         ClickableLoginTextComponent(tryingToLogin = false, onTextSelected = {
                             WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)

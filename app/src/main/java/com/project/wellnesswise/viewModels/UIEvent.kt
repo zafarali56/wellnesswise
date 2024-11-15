@@ -23,12 +23,9 @@ sealed class UIEvent {
     data class ExposureToPollutantsChanged(val value: Int) : UIEvent()
     data class StressLevelChanged(val value: Int) : UIEvent()
     data class AccessToHealthcareChanged(val value: Int) : UIEvent()
-    object SaveHealthAssessmentClicked : UIEvent()
+    data object SaveHealthAssessmentClicked : UIEvent()
 
-    object RegisterButtonClicked : UIEvent()
-
-
-
+    data object RegisterButtonClicked : UIEvent()
 
 }
 
@@ -38,5 +35,5 @@ sealed class LoginUIEvent {
     data class PasswordChangedLogin(val password: String) : LoginUIEvent()
 
 
-    object LoginButtonClicked : LoginUIEvent()
+    data object LoginButtonClicked : LoginUIEvent()
 }

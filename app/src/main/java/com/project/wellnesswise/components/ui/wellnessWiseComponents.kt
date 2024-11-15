@@ -539,7 +539,7 @@ fun NavigationDrawer(
     onHomeClick: () -> Unit,
     onLogoutClick: () -> Unit,
     userData: Map<String, Any>?,
-    currentScreen: Screen // Add this parameter
+    currentScreen: Screen
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -561,12 +561,12 @@ fun NavigationDrawer(
                         text = userData?.get("fullName") as? String ?: "User Name",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = colorScheme.onSurface,
                     )
                     Text(
                         text = user?.email ?: "user@example.com",
                         fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = colorScheme.onSurface,
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -628,10 +628,10 @@ fun NavigationItem(
             .padding(vertical = 4.dp),
         shape = RoundedCornerShape(26.dp),
         color = if (isPressed)
-            MaterialTheme.colorScheme.primaryContainer
+            colorScheme.primaryContainer
         else
-            MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)),
+            colorScheme.surface,
+        border = BorderStroke(1.dp, colorScheme.outline.copy(alpha = 0.12f)),
         onClick = onClick,
         interactionSource = interactionSource,
     ) {
@@ -644,13 +644,13 @@ fun NavigationItem(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = colorScheme.primary,
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = colorScheme.onSurface,
             )
         }
     }
@@ -967,7 +967,7 @@ fun EnvironmentalFactorsSection(viewModel: RegistrationViewModel, validationResu
         NumberField(
             labelValue = "Air Quality Index (0-500)",
             initialValue = viewModel.registrationUIState.value.airQualityIndex.toString(),
-            onTextSelected = { viewModel.onEvent(UIEvent.AirQualityIndexChanged(it?.toIntOrNull() ?: 0)) },
+            onTextSelected = { viewModel.onEvent(UIEvent.AirQualityIndexChanged(it.toIntOrNull() ?: 0)) },
             isError = validationResults["airQualityIndex"] == false,
             range = 0..500
         )

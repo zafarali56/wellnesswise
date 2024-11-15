@@ -1,3 +1,6 @@
+package com.project.wellnesswise.screens
+
+import com.project.wellnesswise.viewModels.PredictionsViewModelFactory
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,7 +30,10 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PredictionHistoryScreen(viewModel: PredictionsViewModel = viewModel(factory = PredictionsViewModelFactory(LocalContext.current))) {
+fun PredictionHistoryScreen(viewModel: PredictionsViewModel = viewModel(factory = PredictionsViewModelFactory(
+    LocalContext.current
+)
+)) {
     val predictionHistory by viewModel.predictionHistory.collectAsState()
     val context = LocalContext.current
     val colorScheme = if (isSystemInDarkTheme()) {
@@ -109,14 +115,14 @@ fun PredictionHistoryCard(historyItem: PredictionsViewModel.PredictionHistoryIte
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height(8.dp))
-            historyItem.predictions.forEach { (category, risk, context) ->
+            historyItem.predictions.forEach { (category, risk, _) ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(category, style = MaterialTheme.typography.bodyMedium)
                     Text(
-                        "${risk.format(2)} - ${viewModel.classifyRisk(risk)}",
+                        viewModel.classifyRisk(risk),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }

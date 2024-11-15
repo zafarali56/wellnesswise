@@ -1,15 +1,15 @@
 package com.project.wellnesswise.app
 import com.project.wellnesswise.screens.DataVisualizationScreen
-import DataVisualizationViewModel
+import com.project.wellnesswise.viewModels.DataVisualizationViewModel
 import com.project.wellnesswise.screens.HealthDataScreen
-import HealthDataViewModel
+import com.project.wellnesswise.viewModels.HealthDataViewModel
 import com.project.wellnesswise.screens.HomeScreen
-import HomeViewModel
+import com.project.wellnesswise.viewModels.HomeViewModel
 import com.project.wellnesswise.screens.LoginScreen
-import LoginViewModel
+import com.project.wellnesswise.viewModels.LoginViewModel
 import PersonalizedRecommendationsViewModel
-import PredictionHistoryScreen
-import UserProfileScreen
+import com.project.wellnesswise.screens.PredictionHistoryScreen
+import com.project.wellnesswise.screens.UserProfileScreen
 import android.annotation.SuppressLint
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,7 +36,7 @@ fun WellnessWiseApp(
     authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel,
     healthDataViewModel: HealthDataViewModel,
-    dataVisualizationViewModel : DataVisualizationViewModel ,
+    dataVisualizationViewModel : DataVisualizationViewModel,
     personalizedRecommendationsViewModel : PersonalizedRecommendationsViewModel
 ) {
     homeViewModel.checkForActiveSession()

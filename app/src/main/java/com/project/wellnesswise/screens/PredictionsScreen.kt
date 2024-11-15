@@ -1,6 +1,6 @@
 package com.project.wellnesswise.screens
 
-import PredictionsViewModelFactory
+import com.project.wellnesswise.viewModels.PredictionsViewModelFactory
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
