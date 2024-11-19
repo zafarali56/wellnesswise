@@ -127,7 +127,7 @@ class HealthDataProcessor {
                 if (snapshot != null && snapshot.exists()) {
                     val changedFields = snapshot.data?.filterKeys { it in relevantFields } ?: emptyMap()
                     if (changedFields.isNotEmpty()) {
-                        notifyListeners() // Notify listeners only when relevant fields change
+                        notifyListeners()
                     }
                 }
             }

@@ -92,11 +92,9 @@ class HealthDataSyncWorker(
     ): Map<String, Any> {
         val mergedData = existingData.toMutableMap()
 
-        // Check global viewModels source preference
         val globalDataSource = mergedData["dataSourcePreference"] as? String ?: "MANUAL"
 
         if (globalDataSource == "GOOGLE_FIT") {
-            // If global preference is Google Fit, update all viewModels from Google Fit
             for ((key, value) in googleFitData) {
                 mergedData[key] = value
                 mergedData["${key}Source"] = "GOOGLE_FIT"

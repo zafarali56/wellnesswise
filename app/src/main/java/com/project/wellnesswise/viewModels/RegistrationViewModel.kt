@@ -136,7 +136,6 @@ class RegistrationViewModel : ViewModel() {
                 if (isValid) {
                     _healthAssessmentValidated.value = true
                 } else {
-                    // Handle validation failure (e.g., show an error message)
                     Log.d(TAG, "Health assessment validation failed")
                 }
             }

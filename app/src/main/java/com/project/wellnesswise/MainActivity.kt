@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
         if (isGranted) {
             HealthAlerts.startPeriodicMonitoring(this)
         } else {
-            // Inform the user that the permission was denied
+
             Toast.makeText(this, "Notification permission denied. You won't receive health alerts.", Toast.LENGTH_LONG).show()
         }
     }
@@ -62,22 +62,18 @@ class MainActivity : ComponentActivity() {
         } else {
             HealthAlerts.startPeriodicMonitoring(this)
         }
-        // Initialize Firebase
+
         FirebaseApp.initializeApp(this)
 
-        // Configure Firestore for real-time updates
+
         configureFirestore()
 
-        // Schedule periodic health viewModels sync
         scheduleHealthDataSync()
 
-        // Set up Google Fit permission launcher
         setupGoogleFitPermissionLauncher()
 
-        // Register broadcast receiver for health viewModels updates
         registerUpdateReceiver()
 
-        // Set up auth state listener
         setupAuthStateListener()
 
         setContent {
@@ -126,7 +122,6 @@ class MainActivity : ComponentActivity() {
     private fun scheduleHealthDataSync() {
         HealthDataSyncWorker.startPeriodicSync(this)
 
-        // Schedule an immediate sync
         val immediateSync =
             OneTimeWorkRequestBuilder<HealthDataSyncWorker>()
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
@@ -142,7 +137,7 @@ class MainActivity : ComponentActivity() {
                 if (result.resultCode == RESULT_OK) {
                     Log.i(TAG, "Google Fit permissions granted")
                     onPermissionGranted?.invoke()
-                    scheduleHealthDataSync() // Trigger a sync after permissions are granted
+                    scheduleHealthDataSync()
                 } else {
                     Log.e(TAG, "Google Fit permissions not granted")
                 }
@@ -167,7 +162,7 @@ class MainActivity : ComponentActivity() {
         FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
             homeViewModel.checkForActiveSession()
             if (firebaseAuth.currentUser != null) {
-                scheduleHealthDataSync() // Trigger a sync when user logs in
+                scheduleHealthDataSync()
             }
         }
     }

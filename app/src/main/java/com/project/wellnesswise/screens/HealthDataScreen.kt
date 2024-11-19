@@ -252,7 +252,6 @@ fun HealthDataScreen(
                                     WellnessWiseAppRouter.navigateTo(Screen.RecommendationSetupScreen)
 
                                 } catch (e: Exception) {
-                                    // Handle error for health data saving
                                     println("Error saving health data: ${e.message}")
                                 }
                             }

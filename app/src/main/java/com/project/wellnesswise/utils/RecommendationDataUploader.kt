@@ -8,7 +8,6 @@ object RecommendationDataUploader {
     suspend fun uploadAllRecommendations(firestore: FirebaseFirestore) {
         val recommendationsCollection = firestore.collection("recommendationTemplates")
 
-        // Create a batch for atomic operation
         val batch = firestore.batch()
 
         // Diabetes recommendations
@@ -176,14 +175,12 @@ object RecommendationDataUploader {
             )
         ))
 
-        // Summary templates
         val summaryDoc = recommendationsCollection.document("summaryTemplates")
         batch.set(summaryDoc, mapOf(
             "highRisk" to "Important health alert: Due to elevated risk of {conditions}, please schedule a comprehensive health check-up with your healthcare provider as soon as possible. They can help create a personalized plan to address these specific health concerns and monitor your progress regularly.",
             "lowRisk" to "Great job! You're maintaining healthy levels for: {conditions}. Your lifestyle choices are positively impacting multiple aspects of your health. Keep up these excellent habits while staying proactive with regular check-ups and screenings."
         ))
 
-        // Commit the batch
         batch.commit().await()
     }
 }

@@ -142,7 +142,6 @@ class HealthAlerts(
             else -> System.currentTimeMillis().toInt()
         }
 
-        // Create action buttons for the notification
         val actionIntent = Intent(applicationContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
@@ -153,9 +152,8 @@ class HealthAlerts(
             PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Build the notification with system icon
         val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_alert) // System alert icon
+            .setSmallIcon(android.R.drawable.ic_dialog_alert)
             .setContentTitle(title)
             .setContentText(shortContent)
             .setStyle(NotificationCompat.BigTextStyle()
@@ -204,7 +202,7 @@ class HealthAlerts(
                 .build()
 
             val monitoringWork = PeriodicWorkRequestBuilder<HealthAlerts>(
-                15, TimeUnit.MINUTES  // Using 15 minutes for testing
+                15, TimeUnit.MINUTES
             ).setConstraints(constraints)
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,

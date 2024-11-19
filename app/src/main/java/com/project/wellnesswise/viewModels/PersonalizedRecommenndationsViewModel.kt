@@ -164,7 +164,6 @@ class PersonalizedRecommendationsViewModel(
                     )
                 } ?: throw Exception("Invalid prediction data format")
 
-                // Generate individual recommendations
                 val recommendations = mutableListOf<String>()
                 predictions.forEach { (category, risk, _) ->
                     generateRecommendationFromTemplate(category, risk)?.let {

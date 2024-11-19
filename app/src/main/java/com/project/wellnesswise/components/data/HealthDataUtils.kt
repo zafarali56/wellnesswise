@@ -59,13 +59,13 @@ object HealthDataUtils {
                         val systolic = dataPoint.getValue(HealthFields.FIELD_BLOOD_PRESSURE_SYSTOLIC).asFloat()
                         val diastolic = dataPoint.getValue(HealthFields.FIELD_BLOOD_PRESSURE_DIASTOLIC).asFloat()
                         healthData["bloodPressure"] = "${systolic.toInt()}/${diastolic.toInt()}"
-                        break // Take the most recent reading
+                        break
                     }
                 }
                 HealthDataTypes.TYPE_BLOOD_GLUCOSE -> {
                     for (dataPoint in dataSet.dataPoints.sortedByDescending { it.getEndTime(TimeUnit.MILLISECONDS) }) {
                         val bloodSugarValue = dataPoint.getValue(HealthFields.FIELD_BLOOD_GLUCOSE_LEVEL).asFloat().toInt()
-                        healthData["bloodSugar"] = bloodSugarValue.toString()  // Convert to String
+                        healthData["bloodSugar"] = bloodSugarValue.toString()
                         break
                     }
                 }

@@ -103,7 +103,6 @@ fun HeadingTextComponent(value: String) {
             Modifier
                 .fillMaxWidth()
                 .heightIn(min = 40.dp),
-        // Added min height
         style =
             TextStyle(
                 fontSize = 30.sp,
@@ -504,7 +503,7 @@ fun HealthAssessmentButton(
                 color = colorScheme.onPrimary,
                 fontWeight = FontWeight.Bold,
             )
-            Spacer(modifier = Modifier.weight(1f)) // This will push the icon to the end
+            Spacer(modifier = Modifier.weight(1f))
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = null,

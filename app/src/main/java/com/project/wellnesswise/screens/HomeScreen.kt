@@ -167,7 +167,7 @@ fun HomeScreen(
             onProfileClick = { WellnessWiseAppRouter.navigateTo(Screen.UserProfileScreen) },
             onHomeClick = { WellnessWiseAppRouter.navigateTo(Screen.HomeScreen) },
             userData = userData,
-            currentScreen = Screen.HomeScreen // Specify the current screen
+            currentScreen = Screen.HomeScreen
         )
     }
 }
