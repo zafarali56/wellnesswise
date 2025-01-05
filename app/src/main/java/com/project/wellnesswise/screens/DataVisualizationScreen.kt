@@ -62,7 +62,7 @@ fun DataVisualizationScreen(dataVisualizationViewModel: DataVisualizationViewMod
                 TopAppBar(
                     title = { Text(text = "Data Visualization", color = colorScheme.onSurface) },
                     navigationIcon = {
-                        IconButton(onClick = { WellnessWiseAppRouter.navigateTo(Screen.HomeScreen) }) {
+                        IconButton(onClick = { WellnessWiseAppRouter.navigateTo(Screen.PredictionsScreen) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back",
@@ -144,7 +144,7 @@ fun DataVisualizationScreen(dataVisualizationViewModel: DataVisualizationViewMod
                 }
 
                 SystemBackButtonHandler {
-                    WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
+                    WellnessWiseAppRouter.navigateTo(Screen.PredictionsScreen)
                 }
             }
         }

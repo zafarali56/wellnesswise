@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Button
@@ -18,27 +17,24 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItemDefaults.shape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
 fun ActionButton(
     text: String,
     icon: ImageVector,
     onClick: () -> Unit,
-    color: Color = colorScheme.primaryContainer,
+    color: Color = MaterialTheme.colorScheme.primaryContainer,
 ) {
     val configuration = LocalConfiguration.current
     val buttonText = if (configuration.screenWidthDp < 360) "" else text
@@ -48,11 +44,11 @@ fun ActionButton(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp),
+        shape = MaterialTheme.shapes.extraLarge,
         colors = ButtonDefaults.buttonColors(
             containerColor = color,
             contentColor = MaterialTheme.colorScheme.onPrimary
-        ),
-        shape = RoundedCornerShape(26.dp)
+        )
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -66,7 +62,7 @@ fun ActionButton(
             )
             if (buttonText.isNotEmpty()) {
                 Text(
-                    buttonText,
+                    text = buttonText,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                 )
@@ -91,17 +87,15 @@ fun HealthMetricCard(
     isLargeCard: Boolean = true,
 ) {
     Card(
-        modifier = modifier.height(if (isLargeCard) 120.dp else 100.dp)
-            .clip(shape),
-        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.height(if (isLargeCard) 120.dp else 100.dp),
+        shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
-            containerColor = colorScheme.secondaryContainer,
-            contentColor = colorScheme.onSecondaryContainer
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
         )
     ) {
         Row(
-            modifier =
-            Modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -109,7 +103,7 @@ fun HealthMetricCard(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = colorScheme.primary,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(if (isLargeCard) 40.dp else 25.dp),
             )
             Spacer(modifier = Modifier.width(16.dp))
@@ -122,7 +116,7 @@ fun HealthMetricCard(
                     } else {
                         MaterialTheme.typography.titleSmall
                     },
-                    color = colorScheme.onSurface,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(4.dp))

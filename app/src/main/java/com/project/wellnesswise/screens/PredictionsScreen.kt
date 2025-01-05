@@ -19,11 +19,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Dangerous
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -51,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.project.wellnesswise.components.ui.ActionButton
 import com.project.wellnesswise.components.ui.LoadingAnimation
 import com.project.wellnesswise.viewModels.PredictionsViewModel
 import com.project.wellnesswise.navigations.Screen
@@ -129,8 +132,28 @@ fun PredictionsScreen(viewModel: PredictionsViewModel = viewModel(factory = Pred
                     predictions?.let { preds ->
                         items(preds) { (category, risk, context) ->
                             PredictionCard(category, risk, context, viewModel)
+
                         }
+                        item {
+
+                            ActionButton(
+                                text = "Data Visualization",
+                                icon = Icons.Filled.BarChart,
+                                onClick = { WellnessWiseAppRouter.navigateTo(Screen.DataVisualizationScreen) },
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                        item {
+                            ActionButton(
+                                text = "Personalized Recommendations",
+                                icon = Icons.Filled.Spa,
+                                onClick = { WellnessWiseAppRouter.navigateTo(Screen.PersonalizedRecommendationsScreen) },
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+
                     }
+
                 }
             }
         }

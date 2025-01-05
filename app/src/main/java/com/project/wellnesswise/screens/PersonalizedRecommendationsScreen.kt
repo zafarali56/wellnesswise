@@ -79,7 +79,7 @@ fun PersonalizedRecommendationsScreen(
     }
 
     SystemBackButtonHandler {
-        WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
+        WellnessWiseAppRouter.navigateTo(Screen.PredictionsScreen)
     }
 }
 
