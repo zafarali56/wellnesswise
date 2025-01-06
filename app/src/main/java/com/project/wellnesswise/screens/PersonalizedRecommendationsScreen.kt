@@ -48,7 +48,7 @@ fun PersonalizedRecommendationsScreen(
                 TopAppBar(
                     title = { Text("Recommendations") },
                     navigationIcon = {
-                        IconButton(onClick = { WellnessWiseAppRouter.navigateTo(Screen.HomeScreen) }) {
+                        IconButton(onClick = { WellnessWiseAppRouter.navigateTo(Screen.PredictionsScreen) }) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     },

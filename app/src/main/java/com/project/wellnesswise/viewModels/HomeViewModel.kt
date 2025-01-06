@@ -30,7 +30,6 @@ class HomeViewModel : ViewModel() {
     val cholesterol: StateFlow<String> = _cholesterol
 
     private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
