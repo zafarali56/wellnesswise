@@ -65,29 +65,36 @@ fun RecommendationsList(recommendations: List<String>) {
 enum class RiskLevel {
     STABLE, MILD, MODERATE, SEVERE, CRITICAL
 }
-
 @Composable
 fun RecommendationCard(recommendation: String) {
     val (icon, category, description, riskLevel) = getDetailedCategoryInfo(recommendation)
     var expanded by remember { mutableStateOf(false) }
 
+    val emoji = when (riskLevel) {
+        RiskLevel.CRITICAL -> "🚨" // Red siren for critical
+        RiskLevel.SEVERE -> "⚠️"  // Warning sign for severe
+        RiskLevel.MODERATE -> "🔶" // Orange diamond for moderate
+        RiskLevel.MILD -> "🔹"     // Blue diamond for mild
+        RiskLevel.STABLE -> "✅"   // Green check for stable
+    }
+
     ElevatedCard(
         onClick = { expanded = !expanded },
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = when(riskLevel) {
-                RiskLevel.CRITICAL -> colorScheme.errorContainer
-                RiskLevel.SEVERE -> colorScheme.errorContainer
-                RiskLevel.MODERATE -> colorScheme.tertiaryContainer
-                RiskLevel.MILD -> colorScheme.secondaryContainer
-                RiskLevel.STABLE -> colorScheme.surfaceVariant
+            containerColor = when (riskLevel) {
+                RiskLevel.CRITICAL -> colorScheme.primaryContainer
+                RiskLevel.SEVERE -> colorScheme.primaryContainer
+                RiskLevel.MODERATE -> colorScheme.primaryContainer
+                RiskLevel.MILD -> colorScheme.primaryContainer
+                RiskLevel.STABLE -> colorScheme.primaryContainer
             },
-            contentColor = when(riskLevel) {
-                RiskLevel.CRITICAL -> colorScheme.onErrorContainer
-                RiskLevel.SEVERE -> colorScheme.onErrorContainer
-                RiskLevel.MODERATE -> colorScheme.onTertiaryContainer
-                RiskLevel.MILD -> colorScheme.onSecondaryContainer
-                RiskLevel.STABLE -> colorScheme.onSurfaceVariant
+            contentColor = when (riskLevel) {
+                RiskLevel.CRITICAL -> colorScheme.primaryContainer
+                RiskLevel.SEVERE -> colorScheme.primaryContainer
+                RiskLevel.MODERATE -> colorScheme.primaryContainer
+                RiskLevel.MILD -> colorScheme.primaryContainer
+                RiskLevel.STABLE -> colorScheme.primaryContainer
             }
         )
     ) {
@@ -103,43 +110,40 @@ fun RecommendationCard(recommendation: String) {
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        tint = when(riskLevel) {
-                            RiskLevel.CRITICAL -> colorScheme.error
-                            RiskLevel.SEVERE -> colorScheme.error.copy(alpha = 0.7f)
-                            RiskLevel.MODERATE -> colorScheme.tertiary
-                            RiskLevel.MILD -> colorScheme.secondary
-                            RiskLevel.STABLE -> colorScheme.primary
-                        },
-                        modifier = Modifier.size(32.dp)
+                    // Add emoji before the icon
+                    Text(
+                        text = emoji,
+                        modifier = Modifier.padding(end = 8.dp)
+
                     )
+
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
                         Text(
                             text = category,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
+                                    ,
+                            color = colorScheme.onPrimaryContainer
                         )
                         Text(
                             text = description,
                             style = MaterialTheme.typography.bodySmall,
-                            color = LocalContentColor.current.copy(alpha = 0.7f)
+                            color = colorScheme.onPrimaryContainer
                         )
                     }
                 }
                 FilledTonalButton(
                     onClick = { },
                     colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = when(riskLevel) {
+                        containerColor = when (riskLevel) {
                             RiskLevel.CRITICAL -> colorScheme.error.copy(alpha = 0.15f)
                             RiskLevel.SEVERE -> colorScheme.error.copy(alpha = 0.15f)
                             RiskLevel.MODERATE -> colorScheme.tertiary.copy(alpha = 0.1f)
                             RiskLevel.MILD -> colorScheme.secondary.copy(alpha = 0.1f)
                             RiskLevel.STABLE -> colorScheme.primary.copy(alpha = 0.1f)
                         },
-                        contentColor = when(riskLevel) {
+                        contentColor = when (riskLevel) {
                             RiskLevel.CRITICAL -> colorScheme.error
                             RiskLevel.SEVERE -> colorScheme.error
                             RiskLevel.MODERATE -> colorScheme.tertiary
@@ -154,7 +158,8 @@ fun RecommendationCard(recommendation: String) {
                 ) {
                     Text(
                         text = riskLevel.name.capitalize(),
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colorScheme.onPrimaryContainer
                     )
                 }
             }
@@ -168,7 +173,8 @@ fun RecommendationCard(recommendation: String) {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = recommendation,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colorScheme.onPrimaryContainer
                     )
                 }
             }
@@ -199,50 +205,50 @@ fun getDetailedCategoryInfo(recommendation: String): Quadruple<ImageVector, Stri
     }
 
     return when {
-        recommendation.contains("diabetes", ignoreCase = true) ->
+        recommendation.contains("Diabetes", ignoreCase = true) ->
             Quadruple(
                 Icons.Default.Bloodtype,
-                "Diabetes Risk",
+                "Recommendations for diabetes",
                 if (riskLevel == RiskLevel.CRITICAL || riskLevel == RiskLevel.SEVERE)
                     "Urgent: Blood sugar management required"
                 else
                     "Blood sugar management and lifestyle factors",
                 riskLevel
             )
-        recommendation.contains("cardiovascular", ignoreCase = true) ->
+        recommendation.contains("Cardiovascular", ignoreCase = true) ->
             Quadruple(
                 Icons.Default.Favorite,
-                "Heart Health",
+                "Recommendations for Cardiovascular",
                 if (riskLevel == RiskLevel.CRITICAL || riskLevel == RiskLevel.SEVERE)
                     "Urgent: Cardiovascular attention needed"
                 else
                     "Cardiovascular disease risk and prevention",
                 riskLevel
             )
-        recommendation.contains("hypertension", ignoreCase = true) ->
+        recommendation.contains("Hypertension", ignoreCase = true) ->
             Quadruple(
                 Icons.Default.Speed,
-                "Blood Pressure",
+                "Recommendations for Hypertension",
                 if (riskLevel == RiskLevel.CRITICAL || riskLevel == RiskLevel.SEVERE)
                     "Urgent: Blood pressure management needed"
                 else
                     "Hypertension risk and management",
                 riskLevel
             )
-        recommendation.contains("obesity", ignoreCase = true) ->
+        recommendation.contains("Obesity", ignoreCase = true) ->
             Quadruple(
                 Icons.Default.MonitorWeight,
-                "Weight Management",
+                "Recommendations for Obesity",
                 if (riskLevel == RiskLevel.CRITICAL || riskLevel == RiskLevel.SEVERE)
                     "Urgent: Weight management attention needed"
                 else
                     "BMI and healthy weight strategies",
                 riskLevel
             )
-        recommendation.contains("cancer", ignoreCase = true) ->
+        recommendation.contains("Cancer", ignoreCase = true) ->
             Quadruple(
                 Icons.Default.Biotech,
-                "Cancer Risk",
+                "Recommendations for cancer",
                 if (riskLevel == RiskLevel.CRITICAL || riskLevel == RiskLevel.SEVERE)
                     "Urgent: Cancer risk assessment needed"
                 else

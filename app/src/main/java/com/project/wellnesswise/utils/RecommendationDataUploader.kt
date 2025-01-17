@@ -18,60 +18,121 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.0,
                     "max" to 0.2,
-                    "message" to "Excellent! Your diabetes risk is stable. Your healthy lifestyle choices are paying off - keep maintaining a balanced diet and regular exercise routine. This is a great foundation for long-term health."
+                    "message" to """
+                        Excellent! Your Diabetes risk is stable. Your healthy lifestyle choices are paying off. 
+                        Continue with:
+                        - Diet: Focus on a balanced diet rich in whole grains, lean proteins, and healthy fats. Include plenty of non-starchy vegetables like spinach, broccoli, and peppers. Limit refined sugars and processed foods.
+                        - Exercise: Aim for at least 150 minutes of moderate aerobic activity per week, such as brisk walking or cycling. Include strength training exercises twice a week.
+                        - Monitoring: Regularly check your blood sugar levels and maintain a healthy weight.
+                        - Hydration: Drink plenty of water and avoid sugary beverages.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.2,
                     "max" to 0.4,
-                    "message" to "Your diabetes risk is mild. While you're on the right track, consider fine-tuning your diet by reducing refined sugars and increasing fiber intake. Your current habits are already helping you maintain good health."
+                    "message" to """
+                        Your Diabetes risk is mild. While you're on the right track, consider fine-tuning your habits:
+                        - Diet: Reduce intake of refined sugars and increase fiber intake. Include more legumes, nuts, and seeds in your diet.
+                        - Exercise: Incorporate more physical activity into your daily routine. Try activities like swimming or yoga.
+                        - Monitoring: Keep a food diary to track your carbohydrate intake and monitor your blood sugar levels regularly.
+                        - Stress Management: Practice stress-reducing techniques such as meditation or deep breathing exercises.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.4,
                     "max" to 0.6,
-                    "message" to "Your diabetes risk is moderate. Schedule a diabetes screening with your healthcare provider. Consider consulting a nutritionist for a personalized meal plan and increase your physical activity."
+                    "message" to """
+                        Your Diabetes risk is moderate. Take proactive steps:
+                        - Diet: Consult a nutritionist for a personalized meal plan. Focus on low-glycemic index foods like oats, lentils, and non-starchy vegetables.
+                        - Exercise: Aim for at least 30 minutes of moderate exercise five times a week. Consider activities like jogging or dancing.
+                        - Monitoring: Schedule regular check-ups with your healthcare provider and monitor your blood sugar levels closely.
+                        - Medication: Discuss with your doctor if medication is necessary to manage your blood sugar levels.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.6,
                     "max" to 0.8,
-                    "message" to "Your diabetes risk is severe. Consult your doctor soon for a comprehensive diabetes assessment and management plan. Focus on immediate lifestyle changes including diet, exercise, and possibly medication."
+                    "message" to """
+                        Your Diabetes risk is severe. Immediate action is needed:
+                        - Diet: Follow a strict low-carb diet. Avoid sugary snacks and beverages. Focus on high-fiber foods and lean proteins.
+                        - Exercise: Engage in daily physical activity. Consider supervised exercise programs if necessary.
+                        - Monitoring: Regularly monitor your blood sugar levels and keep a detailed log for your doctor.
+                        - Medication: Consult your doctor for a comprehensive diabetes management plan, including medication and insulin therapy if needed.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.8,
                     "max" to 1.0,
-                    "message" to "Your diabetes risk is critical. Consult your doctor immediately for an urgent diabetes assessment and management plan. Immediate attention to lifestyle changes and medical intervention may be necessary."
+                    "message" to """
+                        Your Diabetes risk is critical. Urgent medical attention is required:
+                        - Diet: Strictly adhere to a diabetic meal plan. Avoid all forms of sugar and refined carbohydrates.
+                        - Exercise: Engage in light to moderate exercise as recommended by your healthcare provider.
+                        - Monitoring: Monitor your blood sugar levels multiple times a day and keep a detailed log.
+                        - Medication: Follow your doctor's advice on medication and insulin therapy strictly.
+                    """.trimIndent()
                 )
             )
         ))
 
         // Cardiovascular recommendations
-        val cardiovascularDoc = recommendationsCollection.document("Cardiovascular Disease")
+        val cardiovascularDoc = recommendationsCollection.document("Cardiovascular")
         batch.set(cardiovascularDoc, mapOf(
-            "category" to "Cardiovascular Disease",
+            "category" to "cardiovascular Disease",
             "thresholds" to listOf(
                 mapOf(
                     "min" to 0.0,
                     "max" to 0.2,
-                    "message" to "Excellent! Your cardiovascular health is in great shape. Your heart-healthy practices are working well - continue with your balanced diet rich in fruits, vegetables, and whole grains, and maintain your exercise routine."
+                    "message" to """
+                        Excellent! Your Cardiovascular health is in great shape. Maintain your heart-healthy practices:
+                        - Diet: Continue with a diet rich in fruits, vegetables, whole grains, and lean proteins. Include omega-3 fatty acids from sources like salmon and flaxseeds.
+                        - Exercise: Aim for at least 150 minutes of moderate aerobic activity per week, such as brisk walking or cycling.
+                        - Monitoring: Regularly check your blood pressure and cholesterol levels.
+                        - Stress Management: Practice stress-reducing techniques such as meditation or yoga.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.2,
                     "max" to 0.4,
-                    "message" to "Your cardiovascular risk is mild. Your heart-healthy habits are showing positive results. Consider regular check-ups and maintain your current lifestyle while looking for ways to further improve."
+                    "message" to """
+                        Your Cardiovascular risk is mild. Optimize your heart health:
+                        - Diet: Reduce intake of saturated fats and sodium. Include more nuts, seeds, and whole grains in your diet.
+                        - Exercise: Incorporate strength training exercises twice a week along with aerobic activities.
+                        - Monitoring: Keep track of your blood pressure and cholesterol levels regularly.
+                        - Stress Management: Engage in activities that reduce stress, such as reading or gardening.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.4,
                     "max" to 0.6,
-                    "message" to "Your cardiovascular risk is moderate. Schedule a comprehensive cardiovascular health check-up. Consider discussing preventive measures, including lifestyle changes and possibly medication, with your doctor."
+                    "message" to """
+                        Your Cardiovascular risk is moderate. Take preventive measures:
+                        - Diet: Follow a heart-healthy diet plan. Limit red meat and processed foods. Include more plant-based proteins.
+                        - Exercise: Aim for at least 30 minutes of moderate exercise five times a week. Consider activities like swimming or dancing.
+                        - Monitoring: Schedule regular check-ups with your healthcare provider and monitor your blood pressure and cholesterol levels closely.
+                        - Medication: Discuss with your doctor if medication is necessary to manage your cardiovascular health.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.6,
                     "max" to 0.8,
-                    "message" to "Your cardiovascular risk is severe. Consult a doctor soon for a thorough evaluation and personalized heart health plan. Immediate attention to lifestyle changes may be necessary."
+                    "message" to """
+                        Your Cardiovascular risk is severe. Immediate action is needed:
+                        - Diet: Follow a strict heart-healthy diet. Avoid trans fats and limit sodium intake. Focus on fruits, vegetables, and whole grains.
+                        - Exercise: Engage in daily physical activity. Consider supervised exercise programs if necessary.
+                        - Monitoring: Regularly monitor your blood pressure and cholesterol levels and keep a detailed log for your doctor.
+                        - Medication: Consult your doctor for a comprehensive cardiovascular management plan, including medication if needed.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.8,
                     "max" to 1.0,
-                    "message" to "Your cardiovascular risk is critical. Consult a cardiologist immediately for a thorough evaluation and personalized heart health plan. This requires urgent attention to lifestyle changes and possible medical intervention."
+                    "message" to """
+                        Your Cardiovascular risk is critical. Urgent medical attention is required:
+                        - Diet: Strictly adhere to a heart-healthy meal plan. Avoid all forms of trans fats and limit saturated fats.
+                        - Exercise: Engage in light to moderate exercise as recommended by your healthcare provider.
+                        - Monitoring: Monitor your blood pressure and cholesterol levels multiple times a day and keep a detailed log.
+                        - Medication: Follow your doctor's advice on medication strictly.
+                    """.trimIndent()
                 )
             )
         ))
@@ -84,27 +145,57 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.0,
                     "max" to 0.2,
-                    "message" to "Excellent! Your blood pressure risk is stable. Your current lifestyle choices are helping maintain healthy blood pressure levels. Keep up with your low-sodium diet and regular exercise routine."
+                    "message" to """
+                        Excellent! Your Hypertension risk is stable. Maintain your healthy habits:
+                        - Diet: Continue with a low-sodium diet rich in fruits, vegetables, and whole grains. Include potassium-rich foods like bananas and sweet potatoes.
+                        - Exercise: Aim for at least 150 minutes of moderate aerobic activity per week, such as brisk walking or cycling.
+                        - Monitoring: Regularly check your blood pressure and maintain a healthy weight.
+                        - Stress Management: Practice stress-reducing techniques such as meditation or deep breathing exercises.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.2,
                     "max" to 0.4,
-                    "message" to "Your blood pressure risk is mild. Your current habits are working well. Consider optimizing your diet further by increasing potassium-rich foods while maintaining your low-sodium approach."
+                    "message" to """
+                        Your Hypertension risk is mild. Optimize your habits:
+                        - Diet: Reduce sodium intake further and increase potassium-rich foods. Avoid processed foods and limit alcohol consumption.
+                        - Exercise: Incorporate more physical activity into your daily routine. Try activities like swimming or yoga.
+                        - Monitoring: Keep a food diary to track your sodium intake and monitor your blood pressure regularly.
+                        - Stress Management: Engage in activities that reduce stress, such as reading or gardening.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.4,
                     "max" to 0.6,
-                    "message" to "Your hypertension risk is moderate. Monitor your blood pressure regularly at home. Discuss lifestyle modifications with your doctor and consider medication if recommended."
+                    "message" to """
+                        Your Hypertension risk is moderate. Take proactive steps:
+                        - Diet: Consult a nutritionist for a personalized meal plan. Focus on low-sodium foods and include more fruits and vegetables.
+                        - Exercise: Aim for at least 30 minutes of moderate exercise five times a week. Consider activities like jogging or dancing.
+                        - Monitoring: Schedule regular check-ups with your healthcare provider and monitor your blood pressure closely.
+                        - Medication: Discuss with your doctor if medication is necessary to manage your blood pressure.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.6,
                     "max" to 0.8,
-                    "message" to "Your hypertension risk is severe. Consult your healthcare provider soon for a thorough blood pressure assessment and management plan. Immediate lifestyle changes may be necessary."
+                    "message" to """
+                        Your Hypertension risk is severe. Immediate action is needed:
+                        - Diet: Follow a strict low-sodium diet. Avoid all forms of processed foods and limit alcohol consumption.
+                        - Exercise: Engage in daily physical activity. Consider supervised exercise programs if necessary.
+                        - Monitoring: Regularly monitor your blood pressure and keep a detailed log for your doctor.
+                        - Medication: Consult your doctor for a comprehensive hypertension management plan, including medication if needed.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.8,
                     "max" to 1.0,
-                    "message" to "Your hypertension risk is critical. Seek immediate medical attention for your blood pressure management. Urgent lifestyle changes and medical intervention may be necessary."
+                    "message" to """
+                        Your Hypertension risk is critical. Urgent medical attention is required:
+                        - Diet: Strictly adhere to a low-sodium meal plan. Avoid all forms of processed foods and limit alcohol consumption.
+                        - Exercise: Engage in light to moderate exercise as recommended by your healthcare provider.
+                        - Monitoring: Monitor your blood pressure multiple times a day and keep a detailed log.
+                        - Medication: Follow your doctor's advice on medication strictly.
+                    """.trimIndent()
                 )
             )
         ))
@@ -117,27 +208,57 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.0,
                     "max" to 0.2,
-                    "message" to "Excellent! Your weight management is on track. Your balanced approach to diet and exercise is working well - keep maintaining these healthy habits for continued success."
+                    "message" to """
+                        Excellent! Your Obesity management is on track. Maintain your healthy habits:
+                        - Diet: Continue with a balanced diet rich in fruits, vegetables, whole grains, and lean proteins. Avoid sugary snacks and beverages.
+                        - Exercise: Aim for at least 150 minutes of moderate aerobic activity per week, such as brisk walking or cycling.
+                        - Monitoring: Regularly check your weight and maintain a healthy BMI.
+                        - Hydration: Drink plenty of water and avoid sugary beverages.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.2,
                     "max" to 0.4,
-                    "message" to "Your weight-related risk is mild. Your current lifestyle choices are showing positive results. Continue focusing on portion control and regular physical activity while looking for ways to optimize further."
+                    "message" to """
+                        Your Obesity risk is mild. Optimize your habits:
+                        - Diet: Focus on portion control and include more fiber-rich foods. Avoid processed foods and limit high-calorie snacks.
+                        - Exercise: Incorporate more physical activity into your daily routine. Try activities like swimming or yoga.
+                        - Monitoring: Keep a food diary to track your calorie intake and monitor your weight regularly.
+                        - Stress Management: Practice stress-reducing techniques such as meditation or deep breathing exercises.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.4,
                     "max" to 0.6,
-                    "message" to "Your obesity risk is moderate. Consider consulting a nutritionist for a personalized meal plan. Aim for at least 150 minutes of moderate exercise per week."
+                    "message" to """
+                        Your Obesity risk is moderate. Take proactive steps:
+                        - Diet: Consult a nutritionist for a personalized meal plan. Focus on low-calorie, nutrient-dense foods.
+                        - Exercise: Aim for at least 30 minutes of moderate exercise five times a week. Consider activities like jogging or dancing.
+                        - Monitoring: Schedule regular check-ups with your healthcare provider and monitor your weight closely.
+                        - Medication: Discuss with your doctor if medication is necessary to manage your weight.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.6,
                     "max" to 0.8,
-                    "message" to "Your obesity risk is severe. Consult a healthcare professional soon for a comprehensive weight management plan. This may include specific dietary changes and structured physical activity."
+                    "message" to """
+                        Your Obesity risk is severe. Immediate action is needed:
+                        - Diet: Follow a strict low-calorie diet. Avoid all forms of processed foods and limit high-calorie snacks.
+                        - Exercise: Engage in daily physical activity. Consider supervised exercise programs if necessary.
+                        - Monitoring: Regularly monitor your weight and keep a detailed log for your doctor.
+                        - Medication: Consult your doctor for a comprehensive weight management plan, including medication if needed.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.8,
                     "max" to 1.0,
-                    "message" to "Your obesity risk is critical. Seek immediate professional help for weight management. This requires urgent attention to diet, exercise, and possible medical interventions."
+                    "message" to """
+                        Your Obesity risk is critical. Urgent medical attention is required:
+                        - Diet: Strictly adhere to a low-calorie meal plan. Avoid all forms of processed foods and limit high-calorie snacks.
+                        - Exercise: Engage in light to moderate exercise as recommended by your healthcare provider.
+                        - Monitoring: Monitor your weight multiple times a day and keep a detailed log.
+                        - Medication: Follow your doctor's advice on medication strictly.
+                    """.trimIndent()
                 )
             )
         ))
@@ -150,31 +271,60 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.0,
                     "max" to 0.2,
-                    "message" to "Excellent! Your cancer risk is stable. Your healthy lifestyle choices are helping maintain low risk levels. Continue with age-appropriate screenings and maintain your healthy habits."
+                    "message" to """
+                        Excellent! Your Cancer risk is stable. Maintain your healthy habits:
+                        - Diet: Continue with a diet rich in fruits, vegetables, whole grains, and lean proteins. Include antioxidants from sources like berries and green tea.
+                        - Exercise: Aim for at least 150 minutes of moderate aerobic activity per week, such as brisk walking or cycling.
+                        - Monitoring: Stay up-to-date with recommended cancer screenings and maintain a healthy weight.
+                        - Stress Management: Practice stress-reducing techniques such as meditation or yoga.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.2,
                     "max" to 0.4,
-                    "message" to "Your cancer risk is mild. Your current lifestyle choices are showing positive results. Stay up-to-date with recommended screenings while maintaining your healthy habits."
+                    "message" to """
+                        Your Cancer risk is mild. Optimize your habits:
+                        - Diet: Reduce intake of processed meats and include more plant-based foods. Avoid sugary snacks and beverages.
+                        - Exercise: Incorporate more physical activity into your daily routine. Try activities like swimming or yoga.
+                        - Monitoring: Keep track of your weight and stay up-to-date with recommended cancer screenings.
+                        - Stress Management: Engage in activities that reduce stress, such as reading or gardening.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.4,
                     "max" to 0.6,
-                    "message" to "Your cancer risk is moderate. Schedule a check-up with your doctor to discuss risk factors and preventive strategies. This may include more frequent screenings and lifestyle modifications."
+                    "message" to """
+                        Your Cancer risk is moderate. Take preventive measures:
+                        - Diet: Follow a cancer-preventive diet plan. Limit red meat and processed foods. Include more cruciferous vegetables like broccoli and cauliflower.
+                        - Exercise: Aim for at least 30 minutes of moderate exercise five times a week. Consider activities like jogging or dancing.
+                        - Monitoring: Schedule regular check-ups with your healthcare provider and stay up-to-date with recommended cancer screenings.
+                        - Medication: Discuss with your doctor if any preventive medications are necessary.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.6,
                     "max" to 0.8,
-                    "message" to "Your cancer risk is severe. Consult a doctor soon for a thorough risk assessment and prevention plan. This may include genetic testing and frequent screenings."
+                    "message" to """
+                        Your Cancer risk is severe. Immediate action is needed:
+                        - Diet: Follow a strict cancer-preventive diet. Avoid all forms of processed meats and limit red meat consumption.
+                        - Exercise: Engage in daily physical activity. Consider supervised exercise programs if necessary.
+                        - Monitoring: Regularly monitor your health and stay up-to-date with recommended cancer screenings.
+                        - Medication: Consult your doctor for a comprehensive cancer prevention plan, including medication if needed.
+                    """.trimIndent()
                 ),
                 mapOf(
                     "min" to 0.8,
                     "max" to 1.0,
-                    "message" to "Your cancer risk is critical. Consult an oncologist immediately for a comprehensive risk assessment and prevention plan. This requires urgent attention to screening and possible interventions."
+                    "message" to """
+                        Your Cancer risk is critical. Urgent medical attention is required:
+                        - Diet: Strictly adhere to a cancer-preventive meal plan. Avoid all forms of processed meats and limit red meat consumption.
+                        - Exercise: Engage in light to moderate exercise as recommended by your healthcare provider.
+                        - Monitoring: Monitor your health closely and stay up-to-date with recommended cancer screenings.
+                        - Medication: Follow your doctor's advice on preventive medications strictly.
+                    """.trimIndent()
                 )
             )
         ))
-
         val summaryDoc = recommendationsCollection.document("summaryTemplates")
         batch.set(summaryDoc, mapOf(
             "highRisk" to "Important health alert: Due to elevated risk of {conditions}, please schedule a comprehensive health check-up with your healthcare provider as soon as possible. They can help create a personalized plan to address these specific health concerns and monitor your progress regularly.",

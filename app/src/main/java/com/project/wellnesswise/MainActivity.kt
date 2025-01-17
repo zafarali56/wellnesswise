@@ -1,7 +1,7 @@
 package com.project.wellnesswise
 
 import com.project.wellnesswise.viewModels.DataVisualizationViewModel
-import com.project.wellnesswise.utils.HealthAlerts
+import com.project.wellnesswise.utils.AppNotification
 import com.project.wellnesswise.viewModels.HealthDataSyncWorker
 import com.project.wellnesswise.viewModels.HealthDataViewModel
 import com.project.wellnesswise.viewModels.HomeViewModel
@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestPermission()
     ){ isGranted: Boolean ->
         if (isGranted) {
-            HealthAlerts.startPeriodicMonitoring(this)
+            AppNotification.startPeriodicMonitoring(this)
         } else {
 
             Toast.makeText(this, "Notification permission denied. You won't receive health alerts.", Toast.LENGTH_LONG).show()
@@ -57,10 +57,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (!HealthAlerts.hasNotificationPermission(this)) {
+        if (!AppNotification.hasNotificationPermission(this)) {
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
-            HealthAlerts.startPeriodicMonitoring(this)
+            AppNotification.startPeriodicMonitoring(this)
         }
 
         FirebaseApp.initializeApp(this)
@@ -150,7 +150,7 @@ class MainActivity : ComponentActivity() {
                 if (intent?.action == "com.project.wellnesswise.HEALTH_DATA_UPDATED") {
                     Log.d(TAG, "Received health viewModels update broadcast")
                     homeViewModel.refreshData()
-                    HealthAlerts.performImmediateHealthCheck(this@MainActivity)
+                    AppNotification.performImmediateHealthCheck(this@MainActivity)
                 }
             }
         }
@@ -170,9 +170,9 @@ class MainActivity : ComponentActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            HealthAlerts.NOTIFICATION_PERMISSION_REQUEST_CODE -> {
+            AppNotification.NOTIFICATION_PERMISSION_REQUEST_CODE -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    HealthAlerts.startPeriodicMonitoring(this)
+                    AppNotification.startPeriodicMonitoring(this)
                 } else {
                 }
                 return

@@ -62,39 +62,34 @@ class HealthDataProcessor {
         )
 
         val featureStds = mapOf(
-            "Age" to 18.16039647144302f,
-            "Height" to 8.677557259966656f,
-            "Weight" to 7.402702209328699f,
-            "BMI" to 2.841302518212377f,
-            "Systolic_BP" to 13.55728586406586f,
-            "Diastolic_BP" to 6.760177512462228f,
-            "Heart_Rate" to 4.969909455915671f,
-            "Blood_Sugar" to 18.16590212458495f,
-            "Cholesterol" to 23.874672772626646f,
-            "Triglycerides" to 30.822070014844883f,
-            "Waist_Circumference" to 8.366600265340756f,
-            "Smoking" to 0.5477225575051662f,
-            "Alcohol_Consumption" to 0.8366600265340756f,
-            "Physical_Activity" to 1.140175425099138f,
-            "Diet_Quality" to 1.224744871391589f,
-            "Sleep_Hours" to 1.51657508881031f,
-            "Air_Quality_Index" to 37.68288736283355f,
-            "Stress_Level" to 0.8366600265340756f,
-            "Exposure_to_Pollutants" to 1.140175425099138f,
-            "Access_to_Healthcare" to 1.224744871391589f,
-            "Family_History_Diabetes" to 0.5477225575051662f,
-            "Family_History_Heart_Disease" to 0.5477225575051662f,
-            "Family_History_Cancer" to 0.5477225575051662f,
-            "Previous_Surgeries" to 0.8366600265340756f,
-            "Chronic_Conditions" to 0.8366600265340756f,
-            "Gender_Female" to 0.5477225575051662f,
-            "Gender_Male" to 0.5477225575051662f
-
-
-
+            "Age" to 18.160397f,
+            "Height" to 8.677557f,
+            "Weight" to 7.4027023f,
+            "BMI" to 2.8413026f,
+            "Systolic_BP" to 13.557286f,
+            "Diastolic_BP" to 6.7601776f,
+            "Heart_Rate" to 4.9699097f,
+            "Blood_Sugar" to 18.165901f,
+            "Cholesterol" to 23.874672f,
+            "Triglycerides" to 30.82207f,
+            "Waist_Circumference" to 8.3666f,
+            "Smoking" to 0.5477226f,
+            "Alcohol_Consumption" to 0.83666f,
+            "Physical_Activity" to 1.1401755f,
+            "Diet_Quality" to 1.2247449f,
+            "Sleep_Hours" to 1.5165751f,
+            "Air_Quality_Index" to 37.682888f,
+            "Stress_Level" to 0.83666f,
+            "Exposure_to_Pollutants" to 1.1401755f,
+            "Access_to_Healthcare" to 1.2247449f,
+            "Family_History_Diabetes" to 0.5477226f,
+            "Family_History_Heart_Disease" to 0.5477226f,
+            "Family_History_Cancer" to 0.5477226f,
+            "Previous_Surgeries" to 0.83666f,
+            "Chronic_Conditions" to 0.83666f,
+            "Gender_Female" to 0.5477226f,
+            "Gender_Male" to 0.5477226f
         )
-
-
         private val relevantFields = setOf(
             "age", "height", "weight", "bloodPressure", "heartRate", "bloodSugar",
             "cholesterol", "triglycerides", "waistCircumference", "smoking",
