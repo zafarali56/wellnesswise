@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import com.project.wellnesswise.components.ui.RiskLevel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,12 +23,11 @@ class PersonalizedRecommendationsViewModel(
     private val predictionsViewModel: PredictionsViewModel
 ) : ViewModel() {
 
-    private val _recommendations = MutableStateFlow<List<String>>(emptyList())
-    val recommendations: StateFlow<List<String>> = _recommendations
+    private val _recommendations = MutableStateFlow<List<Pair<String, RiskLevel>>>(emptyList())
+    val recommendations: StateFlow<List<Pair<String, RiskLevel>>> = _recommendations
 
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
-
 
     private var userDataListener: ListenerRegistration? = null
     private var updateJob: Job? = null
@@ -61,7 +61,7 @@ class PersonalizedRecommendationsViewModel(
                     return@addSnapshotListener
                 }
                 if (snapshot != null && snapshot.exists()) {
-                    Log.d(TAG, "User viewModels changed, triggering recommendation update")
+                    Log.d(TAG, "User data changed, triggering recommendation update")
                     triggerRecommendationUpdate()
                 }
             }
@@ -77,10 +77,11 @@ class PersonalizedRecommendationsViewModel(
             }
         }
     }
+
     private suspend fun generateRecommendationFromTemplate(
         category: String,
         risk: Float
-    ): String? {
+    ): Pair<String, RiskLevel>? {
         return try {
             val template = firestore.collection("recommendationTemplates")
                 .document(category)
@@ -93,14 +94,23 @@ class PersonalizedRecommendationsViewModel(
                 val min = (threshold["min"] as Number).toFloat()
                 val max = (threshold["max"] as Number).toFloat()
                 risk >= min && risk < max
-            }?.get("message") as? String
+            }?.let { threshold ->
+                val message = threshold["message"] as? String ?: return null
+                val riskLevelStr = threshold["riskLevel"] as? String ?: return null
+                val riskLevel = when (riskLevelStr) {
+                    "CRITICAL" -> RiskLevel.CRITICAL
+                    "SEVERE" -> RiskLevel.SEVERE
+                    "MODERATE" -> RiskLevel.MODERATE
+                    "MILD" -> RiskLevel.MILD
+                    else -> RiskLevel.STABLE
+                }
+                Pair(message, riskLevel) // Return message and riskLevel
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error generating recommendation for $category", e)
             null
         }
     }
-
-
 
     private fun loadRecommendationsIfLoggedIn() {
         if (auth.currentUser != null) {
@@ -109,8 +119,6 @@ class PersonalizedRecommendationsViewModel(
         }
     }
 
-
-
     private fun triggerRecommendationUpdate() {
         updateJob?.cancel()
         updateJob = viewModelScope.launch {
@@ -118,10 +126,11 @@ class PersonalizedRecommendationsViewModel(
             loadRecommendations()
         }
     }
+
     private suspend fun generateSummaryRecommendation(
         conditions: List<Triple<String, Float, String>>,
         type: String
-    ): String? {
+    ): Pair<String, RiskLevel>? {
         return try {
             val summaryTemplate = firestore.collection("recommendationTemplates")
                 .document("summaryTemplates")
@@ -130,12 +139,19 @@ class PersonalizedRecommendationsViewModel(
 
             val template = summaryTemplate.getString(type) ?: return null
             val conditionNames = conditions.joinToString(", ") { it.first }
-            template.replace("{conditions}", conditionNames)
+            val message = template.replace("{conditions}", conditionNames)
+            val riskLevel = when (type) {
+                "highRisk" -> RiskLevel.CRITICAL
+                "lowRisk" -> RiskLevel.STABLE
+                else -> RiskLevel.STABLE
+            }
+            Pair(message, riskLevel) // Return message and riskLevel
         } catch (e: Exception) {
             Log.e(TAG, "Error generating summary recommendation", e)
             null
         }
     }
+
     private fun loadRecommendations() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -151,7 +167,7 @@ class PersonalizedRecommendationsViewModel(
                     .await()
 
                 if (latestPrediction.isEmpty) {
-                    _recommendations.value = listOf("No predictions available. Please complete your health assessment.")
+                    _recommendations.value = listOf("No predictions available. Please complete your health assessment." to RiskLevel.STABLE)
                     return@launch
                 }
 
@@ -164,7 +180,7 @@ class PersonalizedRecommendationsViewModel(
                     )
                 } ?: throw Exception("Invalid prediction data format")
 
-                val recommendations = mutableListOf<String>()
+                val recommendations = mutableListOf<Pair<String, RiskLevel>>()
                 predictions.forEach { (category, risk, _) ->
                     generateRecommendationFromTemplate(category, risk)?.let {
                         recommendations.add(it)
@@ -189,15 +205,13 @@ class PersonalizedRecommendationsViewModel(
                 _recommendations.value = recommendations
                 Log.d(TAG, "New recommendations generated from Firestore templates")
             } catch (e: Exception) {
-                _recommendations.value = listOf("Unable to load recommendations. Please try again later.")
+                _recommendations.value = listOf("Unable to load recommendations. Please try again later." to RiskLevel.STABLE)
                 Log.e(TAG, "Error loading recommendations", e)
             } finally {
                 _isLoading.value = false
             }
         }
     }
-
-
 
     override fun onCleared() {
         super.onCleared()
@@ -206,7 +220,7 @@ class PersonalizedRecommendationsViewModel(
     }
 
     companion object {
-        private const val TAG = "com.project.wellnesswise.viewModels.PersonalizedRecommendationsViewModel"
+        private const val TAG = "PersonalizedRecommendationsViewModel"
     }
 }
 

@@ -18,8 +18,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.0,
                     "max" to 0.2,
+                    "riskLevel" to "STABLE",
                     "message" to """
-                        Excellent! Your Diabetes risk is stable. Your healthy lifestyle choices are paying off. 
+                        Excellent! Your Diabetes risk is STABLE. Your healthy lifestyle choices are paying off. 
                         Continue with:
                         - Diet: Focus on a balanced diet rich in whole grains, lean proteins, and healthy fats. Include plenty of non-starchy vegetables like spinach, broccoli, and peppers. Limit refined sugars and processed foods.
                         - Exercise: Aim for at least 150 minutes of moderate aerobic activity per week, such as brisk walking or cycling. Include strength training exercises twice a week.
@@ -30,8 +31,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.2,
                     "max" to 0.4,
+                    "riskLevel" to "MILD",
                     "message" to """
-                        Your Diabetes risk is mild. While you're on the right track, consider fine-tuning your habits:
+                        Your Diabetes risk is MILD. While you're on the right track, consider fine-tuning your habits:
                         - Diet: Reduce intake of refined sugars and increase fiber intake. Include more legumes, nuts, and seeds in your diet.
                         - Exercise: Incorporate more physical activity into your daily routine. Try activities like swimming or yoga.
                         - Monitoring: Keep a food diary to track your carbohydrate intake and monitor your blood sugar levels regularly.
@@ -41,8 +43,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.4,
                     "max" to 0.6,
+                    "riskLevel" to "MODERATE",
                     "message" to """
-                        Your Diabetes risk is moderate. Take proactive steps:
+                        Your Diabetes risk is MODERATE. Take proactive steps:
                         - Diet: Consult a nutritionist for a personalized meal plan. Focus on low-glycemic index foods like oats, lentils, and non-starchy vegetables.
                         - Exercise: Aim for at least 30 minutes of moderate exercise five times a week. Consider activities like jogging or dancing.
                         - Monitoring: Schedule regular check-ups with your healthcare provider and monitor your blood sugar levels closely.
@@ -52,8 +55,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.6,
                     "max" to 0.8,
+                    "riskLevel" to "SEVERE",
                     "message" to """
-                        Your Diabetes risk is severe. Immediate action is needed:
+                        Your Diabetes risk is SEVERE. Immediate action is needed:
                         - Diet: Follow a strict low-carb diet. Avoid sugary snacks and beverages. Focus on high-fiber foods and lean proteins.
                         - Exercise: Engage in daily physical activity. Consider supervised exercise programs if necessary.
                         - Monitoring: Regularly monitor your blood sugar levels and keep a detailed log for your doctor.
@@ -63,8 +67,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.8,
                     "max" to 1.0,
+                    "riskLevel" to "CRITICAL",
                     "message" to """
-                        Your Diabetes risk is critical. Urgent medical attention is required:
+                        Your Diabetes risk is CRITICAL. Urgent medical attention is required:
                         - Diet: Strictly adhere to a diabetic meal plan. Avoid all forms of sugar and refined carbohydrates.
                         - Exercise: Engage in light to moderate exercise as recommended by your healthcare provider.
                         - Monitoring: Monitor your blood sugar levels multiple times a day and keep a detailed log.
@@ -75,15 +80,16 @@ object RecommendationDataUploader {
         ))
 
         // Cardiovascular recommendations
-        val cardiovascularDoc = recommendationsCollection.document("Cardiovascular")
+        val cardiovascularDoc = recommendationsCollection.document("Cardiovascular Disease")
         batch.set(cardiovascularDoc, mapOf(
-            "category" to "cardiovascular Disease",
+            "category" to "Cardiovascular Disease",
             "thresholds" to listOf(
                 mapOf(
                     "min" to 0.0,
                     "max" to 0.2,
+                    "riskLevel" to "STABLE",
                     "message" to """
-                        Excellent! Your Cardiovascular health is in great shape. Maintain your heart-healthy practices:
+                        Excellent! Your Cardiovascular health is STABLE. Maintain your heart-healthy practices:
                         - Diet: Continue with a diet rich in fruits, vegetables, whole grains, and lean proteins. Include omega-3 fatty acids from sources like salmon and flaxseeds.
                         - Exercise: Aim for at least 150 minutes of moderate aerobic activity per week, such as brisk walking or cycling.
                         - Monitoring: Regularly check your blood pressure and cholesterol levels.
@@ -93,8 +99,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.2,
                     "max" to 0.4,
+                    "riskLevel" to "MILD",
                     "message" to """
-                        Your Cardiovascular risk is mild. Optimize your heart health:
+                        Your Cardiovascular risk is MILD. Optimize your heart health:
                         - Diet: Reduce intake of saturated fats and sodium. Include more nuts, seeds, and whole grains in your diet.
                         - Exercise: Incorporate strength training exercises twice a week along with aerobic activities.
                         - Monitoring: Keep track of your blood pressure and cholesterol levels regularly.
@@ -104,8 +111,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.4,
                     "max" to 0.6,
+                    "riskLevel" to "MODERATE",
                     "message" to """
-                        Your Cardiovascular risk is moderate. Take preventive measures:
+                        Your Cardiovascular risk is MODERATE. Take preventive measures:
                         - Diet: Follow a heart-healthy diet plan. Limit red meat and processed foods. Include more plant-based proteins.
                         - Exercise: Aim for at least 30 minutes of moderate exercise five times a week. Consider activities like swimming or dancing.
                         - Monitoring: Schedule regular check-ups with your healthcare provider and monitor your blood pressure and cholesterol levels closely.
@@ -115,8 +123,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.6,
                     "max" to 0.8,
+                    "riskLevel" to "SEVERE",
                     "message" to """
-                        Your Cardiovascular risk is severe. Immediate action is needed:
+                        Your Cardiovascular risk is SEVERE. Immediate action is needed:
                         - Diet: Follow a strict heart-healthy diet. Avoid trans fats and limit sodium intake. Focus on fruits, vegetables, and whole grains.
                         - Exercise: Engage in daily physical activity. Consider supervised exercise programs if necessary.
                         - Monitoring: Regularly monitor your blood pressure and cholesterol levels and keep a detailed log for your doctor.
@@ -126,8 +135,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.8,
                     "max" to 1.0,
+                    "riskLevel" to "CRITICAL",
                     "message" to """
-                        Your Cardiovascular risk is critical. Urgent medical attention is required:
+                        Your Cardiovascular risk is CRITICAL. Urgent medical attention is required:
                         - Diet: Strictly adhere to a heart-healthy meal plan. Avoid all forms of trans fats and limit saturated fats.
                         - Exercise: Engage in light to moderate exercise as recommended by your healthcare provider.
                         - Monitoring: Monitor your blood pressure and cholesterol levels multiple times a day and keep a detailed log.
@@ -145,8 +155,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.0,
                     "max" to 0.2,
+                    "riskLevel" to "STABLE",
                     "message" to """
-                        Excellent! Your Hypertension risk is stable. Maintain your healthy habits:
+                        Excellent! Your Hypertension risk is STABLE. Maintain your healthy habits:
                         - Diet: Continue with a low-sodium diet rich in fruits, vegetables, and whole grains. Include potassium-rich foods like bananas and sweet potatoes.
                         - Exercise: Aim for at least 150 minutes of moderate aerobic activity per week, such as brisk walking or cycling.
                         - Monitoring: Regularly check your blood pressure and maintain a healthy weight.
@@ -156,8 +167,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.2,
                     "max" to 0.4,
+                    "riskLevel" to "MILD",
                     "message" to """
-                        Your Hypertension risk is mild. Optimize your habits:
+                        Your Hypertension risk is MILD. Optimize your habits:
                         - Diet: Reduce sodium intake further and increase potassium-rich foods. Avoid processed foods and limit alcohol consumption.
                         - Exercise: Incorporate more physical activity into your daily routine. Try activities like swimming or yoga.
                         - Monitoring: Keep a food diary to track your sodium intake and monitor your blood pressure regularly.
@@ -167,8 +179,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.4,
                     "max" to 0.6,
+                    "riskLevel" to "MODERATE",
                     "message" to """
-                        Your Hypertension risk is moderate. Take proactive steps:
+                        Your Hypertension risk is MODERATE. Take proactive steps:
                         - Diet: Consult a nutritionist for a personalized meal plan. Focus on low-sodium foods and include more fruits and vegetables.
                         - Exercise: Aim for at least 30 minutes of moderate exercise five times a week. Consider activities like jogging or dancing.
                         - Monitoring: Schedule regular check-ups with your healthcare provider and monitor your blood pressure closely.
@@ -178,8 +191,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.6,
                     "max" to 0.8,
+                    "riskLevel" to "SEVERE",
                     "message" to """
-                        Your Hypertension risk is severe. Immediate action is needed:
+                        Your Hypertension risk is SEVERE. Immediate action is needed:
                         - Diet: Follow a strict low-sodium diet. Avoid all forms of processed foods and limit alcohol consumption.
                         - Exercise: Engage in daily physical activity. Consider supervised exercise programs if necessary.
                         - Monitoring: Regularly monitor your blood pressure and keep a detailed log for your doctor.
@@ -189,8 +203,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.8,
                     "max" to 1.0,
+                    "riskLevel" to "CRITICAL",
                     "message" to """
-                        Your Hypertension risk is critical. Urgent medical attention is required:
+                        Your Hypertension risk is CRITICAL. Urgent medical attention is required:
                         - Diet: Strictly adhere to a low-sodium meal plan. Avoid all forms of processed foods and limit alcohol consumption.
                         - Exercise: Engage in light to moderate exercise as recommended by your healthcare provider.
                         - Monitoring: Monitor your blood pressure multiple times a day and keep a detailed log.
@@ -208,8 +223,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.0,
                     "max" to 0.2,
+                    "riskLevel" to "STABLE",
                     "message" to """
-                        Excellent! Your Obesity management is on track. Maintain your healthy habits:
+                        Excellent! Your Obesity management is STABLE. Maintain your healthy habits:
                         - Diet: Continue with a balanced diet rich in fruits, vegetables, whole grains, and lean proteins. Avoid sugary snacks and beverages.
                         - Exercise: Aim for at least 150 minutes of moderate aerobic activity per week, such as brisk walking or cycling.
                         - Monitoring: Regularly check your weight and maintain a healthy BMI.
@@ -219,8 +235,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.2,
                     "max" to 0.4,
+                    "riskLevel" to "MILD",
                     "message" to """
-                        Your Obesity risk is mild. Optimize your habits:
+                        Your Obesity risk is MILD. Optimize your habits:
                         - Diet: Focus on portion control and include more fiber-rich foods. Avoid processed foods and limit high-calorie snacks.
                         - Exercise: Incorporate more physical activity into your daily routine. Try activities like swimming or yoga.
                         - Monitoring: Keep a food diary to track your calorie intake and monitor your weight regularly.
@@ -230,8 +247,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.4,
                     "max" to 0.6,
+                    "riskLevel" to "MODERATE",
                     "message" to """
-                        Your Obesity risk is moderate. Take proactive steps:
+                        Your Obesity risk is MODERATE. Take proactive steps:
                         - Diet: Consult a nutritionist for a personalized meal plan. Focus on low-calorie, nutrient-dense foods.
                         - Exercise: Aim for at least 30 minutes of moderate exercise five times a week. Consider activities like jogging or dancing.
                         - Monitoring: Schedule regular check-ups with your healthcare provider and monitor your weight closely.
@@ -241,8 +259,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.6,
                     "max" to 0.8,
+                    "riskLevel" to "SEVERE",
                     "message" to """
-                        Your Obesity risk is severe. Immediate action is needed:
+                        Your Obesity risk is SEVERE. Immediate action is needed:
                         - Diet: Follow a strict low-calorie diet. Avoid all forms of processed foods and limit high-calorie snacks.
                         - Exercise: Engage in daily physical activity. Consider supervised exercise programs if necessary.
                         - Monitoring: Regularly monitor your weight and keep a detailed log for your doctor.
@@ -252,8 +271,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.8,
                     "max" to 1.0,
+                    "riskLevel" to "CRITICAL",
                     "message" to """
-                        Your Obesity risk is critical. Urgent medical attention is required:
+                        Your Obesity risk is CRITICAL. Urgent medical attention is required:
                         - Diet: Strictly adhere to a low-calorie meal plan. Avoid all forms of processed foods and limit high-calorie snacks.
                         - Exercise: Engage in light to moderate exercise as recommended by your healthcare provider.
                         - Monitoring: Monitor your weight multiple times a day and keep a detailed log.
@@ -271,8 +291,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.0,
                     "max" to 0.2,
+                    "riskLevel" to "STABLE",
                     "message" to """
-                        Excellent! Your Cancer risk is stable. Maintain your healthy habits:
+                        Excellent! Your Cancer risk is STABLE. Maintain your healthy habits:
                         - Diet: Continue with a diet rich in fruits, vegetables, whole grains, and lean proteins. Include antioxidants from sources like berries and green tea.
                         - Exercise: Aim for at least 150 minutes of moderate aerobic activity per week, such as brisk walking or cycling.
                         - Monitoring: Stay up-to-date with recommended cancer screenings and maintain a healthy weight.
@@ -282,8 +303,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.2,
                     "max" to 0.4,
+                    "riskLevel" to "MILD",
                     "message" to """
-                        Your Cancer risk is mild. Optimize your habits:
+                        Your Cancer risk is MILD. Optimize your habits:
                         - Diet: Reduce intake of processed meats and include more plant-based foods. Avoid sugary snacks and beverages.
                         - Exercise: Incorporate more physical activity into your daily routine. Try activities like swimming or yoga.
                         - Monitoring: Keep track of your weight and stay up-to-date with recommended cancer screenings.
@@ -293,8 +315,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.4,
                     "max" to 0.6,
+                    "riskLevel" to "MODERATE",
                     "message" to """
-                        Your Cancer risk is moderate. Take preventive measures:
+                        Your Cancer risk is MODERATE. Take preventive measures:
                         - Diet: Follow a cancer-preventive diet plan. Limit red meat and processed foods. Include more cruciferous vegetables like broccoli and cauliflower.
                         - Exercise: Aim for at least 30 minutes of moderate exercise five times a week. Consider activities like jogging or dancing.
                         - Monitoring: Schedule regular check-ups with your healthcare provider and stay up-to-date with recommended cancer screenings.
@@ -304,8 +327,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.6,
                     "max" to 0.8,
+                    "riskLevel" to "SEVERE",
                     "message" to """
-                        Your Cancer risk is severe. Immediate action is needed:
+                        Your Cancer risk is SEVERE. Immediate action is needed:
                         - Diet: Follow a strict cancer-preventive diet. Avoid all forms of processed meats and limit red meat consumption.
                         - Exercise: Engage in daily physical activity. Consider supervised exercise programs if necessary.
                         - Monitoring: Regularly monitor your health and stay up-to-date with recommended cancer screenings.
@@ -315,8 +339,9 @@ object RecommendationDataUploader {
                 mapOf(
                     "min" to 0.8,
                     "max" to 1.0,
+                    "riskLevel" to "CRITICAL",
                     "message" to """
-                        Your Cancer risk is critical. Urgent medical attention is required:
+                        Your Cancer risk is CRITICAL. Urgent medical attention is required:
                         - Diet: Strictly adhere to a cancer-preventive meal plan. Avoid all forms of processed meats and limit red meat consumption.
                         - Exercise: Engage in light to moderate exercise as recommended by your healthcare provider.
                         - Monitoring: Monitor your health closely and stay up-to-date with recommended cancer screenings.

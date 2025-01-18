@@ -66,13 +66,12 @@ fun PersonalizedRecommendationsScreen(
                     .padding(innerPadding),
                 color = colorScheme.background
             ) {
-
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        when {
-                            isLoading -> LoadingAnimation(modifier = Modifier.align(Alignment.Center))
-                            recommendations.isEmpty() -> ErrorState(modifier = Modifier.align(Alignment.Center))
-                            else -> RecommendationsList(recommendations = recommendations)
-                        }
+                Box(modifier = Modifier.fillMaxSize()) {
+                    when {
+                        isLoading -> LoadingAnimation(modifier = Modifier.align(Alignment.Center))
+                        recommendations.isEmpty() -> ErrorState(modifier = Modifier.align(Alignment.Center))
+                        else -> RecommendationsList(recommendations = recommendations)
+                    }
                 }
             }
         }
@@ -82,6 +81,3 @@ fun PersonalizedRecommendationsScreen(
         WellnessWiseAppRouter.navigateTo(Screen.PredictionsScreen)
     }
 }
-
-
-
