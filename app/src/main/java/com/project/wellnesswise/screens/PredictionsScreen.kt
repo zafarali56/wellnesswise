@@ -1,5 +1,6 @@
 package com.project.wellnesswise.screens
 
+import androidx.compose.foundation.Image
 import com.project.wellnesswise.viewModels.PredictionsViewModelFactory
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -49,10 +50,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.project.wellnesswise.R
 import com.project.wellnesswise.components.ui.ActionButton
 import com.project.wellnesswise.components.ui.LoadingAnimation
 import com.project.wellnesswise.viewModels.PredictionsViewModel
@@ -170,7 +173,14 @@ fun PredictionsScreen(viewModel: PredictionsViewModel = viewModel(factory = Pred
 fun PredictionCard(category: String, risk: Float, context: String, viewModel: PredictionsViewModel) {
     val riskLevel = viewModel.classifyRisk(risk)
     val (icon, color) = getRiskIconAndColor(riskLevel)
-
+    val iconResId = when {
+        category.contains("Diabetes", ignoreCase = true) -> R.drawable.blood
+        category.contains("Cardiovascular", ignoreCase = true) -> R.drawable.cardiology
+        category.contains("Hypertension", ignoreCase = true) -> R.drawable.arm
+        category.contains("Obesity", ignoreCase = true) -> R.drawable.obesity
+        category.contains("Cancer", ignoreCase = true) -> R.drawable.tumor
+        else -> R.drawable.report // Default icon
+    }
     Card(
 
         shape = RoundedCornerShape(16.dp),
@@ -184,6 +194,11 @@ fun PredictionCard(category: String, risk: Float, context: String, viewModel: Pr
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                Image(
+                    painter = painterResource(id = iconResId),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
                 Text(
                         text = category,
                         style = MaterialTheme.typography.titleMedium,
@@ -193,6 +208,9 @@ fun PredictionCard(category: String, risk: Float, context: String, viewModel: Pr
                 Card(
                     colors = CardDefaults.cardColors(containerColor = color)
                 ) {
+
+
+
                     Row(
                         modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
                         verticalAlignment = Alignment.CenterVertically
