@@ -22,12 +22,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Biotech
 import androidx.compose.material.icons.filled.Bloodtype
+import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.HealthAndSafety
 import androidx.compose.material.icons.filled.MonitorWeight
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledTonalButton
@@ -119,28 +121,36 @@ fun RecommendationCard(recommendation: String, riskLevel: RiskLevel) {
                         )
                     }
                 }
-                FilledTonalButton(
-                    onClick = { },
-                    colors = ButtonDefaults.filledTonalButtonColors(
-                        contentColor = when (riskLevel) {
-                            RiskLevel.CRITICAL -> colorScheme.onError
-                            RiskLevel.SEVERE -> colorScheme.onError
-                            RiskLevel.MODERATE -> colorScheme.onTertiary
-                            RiskLevel.MILD -> colorScheme.onSecondary
-                            RiskLevel.STABLE -> colorScheme.onPrimary
-                        }
-                    ),
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .height(32.dp),
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp)
-                ) {
-                    Text(
-                        text = riskLevel.name.capitalize(),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = colorScheme.onPrimaryContainer
-                    )
-                }
+
+                    FilledTonalButton(
+                        onClick = { },
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = when (riskLevel) {
+                                RiskLevel.STABLE -> colorScheme.primary
+                                RiskLevel.MILD -> colorScheme.secondary
+                                RiskLevel.MODERATE -> colorScheme.tertiary
+                                RiskLevel.SEVERE -> colorScheme.error
+                                RiskLevel.CRITICAL -> colorScheme.error
+                            },
+                            contentColor = when (riskLevel) {
+                                RiskLevel.STABLE -> colorScheme.onPrimary
+                                RiskLevel.MILD -> colorScheme.onSecondary
+                                RiskLevel.MODERATE -> colorScheme.onTertiary
+                                RiskLevel.SEVERE -> colorScheme.onError
+                                RiskLevel.CRITICAL -> colorScheme.onError
+                            }
+                        ),
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .height(32.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp)
+                    ) {
+                        Text(
+                            text = riskLevel.name.capitalize(),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    }
             }
             AnimatedVisibility(
                 visible = expanded,
@@ -263,7 +273,7 @@ fun LoadingAnimation(modifier: Modifier = Modifier) {
     }
 
     Icon(
-        imageVector = Icons.Default.Favorite,
+        imageVector = Icons.Default.CloudSync,
         contentDescription = "Loading",
         modifier = modifier
             .size(64.dp)
