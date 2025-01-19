@@ -1,5 +1,6 @@
 package com.project.wellnesswise.screens
 
+import androidx.compose.foundation.Image
 import com.project.wellnesswise.viewModels.DataVisualizationViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -16,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -25,6 +27,7 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.project.wellnesswise.R
 import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
@@ -123,6 +126,7 @@ fun DataVisualizationScreen(dataVisualizationViewModel: DataVisualizationViewMod
                                 item {
                                     ChartBox(
                                         title = "$disease Risk Trend",
+
                                         content = {
                                             dataVisualizationViewModel.getLineData(disease, colorScheme.primary.toArgb())?.let { lineData ->
                                                 LineChartComponent(
@@ -168,6 +172,12 @@ fun OverallHealthScoreCard(score: Float?, colorScheme: ColorScheme) {
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.score),
+                contentDescription = "Health Icon",
+                modifier = Modifier.size(48.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Overall Health Score",
                 style = MaterialTheme.typography.titleLarge,
@@ -262,6 +272,16 @@ fun ChartBox(
     title: String,
     content: @Composable () -> Unit
 ) {
+    // Map disease names to their respective drawable resources
+    val iconResId = when {
+        title.contains("Diabetes", ignoreCase = true) -> R.drawable.blood
+        title.contains("Cardiovascular", ignoreCase = true) -> R.drawable.cardiology
+        title.contains("Hypertension", ignoreCase = true) -> R.drawable.arm
+        title.contains("Obesity", ignoreCase = true) -> R.drawable.obesity
+        title.contains("Cancer", ignoreCase = true) -> R.drawable.tumor
+        else -> R.drawable.report // Default icon
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -270,12 +290,24 @@ fun ChartBox(
             .padding(16.dp)
     ) {
         Column {
-            Text(
-                text = title,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 8.dp)
-            )
+            ) {
+
+                Image(
+                    painter = painterResource(id = iconResId),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
             content()
         }
     }

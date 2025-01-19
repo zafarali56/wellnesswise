@@ -5,6 +5,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -45,9 +46,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.project.wellnesswise.R
 import kotlinx.coroutines.delay
 
 @Composable
@@ -67,16 +71,10 @@ enum class RiskLevel {
 }
 @Composable
 fun RecommendationCard(recommendation: String, riskLevel: RiskLevel) {
-    val (icon, category, description, _) = getDetailedCategoryInfo(recommendation, riskLevel)
+    val (icon, category, description, drawableIcon) = getDetailedCategoryInfo(recommendation, riskLevel)
     var expanded by remember { mutableStateOf(false) }
 
-    val emoji = when (riskLevel) {
-        RiskLevel.CRITICAL -> "🚨" // Red siren for critical
-        RiskLevel.SEVERE -> "⚠️"  // Warning sign for severe
-        RiskLevel.MODERATE -> "🔶" // Orange diamond for moderate
-        RiskLevel.MILD -> "🔹"     // Blue diamond for mild
-        RiskLevel.STABLE -> "✅"   // Green check for stable
-    }
+
 
     ElevatedCard(
         onClick = { expanded = !expanded },
@@ -98,10 +96,12 @@ fun RecommendationCard(recommendation: String, riskLevel: RiskLevel) {
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.weight(1f)
                 ) {
-                    // Add emoji before the icon
-                    Text(
-                        text = emoji,
-                        modifier = Modifier.padding(end = 8.dp)
+
+                    // Display the drawable icon
+                    Image(
+                        painter = drawableIcon,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
                     )
 
                     Spacer(modifier = Modifier.width(16.dp))
@@ -163,9 +163,8 @@ fun RecommendationCard(recommendation: String, riskLevel: RiskLevel) {
 @Composable
 fun getDetailedCategoryInfo(
     recommendation: String,
-    riskLevel: RiskLevel // Pass the risk level directly
-): Quadruple<ImageVector, String, String, RiskLevel> {
-    // Determine the category and description based on the recommendation message
+    riskLevel: RiskLevel
+): Quadruple<ImageVector, String, String, Painter> { // Use Painter for drawable resources
     return when {
         recommendation.contains("Important health alert", ignoreCase = true) ||
                 recommendation.contains("Great job!", ignoreCase = true) -> {
@@ -176,7 +175,7 @@ fun getDetailedCategoryInfo(
                     "Overall health status and achievements"
                 else
                     "Multiple health concerns requiring attention",
-                riskLevel
+                painterResource(id = R.drawable.report) // Add a default health icon
             )
         }
         recommendation.contains("Diabetes", ignoreCase = true) -> {
@@ -187,7 +186,7 @@ fun getDetailedCategoryInfo(
                     "Urgent: Blood sugar management required"
                 else
                     "Blood sugar management and lifestyle factors",
-                riskLevel
+                painterResource(id = R.drawable.blood) // Use blood.png for diabetes
             )
         }
         recommendation.contains("Cardiovascular", ignoreCase = true) -> {
@@ -198,7 +197,7 @@ fun getDetailedCategoryInfo(
                     "Urgent: Cardiovascular attention needed"
                 else
                     "Cardiovascular disease risk and prevention",
-                riskLevel
+                painterResource(id = R.drawable.cardiology) // Add a heart icon for cardiovascular
             )
         }
         recommendation.contains("Hypertension", ignoreCase = true) -> {
@@ -209,7 +208,7 @@ fun getDetailedCategoryInfo(
                     "Urgent: Blood pressure management needed"
                 else
                     "Hypertension risk and management",
-                riskLevel
+                painterResource(id = R.drawable.arm) // Use arm.png for hypertension
             )
         }
         recommendation.contains("Obesity", ignoreCase = true) -> {
@@ -220,7 +219,7 @@ fun getDetailedCategoryInfo(
                     "Urgent: Weight management attention needed"
                 else
                     "BMI and healthy weight strategies",
-                riskLevel
+                painterResource(id = R.drawable.obesity) // Use obesity.png for obesity
             )
         }
         recommendation.contains("Cancer", ignoreCase = true) -> {
@@ -231,7 +230,7 @@ fun getDetailedCategoryInfo(
                     "Urgent: Cancer risk assessment needed"
                 else
                     "Cancer prevention and screening",
-                riskLevel
+                painterResource(id = R.drawable.tumor) // Use tumor.png for cancer
             )
         }
         else -> {
@@ -239,12 +238,11 @@ fun getDetailedCategoryInfo(
                 Icons.Default.HealthAndSafety,
                 "Health Alert",
                 "Important health information",
-                riskLevel
+                painterResource(id = R.drawable.report) // Default health icon
             )
         }
     }
 }
-
 data class Quadruple<out A, out B, out C, out D>(
     val first: A,
     val second: B,
