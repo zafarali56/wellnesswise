@@ -88,7 +88,7 @@ class PredictionsViewModel(private val context: Context) : ViewModel() {
     private suspend fun loadModel() {
         withContext(Dispatchers.Default) {
             Log.d(TAG, "Loading TFLite model")
-            tfliteInterpreter = TFLiteInterpreter(context, "enhanced_health_risk_model.tflite")
+            tfliteInterpreter = TFLiteInterpreter(context, "mlmodel.tflite")
             isModelLoaded = true
             Log.d(TAG, "TFLite model loaded successfully")
             loadPredictions()
