@@ -297,41 +297,6 @@ fun groupProfileData(data: Map<String, Any>): List<Pair<String, List<Pair<String
             "Weight" to data["weight"],
             "Waist Circumference" to data["waistCircumference"]
         ),
-        "Health Metrics" to listOf(
-            "Blood Pressure" to data["bloodPressure"],
-            "Heart Rate" to data["heartRate"],
-            "Blood Sugar" to data["bloodSugar"],
-            "Cholesterol" to data["cholesterol"],
-            "Triglycerides" to data["triglycerides"]
-        ),
-        "Lifestyle" to listOf(
-            "Physical Activity" to data["physicalActivity"],
-            "Sleep Hours" to data["sleepHours"],
-            "Diet Quality" to data["dietQuality"],
-            "Alcohol Consumption" to data["alcoholConsumption"],
-            "Smoking" to data["smoking"],
-            "Stress Level" to data["stressLevel"]
-        ),
-        "Medical History" to listOf(
-            "Chronic Conditions" to data["chronicConditions"],
-            "Previous Surgeries" to data["previousSurgeries"],
-            "Family Cancer History" to data["familyCancer"],
-            "Family Diabetes History" to data["familyDiabetes"],
-            "Family Heart Disease History" to data["familyHeart"]
-        ),
-        "Environmental Factors" to listOf(
-            "Air Quality Index" to data["airQualityIndex"],
-            "Exposure To Pollutants" to data["exposureToPollutants"],
-            "Access to Healthcare" to data["accessToHealthcare"]
-        ),
-        "Data Sources" to listOf(
-            "Data Source Preference" to data["dataSourcePreference"],
-            "Blood Pressure Source" to data["bloodPressureSource"],
-            "Blood Sugar Source" to data["bloodSugarSource"],
-            "Heart Rate Source" to data["heartRateSource"],
-            "Last Updated" to (data["lastUpdated"] as? com.google.firebase.Timestamp)?.toDate(),
-            "Last Updated Source" to data["lastUpdatedSource"]
-        )
     )
 }
 

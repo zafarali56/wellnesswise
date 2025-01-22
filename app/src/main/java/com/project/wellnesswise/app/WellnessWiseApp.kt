@@ -23,6 +23,8 @@ import com.project.wellnesswise.navigations.Screen
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import com.project.wellnesswise.screens.EmailVerificationScreen
 import com.project.wellnesswise.screens.HealthAssessmentScreen
+import com.project.wellnesswise.screens.HealthAssessmentViewEditScreen
+import com.project.wellnesswise.screens.HealthDataViewEditScreen
 import com.project.wellnesswise.screens.PersonalizedRecommendationsScreen
 import com.project.wellnesswise.screens.PredictionsScreen
 import com.project.wellnesswise.screens.RecommendationSetupScreen
@@ -91,7 +93,10 @@ fun WellnessWiseApp(
                 }
                 is Screen.PredictionHistoryScreen -> PredictionHistoryScreen()
                 is Screen.RecommendationSetupScreen -> RecommendationSetupScreen()
+                is Screen.HealthDataViewEditScreen -> HealthDataViewEditScreen(authViewModel)
+                is Screen.HealthAssessmentEditViewScreen -> HealthAssessmentViewEditScreen(authViewModel)
+
+                }
             }
         }
     }
-}

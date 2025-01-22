@@ -17,6 +17,8 @@ sealed class Screen {
     data object HealthAssessmentScreen: Screen()
     data object PredictionHistoryScreen: Screen()
     data object RecommendationSetupScreen: Screen()
+    data object HealthDataViewEditScreen: Screen()
+    data object HealthAssessmentEditViewScreen : Screen()
 }
 
 object WellnessWiseAppRouter {

@@ -178,7 +178,9 @@ fun HomeScreen(
             onProfileClick = { WellnessWiseAppRouter.navigateTo(Screen.UserProfileScreen) },
             onHomeClick = { WellnessWiseAppRouter.navigateTo(Screen.HomeScreen) },
             userData = userData,
-            currentScreen = Screen.HomeScreen
+            currentScreen = Screen.HomeScreen,
+            onHealthDataClick = { WellnessWiseAppRouter.navigateTo(Screen.HealthDataViewEditScreen) }
+            , onAssessmentClick = {WellnessWiseAppRouter.navigateTo(Screen.HealthAssessmentEditViewScreen)}
         )
     }
 }

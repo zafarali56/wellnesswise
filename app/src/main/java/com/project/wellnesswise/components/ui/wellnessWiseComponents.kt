@@ -538,6 +538,8 @@ fun NavigationDrawer(
     content: @Composable () -> Unit,
     onProfileClick: () -> Unit,
     onHomeClick: () -> Unit,
+    onHealthDataClick: () -> Unit,
+    onAssessmentClick : () -> Unit ,
     onLogoutClick: () -> Unit,
     userData: Map<String, Any>?,
     currentScreen: Screen
@@ -575,8 +577,8 @@ fun NavigationDrawer(
                     listOf(
                         Triple(stringResource(id = R.string.Home), Icons.Default.Home, onHomeClick),
                         Triple(stringResource(id = R.string.Profile), Icons.Default.Person, onProfileClick),
-                        Triple("Health data", Icons.Default.HealthAndSafety, onProfileClick),
-                        Triple("Assessment data", Icons.Default.ContentPaste, onProfileClick),
+                        Triple("Health Data", Icons.Default.HealthAndSafety, onHealthDataClick),
+                        Triple("Assessment data", Icons.Default.ContentPaste, onAssessmentClick),
                         Triple(
                             stringResource(id = R.string.Logout),
                             Icons.AutoMirrored.Filled.ExitToApp,
@@ -667,6 +669,8 @@ fun getScreenTitle(screen: Screen): String {
         Screen.DataVisualizationScreen -> "Data visualization"
         Screen.PredictionsScreen -> "Health risk predictions"
         Screen.PersonalizedRecommendationsScreen -> "Health Recommendations"
+        Screen.HealthDataViewEditScreen -> "Health Data Screen"
+        Screen.HealthAssessmentEditViewScreen -> "Assessment Data"
         else -> "WellnessWise"
     }
 }

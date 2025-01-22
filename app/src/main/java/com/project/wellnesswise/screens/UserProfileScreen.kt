@@ -214,7 +214,9 @@ fun UserProfileScreen(authViewModel: AuthViewModel, registrationViewModel: Regis
                     onProfileClick = { WellnessWiseAppRouter.navigateTo(Screen.UserProfileScreen) },
                     onHomeClick = { WellnessWiseAppRouter.navigateTo(Screen.HomeScreen) },
                     onLogoutClick = { authViewModel.logOut() }, userData = userData,
-                    currentScreen = Screen.UserProfileScreen
+                    currentScreen = Screen.UserProfileScreen,
+                    onHealthDataClick = {WellnessWiseAppRouter.navigateTo((Screen.HealthDataViewEditScreen))},
+                    onAssessmentClick = {WellnessWiseAppRouter.navigateTo(Screen.HealthAssessmentEditViewScreen)}
                 )
             } else {
                 content()
