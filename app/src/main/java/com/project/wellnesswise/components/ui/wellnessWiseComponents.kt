@@ -32,6 +32,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ContentPaste
+import androidx.compose.material.icons.filled.HealthAndSafety
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
@@ -573,11 +575,14 @@ fun NavigationDrawer(
                     listOf(
                         Triple(stringResource(id = R.string.Home), Icons.Default.Home, onHomeClick),
                         Triple(stringResource(id = R.string.Profile), Icons.Default.Person, onProfileClick),
+                        Triple("Health data", Icons.Default.HealthAndSafety, onProfileClick),
+                        Triple("Assessment data", Icons.Default.ContentPaste, onProfileClick),
                         Triple(
                             stringResource(id = R.string.Logout),
                             Icons.AutoMirrored.Filled.ExitToApp,
                             onLogoutClick,
-                        ),
+                        )
+                        ,
                     ).forEach { (text, icon, onClick) ->
                         NavigationItem(
                             text = text,
