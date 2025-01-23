@@ -1,22 +1,36 @@
 package com.project.wellnesswise.screens
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bloodtype
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.MonitorHeart
+import androidx.compose.material.icons.filled.Science
+import androidx.compose.material.icons.filled.SimCardAlert
+import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material3.*
+import androidx.compose.material3.ExposedDropdownMenuDefaults.textFieldColors
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.project.wellnesswise.components.ui.NavigationDrawer
 import com.project.wellnesswise.navigations.Screen
+import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import com.project.wellnesswise.ui.theme.WellnessWiseTheme
 import com.project.wellnesswise.viewModels.AuthViewModel
@@ -32,32 +46,51 @@ fun HealthDataViewEditScreen(
     var waistCircumference by remember { mutableDoubleStateOf(0.0) }
     var triglycerides by remember { mutableDoubleStateOf(0.0) }
     var cholesterol by remember { mutableDoubleStateOf(0.0) }
-    var bloodSugar by remember { androidx.compose.runtime.mutableDoubleStateOf(0.0) }
+    var bloodSugar by remember { mutableDoubleStateOf(0.0) }
     var systolic by remember { mutableStateOf(0) }
     var diastolic by remember { mutableStateOf(0) }
     var heartRate by remember { mutableStateOf(0) }
 
+    // In HealthDataViewEditScreen's LaunchedEffect
     LaunchedEffect(Unit) {
         fetch_HealthDataFromFirebase { data ->
             healthData = data
-            // Debug log to verify fetched data
             println("Fetched health data: $data")
 
-            // Initialize editable fields with current data
-            waistCircumference = (data?.get("waistCircumference") as? Double) ?: 0.0
-            triglycerides = (data?.get("triglycerides") as? Double) ?: 0.0
-            cholesterol = (data?.get("cholesterol") as? Double) ?: 0.0
-            bloodSugar = (data?.get("bloodSugar") as? Double) ?: 0.0
-            heartRate = (data?.get("heartRate") as? Number)?.toInt() ?: 0
-            val bloodPressure = (data?.get("bloodPressure") as? String)?.split("/")
-            systolic = bloodPressure?.getOrNull(0)?.toIntOrNull() ?: 0
-            diastolic = bloodPressure?.getOrNull(1)?.toIntOrNull() ?: 0
+            // Improved initialization with type checking
+            fun parseDouble(value: Any?) = when (value) {
+                is Double -> value
+                is Number -> value.toDouble()
+                is String -> value.toDoubleOrNull() ?: 0.0
+                else -> 0.0
+            }
 
-            // Debug log to verify initialized fields
-            println("Initialized heartRate: $heartRate")
+            fun parseInt(value: Any?) = when (value) {
+                is Int -> value
+                is Number -> value.toInt()
+                is String -> value.toIntOrNull() ?: 0
+                else -> 0
+            }
+
+            waistCircumference = parseDouble(data?.get("waistCircumference"))
+            triglycerides = parseDouble(data?.get("triglycerides"))
+            cholesterol = parseDouble(data?.get("cholesterol"))
+            bloodSugar = parseDouble(data?.get("bloodSugar"))
+
+            heartRate = parseInt(data?.get("heartRate"))
+
+            // Blood pressure handling
+            val bloodPressure = when (val bp = data?.get("bloodPressure")) {
+                is String -> bp.split("/")
+                else -> listOf("0", "0")
+            }
+            systolic = bloodPressure.first().toIntOrNull() ?: 0
+            diastolic = bloodPressure.last().toIntOrNull() ?: 0
+
+            println("Initialized fields - WC: $waistCircumference, TRI: $triglycerides")
             isLoading = false
         }
-    }    // Fetch user data for the NavigationDrawer
+    }   // Fetch user data for the NavigationDrawer
     var userData by remember { mutableStateOf<Map<String, Any>?>(null) }
     LaunchedEffect(Unit) {
         fetch_UserData { data ->
@@ -122,6 +155,9 @@ fun HealthDataViewEditScreen(
             userData = userData, // Pass user data to NavigationDrawer
             currentScreen = Screen.HealthDataScreen // Set current screen
         )
+    }
+    SystemBackButtonHandler {
+        WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
     }
 }
 
@@ -192,14 +228,23 @@ private fun fetch_UserData(onDataFetched: (Map<String, Any>?) -> Unit) {
         }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditableHealthDataItem(
     label: String,
-    value: Any, // Expects a Double
-    onValueChange: (Double) -> Unit, // Accepts a Double
+    value: Any,
+    onValueChange: (Double) -> Unit,
     onSave: () -> Unit
 ) {
     var textValue by remember { mutableStateOf(value.toString()) }
+    val leadingIcon = when (label) {
+        "Waist Circumference" -> Icons.Default.Straighten
+        "Triglycerides" -> Icons.Default.Science
+        "Cholesterol" -> Icons.Default.MonitorHeart
+        "Blood Sugar" -> Icons.Default.Bloodtype
+        "Heart Rate" -> Icons.Default.Favorite
+        else -> Icons.Default.SimCardAlert
+    }
 
     Row(
         modifier = Modifier
@@ -207,12 +252,32 @@ fun EditableHealthDataItem(
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-            )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Label with icon
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = leadingIcon,
+                    contentDescription = null,
+                    tint = colorScheme.onSecondaryContainer.copy(alpha = 0.6f),
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colorScheme.onSecondaryContainer,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            // Input field
             OutlinedTextField(
                 value = textValue,
                 onValueChange = { newValue ->
@@ -220,19 +285,52 @@ fun EditableHealthDataItem(
                     val doubleValue = newValue.toDoubleOrNull() ?: 0.0
                     onValueChange(doubleValue)
                 },
-                modifier = Modifier.width(100.dp),
-                singleLine = true,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp),
+                shape = RoundedCornerShape(12.dp),
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
+                    textAlign = TextAlign.End,
+                    fontWeight = FontWeight.SemiBold
+                ),
+                colors = textFieldColors(),
+                singleLine = true,
+                leadingIcon = {
+                    Text(
+                        text = when (label) {
+                            "Waist Circumference" -> "cm"
+                            "Triglycerides" -> "mg/dL"
+                            "Cholesterol" -> "mg/dL"
+                            "Blood Sugar" -> "mg/dL"
+                            "Heart Rate" -> "bpm"
+                            else -> ""
+                        },
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colorScheme.onSurfaceVariant
+                    )
+                }
             )
-            Button(onClick = onSave) {
-                Text("Save")
+
+            // Save button
+            IconButton(
+                onClick = onSave,
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(
+                        color = colorScheme.onPrimaryContainer,
+                        shape = CircleShape
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Save",
+                    tint = colorScheme.primaryContainer
+                )
             }
         }
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HealthDataSection(
     title: String,
@@ -262,7 +360,7 @@ fun HealthDataSection(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .animateContentSize(),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            containerColor = colorScheme.secondaryContainer
         ),
         onClick = { expanded = !expanded }
     ) {
@@ -292,72 +390,101 @@ fun HealthDataSection(
                         "Waist Circumference" -> EditableHealthDataItem(
                             label = label,
                             value = waistCircumference,
-                            onValueChange = { onWaistCircumferenceChange(it as Double) },
+                            onValueChange = { onWaistCircumferenceChange(it) },
                             onSave = { onSave("waistCircumference", waistCircumference) }
                         )
                         "Triglycerides" -> EditableHealthDataItem(
                             label = label,
                             value = triglycerides,
-                            onValueChange = { onTriglyceridesChange(it as Double) },
+                            onValueChange = { onTriglyceridesChange(it) },
                             onSave = { onSave("triglycerides", triglycerides) }
                         )
                         "Cholesterol" -> EditableHealthDataItem(
                             label = label,
                             value = cholesterol,
-                            onValueChange = { onCholesterolChange(it as Double) },
+                            onValueChange = { onCholesterolChange(it ) },
                             onSave = { onSave("cholesterol", cholesterol) }
                         )
                         "Blood Sugar" -> if (dataSourcePreference == "MANUAL") {
                             EditableHealthDataItem(
                                 label = label,
                                 value = bloodSugar,
-                                onValueChange = { onBloodSugarChange(it as Double) },
+                                onValueChange = { onBloodSugarChange(it) },
                                 onSave = { onSave("bloodSugar", bloodSugar) }
                             )
                         } else {
                             HealthDataItem(label, value)
                         }
                         "Blood Pressure" -> if (dataSourcePreference == "MANUAL") {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
+                            Column(modifier = Modifier.fillMaxWidth()) {
                                 Text(
-                                    text = "Systolic",
+                                    text = "Blood Pressure",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    color = colorScheme.onSecondaryContainer,
+                                    modifier = Modifier.padding(bottom = 4.dp)
                                 )
-                                OutlinedTextField(
-                                    value = systolic.toString(),
-                                    onValueChange = { onSystolicChange(it.toIntOrNull() ?: 0) },
-                                    modifier = Modifier.width(100.dp),
-                                    singleLine = true,
-                                    textStyle = MaterialTheme.typography.bodyMedium.copy(
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                                    )
-                                )
-                                Text(
-                                    text = "Diastolic",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                )
-                                OutlinedTextField(
-                                    value = diastolic.toString(),
-                                    onValueChange = { onDiastolicChange(it.toIntOrNull() ?: 0) },
-                                    modifier = Modifier.width(100.dp),
-                                    singleLine = true,
-                                    textStyle = MaterialTheme.typography.bodyMedium.copy(
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                                    )
-                                )
-                                Button(onClick = { onSave("bloodPressure", "$systolic/$diastolic") }) {
-                                    Text("Save")
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+
+                                        OutlinedTextField(
+                                            value = systolic.toString(),
+                                            onValueChange = { onSystolicChange(it.toIntOrNull() ?: 0) },
+                                            modifier = Modifier.fillMaxWidth(),
+                                            shape = RoundedCornerShape(30.dp),
+                                            textStyle = LocalTextStyle.current.copy(
+                                                textAlign = TextAlign.Center,
+                                                fontWeight = FontWeight.SemiBold
+                                            ),
+                                            colors = textFieldColors(),
+                                            singleLine = true
+                                                    ,
+                                            leadingIcon = { Text(text = "  -Systolic",style = MaterialTheme.typography.labelSmall,
+                                                color = colorScheme.onSurfaceVariant)}
+
+                                        )
+                                    }
+
+                                    Column(modifier = Modifier.weight(1f)) {
+
+                                        OutlinedTextField(
+                                            value = diastolic.toString(),
+                                            onValueChange = { onDiastolicChange(it.toIntOrNull() ?: 0) },
+                                            modifier = Modifier.fillMaxWidth(),
+                                            shape = RoundedCornerShape(30.dp), // Add rounded corners
+                                            textStyle = LocalTextStyle.current.copy(
+                                                textAlign = TextAlign.Center,
+                                                fontWeight = FontWeight.SemiBold
+                                            ),
+                                            colors = textFieldColors(),
+                                            singleLine = true
+                                                    ,
+                                            leadingIcon = { Text(text = "  -Diastolic",style = MaterialTheme.typography.labelSmall,
+                                                color = colorScheme.onSurfaceVariant) }
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = { onSave("bloodPressure", "$systolic/$diastolic") },
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .background(
+                                                color = colorScheme.onPrimaryContainer,
+                                                shape = CircleShape
+                                            )
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = "Save",
+                                            tint = colorScheme.primaryContainer
+                                        )
+                                    }
                                 }
-                            }
+
+                           }
+
                         } else {
                             HealthDataItem(label, value)
                         }
@@ -394,13 +521,13 @@ fun HealthDataItem(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                color = colorScheme.onSecondaryContainer,
             )
             Text(
                 text = value?.toString() ?: "N/A",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                color = colorScheme.onSecondaryContainer,
             )
         }
     }

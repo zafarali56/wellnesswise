@@ -16,15 +16,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.project.wellnesswise.components.ui.HealthAssessmentMode
 import com.project.wellnesswise.components.ui.NavigationDrawer
 import com.project.wellnesswise.navigations.Screen
+import com.project.wellnesswise.navigations.SystemBackButtonHandler
 import com.project.wellnesswise.navigations.WellnessWiseAppRouter
 import com.project.wellnesswise.ui.theme.WellnessWiseTheme
 import com.project.wellnesswise.viewModels.AuthViewModel
+import com.project.wellnesswise.viewModels.RegistrationViewModel
 
 @Composable
 fun HealthAssessmentViewEditScreen(
     authViewModel: AuthViewModel, // Pass AuthViewModel for logout functionality
+    registrationViewModel: RegistrationViewModel // Pass RegistrationViewModel for health assessment data
 ) {
     // State to hold health assessment data
     var healthAssessmentData by remember { mutableStateOf<Map<String, Any>?>(null) }
@@ -46,39 +50,77 @@ fun HealthAssessmentViewEditScreen(
         }
     }
 
+    // Determine the current view (main or edit)
+    var currentView by remember { mutableStateOf("main") }
+
     WellnessWiseTheme {
         NavigationDrawer(
             content = {
                 Scaffold(
                     floatingActionButton = {
-                        FloatingActionButton(
-                            onClick = {},
-                            containerColor = MaterialTheme.colorScheme.primary
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit health assessment data",
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
+                        if (currentView == "main") {
+                            FloatingActionButton(
+                                onClick = {
+                                    // Navigate to the edit screen
+                                    currentView = "edit"
+                                    registrationViewModel.loadExistingHealthAssessmentData(healthAssessmentData)
+                                    registrationViewModel.currentMode.value = HealthAssessmentMode.EDIT
+                                },
+                                containerColor = MaterialTheme.colorScheme.primary
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Edit health assessment data",
+                                    tint = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
                         }
                     },
                     floatingActionButtonPosition = FabPosition.End
                 ) { paddingValues ->
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues)
-                            .padding(horizontal = 5.dp)
-                    ) {
-                        if (isLoading) {
-                            item { CircularProgressIndicator(modifier = Modifier.size(24.dp)) }
-                        } else {
-                            healthAssessmentData?.let { data ->
-                                val groupedData = groupHealthAssessmentData(data)
-                                items(groupedData) { (groupTitle, items) ->
-                                    HealthDataSections(groupTitle, items)
+                    when (currentView) {
+                        "main" -> {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(paddingValues)
+                                    .padding(horizontal = 5.dp)
+                            ) {
+                                if (isLoading) {
+                                    item { CircularProgressIndicator(modifier = Modifier.size(24.dp)) }
+                                } else {
+                                    healthAssessmentData?.let { data ->
+                                        val groupedData = groupHealthAssessmentData(data)
+                                        items(groupedData) { (groupTitle, items) ->
+                                            HealthDataSections(groupTitle, items)
+                                        }
+                                    }
                                 }
                             }
+                        }
+                        "edit" -> {
+                            HealthAssessmentScreen(
+                                registrationViewModel = registrationViewModel,
+                                mode = HealthAssessmentMode.EDIT,
+                                onSave = {
+                                    val updatedHealthData = registrationViewModel.getHealthAssessmentData()
+                                    val userId = FirebaseAuth.getInstance().currentUser?.uid
+                                    if (userId != null) {
+                                        val db = FirebaseFirestore.getInstance()
+                                        db.collection("users").document(userId)
+                                            .update(updatedHealthData)
+                                            .addOnSuccessListener {
+                                                healthAssessmentData = healthAssessmentData?.toMutableMap()
+                                                    ?.apply { putAll(updatedHealthData) }
+                                                currentView = "main"
+                                            }
+                                    }
+                                },
+                                onBack = {
+                                    registrationViewModel.setMode(HealthAssessmentMode.SIGNUP)
+                                    currentView = "main"
+                                }
+                            )
                         }
                     }
                 }
@@ -86,11 +128,14 @@ fun HealthAssessmentViewEditScreen(
             onLogoutClick = { authViewModel.logOut() }, // Handle logout
             onProfileClick = { WellnessWiseAppRouter.navigateTo(Screen.UserProfileScreen) }, // Navigate to profile
             onHomeClick = { WellnessWiseAppRouter.navigateTo(Screen.HomeScreen) }, // Navigate to home
-            onHealthDataClick = { WellnessWiseAppRouter.navigateTo(Screen.HealthDataScreen) }, // Navigate to health data
-            onAssessmentClick = {WellnessWiseAppRouter.navigateTo(Screen.HealthAssessmentEditViewScreen)}, //Navigate to health assesment screen
+            onHealthDataClick = { WellnessWiseAppRouter.navigateTo(Screen.HealthDataViewEditScreen) }, // Navigate to health data
+            onAssessmentClick = { WellnessWiseAppRouter.navigateTo(Screen.HealthAssessmentEditViewScreen) }, // Navigate to health assessment screen
             userData = userData, // Pass user data to NavigationDrawer
             currentScreen = Screen.HealthAssessmentScreen // Set current screen
         )
+    }
+    SystemBackButtonHandler {
+        WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
     }
 }
 
@@ -164,8 +209,7 @@ private fun groupHealthAssessmentData(data: Map<String, Any>): List<Pair<String,
             "Air Quality Index" to data["airQualityIndex"],
             "Exposure To Pollutants" to data["exposureToPollutants"],
             "Access to Healthcare" to data["accessToHealthcare"]
-        ),
-
+        )
     )
 }
 

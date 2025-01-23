@@ -295,7 +295,6 @@ fun groupProfileData(data: Map<String, Any>): List<Pair<String, List<Pair<String
             "Gender" to data["gender"],
             "Height" to data["height"],
             "Weight" to data["weight"],
-            "Waist Circumference" to data["waistCircumference"]
         ),
     )
 }

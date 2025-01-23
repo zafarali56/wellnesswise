@@ -94,7 +94,7 @@ fun WellnessWiseApp(
                 is Screen.PredictionHistoryScreen -> PredictionHistoryScreen()
                 is Screen.RecommendationSetupScreen -> RecommendationSetupScreen()
                 is Screen.HealthDataViewEditScreen -> HealthDataViewEditScreen(authViewModel)
-                is Screen.HealthAssessmentEditViewScreen -> HealthAssessmentViewEditScreen(authViewModel)
+                is Screen.HealthAssessmentEditViewScreen -> HealthAssessmentViewEditScreen(authViewModel, registrationViewModel)
 
                 }
             }
