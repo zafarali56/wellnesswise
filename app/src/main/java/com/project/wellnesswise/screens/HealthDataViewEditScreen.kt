@@ -316,14 +316,14 @@ fun EditableHealthDataItem(
                 modifier = Modifier
                     .size(40.dp)
                     .background(
-                        color = colorScheme.onPrimaryContainer,
+                        color = colorScheme.primary,
                         shape = CircleShape
                     )
             ) {
                 Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = "Save",
-                    tint = colorScheme.primaryContainer
+                    tint = colorScheme.onPrimary
                 )
             }
         }
@@ -372,14 +372,14 @@ fun HealthDataSection(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = colorScheme.onSurface,
                     fontWeight = FontWeight.Bold
                 )
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(
                         imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                         contentDescription = if (expanded) "Collapse" else "Expand",
-                        tint = MaterialTheme.colorScheme.onSurface
+                        tint = colorScheme.onSurface
                     )
                 }
             }
@@ -414,6 +414,7 @@ fun HealthDataSection(
                         } else {
                             HealthDataItem(label, value)
                         }
+
                         "Blood Pressure" -> if (dataSourcePreference == "MANUAL") {
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 Text(
@@ -433,7 +434,7 @@ fun HealthDataSection(
                                             value = systolic.toString(),
                                             onValueChange = { onSystolicChange(it.toIntOrNull() ?: 0) },
                                             modifier = Modifier.fillMaxWidth(),
-                                            shape = RoundedCornerShape(30.dp),
+                                            shape = RoundedCornerShape(12.dp),
                                             textStyle = LocalTextStyle.current.copy(
                                                 textAlign = TextAlign.Center,
                                                 fontWeight = FontWeight.SemiBold
@@ -453,14 +454,15 @@ fun HealthDataSection(
                                             value = diastolic.toString(),
                                             onValueChange = { onDiastolicChange(it.toIntOrNull() ?: 0) },
                                             modifier = Modifier.fillMaxWidth(),
-                                            shape = RoundedCornerShape(30.dp), // Add rounded corners
+                                            shape = RoundedCornerShape(12.dp), // Add rounded corners
                                             textStyle = LocalTextStyle.current.copy(
                                                 textAlign = TextAlign.Center,
                                                 fontWeight = FontWeight.SemiBold
                                             ),
                                             colors = textFieldColors(),
                                             singleLine = true
-                                                    ,
+                                            ,
+
                                             leadingIcon = { Text(text = "  -Diastolic",style = MaterialTheme.typography.labelSmall,
                                                 color = colorScheme.onSurfaceVariant) }
                                         )
@@ -470,14 +472,14 @@ fun HealthDataSection(
                                         modifier = Modifier
                                             .size(40.dp)
                                             .background(
-                                                color = colorScheme.onPrimaryContainer,
+                                                color = colorScheme.primary,
                                                 shape = CircleShape
                                             )
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.Check,
                                             contentDescription = "Save",
-                                            tint = colorScheme.primaryContainer
+                                            tint = colorScheme.onPrimary
                                         )
                                     }
                                 }
