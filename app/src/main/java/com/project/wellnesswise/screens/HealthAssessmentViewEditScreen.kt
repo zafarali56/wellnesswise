@@ -131,7 +131,7 @@ fun HealthAssessmentViewEditScreen(
             onHealthDataClick = { WellnessWiseAppRouter.navigateTo(Screen.HealthDataViewEditScreen) }, // Navigate to health data
             onAssessmentClick = { WellnessWiseAppRouter.navigateTo(Screen.HealthAssessmentEditViewScreen) }, // Navigate to health assessment screen
             userData = userData, // Pass user data to NavigationDrawer
-            currentScreen = Screen.HealthAssessmentScreen // Set current screen
+            currentScreen = Screen.HealthAssessmentEditViewScreen // Set current screen
         )
     }
     SystemBackButtonHandler {

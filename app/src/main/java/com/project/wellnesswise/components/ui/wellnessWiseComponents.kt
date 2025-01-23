@@ -577,7 +577,7 @@ fun NavigationDrawer(
                     listOf(
                         Triple(stringResource(id = R.string.Home), Icons.Default.Home, onHomeClick),
                         Triple(stringResource(id = R.string.Profile), Icons.Default.Person, onProfileClick),
-                        Triple("Health Data", Icons.Default.HealthAndSafety, onHealthDataClick),
+                        Triple("Health profile", Icons.Default.HealthAndSafety, onHealthDataClick),
                         Triple("Assessment data", Icons.Default.ContentPaste, onAssessmentClick),
                         Triple(
                             stringResource(id = R.string.Logout),
@@ -664,13 +664,13 @@ fun NavigationItem(
 
 fun getScreenTitle(screen: Screen): String {
     return when (screen) {
-        Screen.HomeScreen -> "WellnessWise"
+        Screen.HomeScreen -> "Wellness Wise"
         Screen.UserProfileScreen -> "User profile"
         Screen.DataVisualizationScreen -> "Data visualization"
         Screen.PredictionsScreen -> "Health risk predictions"
         Screen.PersonalizedRecommendationsScreen -> "Health Recommendations"
-        Screen.HealthDataViewEditScreen -> "Health Data Screen"
-        Screen.HealthAssessmentEditViewScreen -> "Assessment Data"
+        Screen.HealthDataViewEditScreen -> "Health profile"
+        Screen.HealthAssessmentEditViewScreen -> "Assessment profile"
         else -> "WellnessWise"
     }
 }

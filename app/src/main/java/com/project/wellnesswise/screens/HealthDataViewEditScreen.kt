@@ -47,9 +47,9 @@ fun HealthDataViewEditScreen(
     var triglycerides by remember { mutableDoubleStateOf(0.0) }
     var cholesterol by remember { mutableDoubleStateOf(0.0) }
     var bloodSugar by remember { mutableDoubleStateOf(0.0) }
-    var systolic by remember { mutableStateOf(0) }
-    var diastolic by remember { mutableStateOf(0) }
-    var heartRate by remember { mutableStateOf(0) }
+    var systolic by remember { mutableIntStateOf(0) }
+    var diastolic by remember { mutableIntStateOf(0) }
+    var heartRate by remember { mutableIntStateOf(0) }
 
     // In HealthDataViewEditScreen's LaunchedEffect
     LaunchedEffect(Unit) {
@@ -153,7 +153,7 @@ fun HealthDataViewEditScreen(
             onHealthDataClick = { WellnessWiseAppRouter.navigateTo(Screen.HealthDataViewEditScreen) }, // Navigate to health data
             onAssessmentClick = { WellnessWiseAppRouter.navigateTo(Screen.HealthAssessmentEditViewScreen) },
             userData = userData, // Pass user data to NavigationDrawer
-            currentScreen = Screen.HealthDataScreen // Set current screen
+            currentScreen = Screen.HealthDataViewEditScreen // Set current screen
         )
     }
     SystemBackButtonHandler {
@@ -187,8 +187,7 @@ private fun fetch_HealthDataFromFirebase(onDataFetched: (Map<String, Any>?) -> U
 
 // Function to update health data in Firebase
 private fun updateHealthDataInFirebase(field: String, value: Any) {
-    val userId = FirebaseAuth.getInstance().currentUser?.uid
-    if (userId == null) return
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
     val db = FirebaseFirestore.getInstance()
     val updates = mapOf(field to value)
