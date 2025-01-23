@@ -163,7 +163,7 @@ fun UserProfileScreen(authViewModel: AuthViewModel, registrationViewModel: Regis
                             if (isDeleting) {
                                 Spacer(modifier = Modifier.height(16.dp))
                                 LoadingAnimation()
-                                Text("Deleting account and all associated viewModels... Please wait.",
+                                Text("Deleting account Please wait.",
                                     modifier = Modifier.padding(top = 8.dp))
                             }
                         }
