@@ -133,6 +133,8 @@ class RegistrationViewModel : ViewModel() {
             }
             is UIEvent.SaveHealthAssessmentClicked -> {
                 val isValid = validateHealthAssessment()
+                WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
+                saveHealthAssessmentData() // Save health assessment data to Firebase
                 if (isValid) {
                     _healthAssessmentValidated.value = true
                 } else {
@@ -156,18 +158,31 @@ class RegistrationViewModel : ViewModel() {
             }
         }
     }
+    private fun saveHealthAssessmentData() {
+        val user = auth.currentUser
+        if (user != null) {
+            val healthAssessmentData = getHealthAssessmentData() // Get the health assessment data
+
+            Log.d(TAG, "Saving health assessment data: $healthAssessmentData") // Log the data
+
+            firestore.collection("users").document(user.uid)
+                .update(healthAssessmentData) // Update the Firestore document with the new data
+                .addOnSuccessListener {
+                    Log.d(TAG, "Health assessment data saved successfully")
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "Error saving health assessment data", e)
+                }
+        } else {
+            Log.w(TAG, "User is not logged in, cannot save health assessment data")
+        }
+    }
 
     fun resetHealthAssessmentValidation() {
         _healthAssessmentValidated.value = false
     }
     private fun validateHealthAssessment(): Boolean {
-        val validationResults = Validator.validateRegistrationUIState(registrationUIState.value)
-        return validationResults.filterKeys {
-            it in listOf("familyDiabetes", "familyHeart", "familyCancer", "previousSurgeries",
-                "chronicConditions", "smoking", "alcoholConsumption", "physicalActivity",
-                "dietQuality", "sleepHours", "airQualityIndex", "exposureToPollutants",
-                "stressLevel", "accessToHealthcare")
-        }.all { it.value }
+        return true
     }
 
     private fun validateField(fieldName: String) {
@@ -266,7 +281,7 @@ class RegistrationViewModel : ViewModel() {
                     .set(getUserData())
                     .addOnSuccessListener {
                         Log.d(TAG, "User viewModels stored successfully")
-                        WellnessWiseAppRouter.navigateTo(Screen.HealthDataScreen)
+                        WellnessWiseAppRouter.navigateTo(Screen.HomeScreen)
                     }.addOnFailureListener { e ->
                         Log.w(TAG, "Error storing user viewModels", e)
                     }
@@ -305,7 +320,7 @@ class RegistrationViewModel : ViewModel() {
     }
 
     fun getHealthAssessmentData(): Map<String, Any> {
-        return mapOf(
+        val data = mapOf(
             "familyDiabetes" to registrationUIState.value.familyDiabetes,
             "familyHeart" to registrationUIState.value.familyHeart,
             "familyCancer" to registrationUIState.value.familyCancer,
@@ -321,8 +336,12 @@ class RegistrationViewModel : ViewModel() {
             "stressLevel" to registrationUIState.value.stressLevel,
             "accessToHealthcare" to registrationUIState.value.accessToHealthcare
         )
+        Log.d(TAG, "Health assessment data: $data")
+        return data
     }
+
     fun loadExistingHealthAssessmentData(userData: Map<String, Any>?) {
+        Log.d(TAG, "Loading health assessment data: $userData")
         userData?.let { data ->
             registrationUIState.value = registrationUIState.value.copy(
                 familyDiabetes = data["familyDiabetes"] as? String ?: registrationUIState.value.familyDiabetes,

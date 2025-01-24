@@ -51,7 +51,6 @@ fun HomeScreen(
     val heartRate by homeViewModel.heartRate.collectAsState()
     val bloodSugar by homeViewModel.bloodSugar.collectAsState()
     val cholesterol by homeViewModel.cholesterol.collectAsState()
-
     val systemUiController = rememberSystemUiController()
     val context = LocalContext.current
     val useDarkIcons = !isSystemInDarkTheme()
@@ -87,6 +86,26 @@ fun HomeScreen(
             else -> "Good night"
         }
     }
+// Define required fields for health assessment
+    val requiredHealthAssessmentFields = listOf(
+        "familyDiabetes", "familyHeart", "familyCancer", "previousSurgeries",
+        "chronicConditions", "smoking", "alcoholConsumption", "physicalActivity",
+        "dietQuality", "sleepHours", "airQualityIndex", "exposureToPollutants",
+        "stressLevel", "accessToHealthcare"
+    )
+
+// Check if health assessment is complete and has no missing values
+    val isHealthAssessmentComplete = requiredHealthAssessmentFields.all { field ->
+        when (val value = userData?.get(field)) {
+            // Check for non-null and non-default values
+            is String -> value.isNotEmpty() // Ensure strings are not empty
+            is Number -> value != 0 // Ensure numbers are not zero
+            is Boolean -> true // Booleans are always valid (true/false)
+            else -> false // Treat null or other types as invalid
+        }
+    }
+
+
 
     WellnessWiseTheme {
         NavigationDrawer(
@@ -105,72 +124,88 @@ fun HomeScreen(
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
                     )
-                    Text(
-                        text = "Check the prediction of your health below:",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
 
-                    HealthMetricCard(
-                        title = "Heart Rate",
-                        value = heartRate,
-                        unit = "bpm",
-                        color = MaterialTheme.colorScheme.onSurface,
-                        icon = Icons.Filled.Favorite,
-                        modifier = Modifier.fillMaxWidth(),
-                        isLargeCard = true,
-                    )
+                    if (isHealthAssessmentComplete) {
+                        // Show health metrics if the health assessment is complete
+                        Text(
+                            text = "Check the prediction of your health below:",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
 
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
                         HealthMetricCard(
-                            title = "Blood Pressure",
-                            value = bloodPressure,
-                            unit = "mmHg",
+                            title = "Heart Rate",
+                            value = heartRate,
+                            unit = "bpm",
                             color = MaterialTheme.colorScheme.onSurface,
-                            icon = Icons.Filled.MonitorHeart,
-                            modifier = Modifier.weight(1f),
+                            icon = Icons.Filled.Favorite,
+                            modifier = Modifier.fillMaxWidth(),
+                            isLargeCard = true,
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        ) {
+                            HealthMetricCard(
+                                title = "Blood Pressure",
+                                value = bloodPressure,
+                                unit = "mmHg",
+                                color = MaterialTheme.colorScheme.onSurface,
+                                icon = Icons.Filled.MonitorHeart,
+                                modifier = Modifier.weight(1f),
+                                isLargeCard = false,
+                            )
+
+                            HealthMetricCard(
+                                title = "Blood Sugar",
+                                value = bloodSugar,
+                                unit = "mg/dL",
+                                color = MaterialTheme.colorScheme.onSurface,
+                                icon = Icons.Filled.WaterDrop,
+                                modifier = Modifier.weight(1f),
+                                isLargeCard = false,
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        HealthMetricCard(
+                            title = "Cholesterol",
+                            value = cholesterol,
+                            unit = "mg/dL",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            icon = Icons.Filled.Analytics,
+                            modifier = Modifier.fillMaxWidth(),
                             isLargeCard = false,
                         )
 
-                        HealthMetricCard(
-                            title = "Blood Sugar",
-                            value = bloodSugar,
-                            unit = "mg/dL",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            icon = Icons.Filled.WaterDrop,
-                            modifier = Modifier.weight(1f),
-                            isLargeCard = false,
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        ActionButton(
+                            text = "Health Risk Predictions",
+                            icon = Icons.Filled.BubbleChart,
+                            onClick = {
+                                WellnessWiseAppRouter.navigateTo(Screen.PredictionsScreen)
+                            },
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    } else {
+                        // Show "Create Health Profile" button if the health assessment is incomplete
+                        Spacer(modifier = Modifier.height(24.dp))
+                        ActionButton(
+                            text = "Create Health Profile",
+                            icon = Icons.Filled.MonitorHeart,
+                            onClick = {
+                                WellnessWiseAppRouter.navigateTo(Screen.WelcomeScreen)
+                            },
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    HealthMetricCard(
-                        title = "Cholesterol",
-                        value = cholesterol,
-                        unit = "mg/dL",
-                        color = MaterialTheme.colorScheme.onSurface,
-                        icon = Icons.Filled.Analytics,
-                        modifier = Modifier.fillMaxWidth(),
-                        isLargeCard = false,
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    ActionButton(
-                        text = "Health Risk Predictions",
-                        icon = Icons.Filled.BubbleChart,
-                        onClick = {
-                            WellnessWiseAppRouter.navigateTo(Screen.PredictionsScreen)
-                        },
-                        color = MaterialTheme.colorScheme.primary,
-                    )
                     Spacer(modifier = Modifier.height(24.dp))
                 }
             },
@@ -179,8 +214,8 @@ fun HomeScreen(
             onHomeClick = { WellnessWiseAppRouter.navigateTo(Screen.HomeScreen) },
             userData = userData,
             currentScreen = Screen.HomeScreen,
-            onHealthDataClick = { WellnessWiseAppRouter.navigateTo(Screen.HealthDataViewEditScreen) }
-            , onAssessmentClick = {WellnessWiseAppRouter.navigateTo(Screen.HealthAssessmentEditViewScreen)}
+            onHealthDataClick = { WellnessWiseAppRouter.navigateTo(Screen.HealthDataViewEditScreen) },
+            onAssessmentClick = { WellnessWiseAppRouter.navigateTo(Screen.HealthAssessmentEditViewScreen) }
         )
     }
 }

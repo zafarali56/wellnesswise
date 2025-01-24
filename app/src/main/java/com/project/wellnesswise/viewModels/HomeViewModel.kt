@@ -28,7 +28,8 @@ class HomeViewModel : ViewModel() {
 
     private val _cholesterol = MutableStateFlow("N/A")
     val cholesterol: StateFlow<String> = _cholesterol
-
+    private val _isHealthAssessmentComplete = MutableStateFlow(false)
+    val isHealthAssessmentComplete: StateFlow<Boolean> = _isHealthAssessmentComplete
     private val _isRefreshing = MutableStateFlow(false)
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -37,6 +38,24 @@ class HomeViewModel : ViewModel() {
     init {
         checkForActiveSession()
     }
+
+    fun checkHealthAssessmentCompletion(userData: Map<String, Any>?) {
+        viewModelScope.launch {
+            val requiredFields = listOf(
+                "familyDiabetes", "familyHeart", "familyCancer", "previousSurgeries",
+                "chronicConditions", "smoking", "alcoholConsumption", "physicalActivity",
+                "dietQuality", "sleepHours", "airQualityIndex", "exposureToPollutants",
+                "stressLevel", "accessToHealthcare"
+            )
+
+            val isComplete = requiredFields.all { field ->
+                userData?.get(field) != null
+            }
+
+            _isHealthAssessmentComplete.value = isComplete
+        }
+    }
+
     fun getUserData(callback: (Map<String, Any>?) -> Unit) {
         viewModelScope.launch {
             val currentUser = auth.currentUser

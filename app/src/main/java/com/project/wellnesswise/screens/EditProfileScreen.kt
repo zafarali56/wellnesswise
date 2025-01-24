@@ -91,6 +91,7 @@ fun EditProfileScreen(
     fun getAllUserData(): Map<String, Any> {
         val updatedData = userData?.toMutableMap() ?: mutableMapOf()
 
+        // Basic profile fields
         updatedData["fullName"] = fullName
         updatedData["age"] = age.toIntOrNull() ?: updatedData["age"] ?: 0
         updatedData["weight"] = weight.toDoubleOrNull() ?: updatedData["weight"] ?: 0.0
@@ -99,6 +100,23 @@ fun EditProfileScreen(
         updatedData["triglycerides"] = triglycerides.toDoubleOrNull() ?: updatedData["triglycerides"] ?: 0.0
         updatedData["waistCircumference"] = waistCircumference.toDoubleOrNull() ?: updatedData["waistCircumference"] ?: 0.0
 
+        // Health assessment fields (preserve existing values if not updated)
+        updatedData["familyDiabetes"] = userData?.get("familyDiabetes") ?: ""
+        updatedData["familyHeart"] = userData?.get("familyHeart") ?: ""
+        updatedData["familyCancer"] = userData?.get("familyCancer") ?: ""
+        updatedData["previousSurgeries"] = userData?.get("previousSurgeries") ?: ""
+        updatedData["chronicConditions"] = userData?.get("chronicConditions") ?: ""
+        updatedData["smoking"] = userData?.get("smoking") ?: false
+        updatedData["alcoholConsumption"] = userData?.get("alcoholConsumption") ?: 0
+        updatedData["physicalActivity"] = userData?.get("physicalActivity") ?: 0
+        updatedData["dietQuality"] = userData?.get("dietQuality") ?: 0
+        updatedData["sleepHours"] = userData?.get("sleepHours") ?: 0
+        updatedData["airQualityIndex"] = userData?.get("airQualityIndex") ?: 0
+        updatedData["exposureToPollutants"] = userData?.get("exposureToPollutants") ?: 0
+        updatedData["stressLevel"] = userData?.get("stressLevel") ?: 0
+        updatedData["accessToHealthcare"] = userData?.get("accessToHealthcare") ?: 0
+
+        // Manual health data (if applicable)
         if (dataSourcePreference == "MANUAL") {
             updatedData["bloodPressure"] = bloodPressure
             updatedData["heartRate"] = heartRate.toIntOrNull() ?: updatedData["heartRate"] ?: 0

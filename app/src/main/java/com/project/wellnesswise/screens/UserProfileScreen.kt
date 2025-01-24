@@ -141,6 +141,7 @@ fun UserProfileScreen(authViewModel: AuthViewModel, registrationViewModel: Regis
             }
 
 
+
             if (showDeleteConfirmation) {
                 AlertDialog(
                     onDismissRequest = {

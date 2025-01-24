@@ -73,7 +73,8 @@ fun HealthAssessmentScreen    (
         if (healthAssessmentValidated) {
             when (mode) {
                 HealthAssessmentMode.SIGNUP -> {
-                    WellnessWiseAppRouter.navigateTo(Screen.SignUpScreen)
+                    WellnessWiseAppRouter.navigateTo(Screen.WelcomeScreen)
+
                 }
                 HealthAssessmentMode.EDIT -> {
                     onSave()
@@ -91,10 +92,38 @@ fun HealthAssessmentScreen    (
 
     val validationResults = registrationViewModel.validationResults.value
     MaterialTheme(colorScheme = colorScheme) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            when (mode) {
+                                HealthAssessmentMode.SIGNUP -> "Health Assessment"
+                                HealthAssessmentMode.EDIT -> "Edit Health Assessment"
+                            }
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                    )
+                )
+            },
+            containerColor = colorScheme.background
+        ) { innerPadding ->
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 16.dp)
+                    .padding(innerPadding),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
@@ -165,9 +194,9 @@ fun HealthAssessmentScreen    (
 
             }
         }
+    }
+
     SystemBackButtonHandler {
         onBack()
     }
-
 }
-

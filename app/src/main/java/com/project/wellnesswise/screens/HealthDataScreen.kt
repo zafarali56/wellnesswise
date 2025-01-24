@@ -249,7 +249,7 @@ fun HealthDataScreen(
                                     healthDataViewModel.sendHealthDataToFirestore()
 
                                     // After health data is saved, navigate to recommendation setup screen
-                                    WellnessWiseAppRouter.navigateTo(Screen.RecommendationSetupScreen)
+                                    WellnessWiseAppRouter.navigateTo(Screen.HealthAssessmentScreen)
 
                                 } catch (e: Exception) {
                                     println("Error saving health data: ${e.message}")

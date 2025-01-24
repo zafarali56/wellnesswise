@@ -2,7 +2,10 @@ package com.project.wellnesswise.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -90,7 +93,9 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
             LazyColumn(
                 state = scrollState,
                 contentPadding = innerPadding,
-                modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
             )  {
 
                     item {
@@ -116,8 +121,6 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                         }
                     }
                     item {
-                        Spacer(modifier = Modifier.height(10.dp))
-
                         Text(
                             text = "Provide your full name",
                             style = MaterialTheme.typography.bodySmall,
@@ -135,8 +138,6 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
 
                     }
                     item {
-                        Spacer(modifier = Modifier.height(10.dp))
-
                         Text(
                             text = "Enter an age between 1-120",
                             style = MaterialTheme.typography.bodySmall,
@@ -155,8 +156,6 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                     }
                     item {
 
-                        Spacer(modifier = Modifier.height(10.dp))
-
                         Text(
                             text = "Select your gender",
                             style = MaterialTheme.typography.bodySmall,
@@ -170,72 +169,56 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
                         )
 
                     }
-                    item {
-                        Spacer(modifier = Modifier.height(10.dp))
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp), // Add some vertical padding for better spacing
+                        horizontalArrangement = Arrangement.SpaceBetween, // Distribute space evenly
+                        verticalAlignment = Alignment.CenterVertically // Align items vertically in the center
+                    ) {
+                        // Height Field
+                        Box(
+                            modifier = Modifier
+                                .weight(1f) // Take up half of the available space
+                                .padding(end = 8.dp) // Add some padding between the fields
+                        ) {
+                            Column {
 
-
-                        Text(
-                            text = "Enter a height between 50-300 cm",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        MyNumberField(
-                            labelValue = stringResource(id = R.string.Height),
-                            initialValue = registrationUIState.height.toString(),
-                            onTextSelected = {
-                                registrationViewModel.onEvent(UIEvent.HeightChanged(it ?: 0))
-                            },
-                            isError = validationResults["height"] == false
-                        )
-
-                    }
-
-                    item {
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Text(
-                            text = "Enter a weight between 30-500 kg",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        MyNumberField(
-                            labelValue = stringResource(id = R.string.Weight),
-                            initialValue = registrationUIState.weight.toString(),
-                            onTextSelected = {
-                                registrationViewModel.onEvent(UIEvent.WeightChanged(it ?: 0))
-                            }, isError = validationResults["weight"] == false
-
-                        )
-
-
-                    }
-                    item {
-
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Text(
-                            text = "Please provide medical history",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        )
-                            Spacer(modifier = Modifier.height(10.dp))
-                        HealthAssessmentButton(
-                            text = "Health Assessment",
-                            onClick = {
-                                registrationViewModel.setMode(HealthAssessmentMode.SIGNUP)
-                                WellnessWiseAppRouter.navigateTo(Screen.HealthAssessmentScreen)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                MyNumberField(
+                                    labelValue = stringResource(id = R.string.Height),
+                                    initialValue = registrationUIState.height.toString(),
+                                    onTextSelected = {
+                                        registrationViewModel.onEvent(UIEvent.HeightChanged(it ?: 0))
+                                    },
+                                    isError = validationResults["height"] == false
+                                )
                             }
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        if (validationResults["medicalHistory"] == false) {
-                            Text(text = "Please provide all the answers", color = Color.Red)
                         }
 
+                        // Weight Field
+                        Box(
+                            modifier = Modifier
+                                .weight(1f) // Take up half of the available space
+                                .padding(start = 8.dp) // Add some padding between the fields
+                        ) {
+                            Column {
 
+                                Spacer(modifier = Modifier.height(4.dp))
+                                MyNumberField(
+                                    labelValue = stringResource(id = R.string.Weight),
+                                    initialValue = registrationUIState.weight.toString(),
+                                    onTextSelected = {
+                                        registrationViewModel.onEvent(UIEvent.WeightChanged(it ?: 0))
+                                    },
+                                    isError = validationResults["weight"] == false
+                                )
+                            }
+                        }
                     }
+                }
                     item {
-                        Spacer(modifier = Modifier.height(10.dp))
-
 
                         MyPasswordField(
                             labelValue = stringResource(id = R.string.Password),
@@ -254,7 +237,6 @@ fun SignUpScreen(registrationViewModel: RegistrationViewModel) {
 
                     }
                     item {
-                        Spacer(modifier = Modifier.height(10.dp))
                         CheckBoxComponent(
                             checked = registrationUIState.isPolicyAccepted,
                             onCheckedChange = {

@@ -30,6 +30,7 @@ import com.project.wellnesswise.screens.PredictionsScreen
 import com.project.wellnesswise.screens.RecommendationSetupScreen
 import com.project.wellnesswise.screens.SignUpScreen
 import com.project.wellnesswise.screens.TermsAndConditionsScreen
+import com.project.wellnesswise.screens.WelcomeScreen
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
@@ -95,7 +96,7 @@ fun WellnessWiseApp(
                 is Screen.RecommendationSetupScreen -> RecommendationSetupScreen()
                 is Screen.HealthDataViewEditScreen -> HealthDataViewEditScreen(authViewModel)
                 is Screen.HealthAssessmentEditViewScreen -> HealthAssessmentViewEditScreen(authViewModel, registrationViewModel)
-
+                is Screen.WelcomeScreen -> WelcomeScreen( onStartClick = { WellnessWiseAppRouter.navigateTo(Screen.HealthDataScreen) })
                 }
             }
         }
