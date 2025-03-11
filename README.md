@@ -5,7 +5,7 @@ The primary objective of the proposed project is to develop a mobile application
 
 ---
 
-## 🚀 Technologies Used  
+## Technologies Used  
 
 - **Kotlin** – Primary programming language for Android development.  
 - **Jetpack Compose** – Modern UI toolkit for building native interfaces.  
