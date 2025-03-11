@@ -5,37 +5,37 @@ Introduction The primary objective of the proposed project is to develop a mobil
 ## Screenshots
 
 1. **Assessment Profile**  
-   ![Assessment Profile](assessmentProfile.jpg)
+   ![Assessment Profile](img/assessmentProfile.jpg)
 
 2. **Edit Profile**  
-   ![Edit Profile](editProfile.jpg)
+   ![Edit Profile](img/editProfile.jpg)
 
 3. **Health Input**  
-   ![Health Input](healthInput.jpg)
+   ![Health Input](img/healthInput.jpg)
 
 4. **Home Screen**  
-   ![Home Screen](homescreen.jpg)
+   ![Home Screen](img/homescreen.jpg)
 
 5. **Login**  
-   ![Login](login.jpg)
+   ![Login](img/login.jpg)
 
 6. **Menu**  
-   ![Menu](menu.jpg)
+   ![Menu](img/menu.jpg)
 
 7. **Predictions**  
-   ![Predictions](predictions.jpg)
+   ![Predictions](img/predictions.jpg)
 
 8. **Recommendations**  
-   ![Recommendations](recommendations.jpg)
+   ![Recommendations](img/recommendations.jpg)
 
 9. **Sign Up**  
-   ![Sign Up](signup.jpg)
+   ![Sign Up](img/signup.jpg)
 
 10. **User Profile**  
-    ![User Profile](userProfile.jpg)
+    ![User Profile](img/userProfile.jpg)
 
 11. **Visualizations**  
-    ![Visualizations](visualizations2.jpg)
+    ![Visualizations](img/visualizations2.jpg)
 
 12. **Welcome Screen**  
-    ![Welcome Screen](welcomeScreen.jpg)
+    ![Welcome Screen](img/welcomeScreen.jpg)
